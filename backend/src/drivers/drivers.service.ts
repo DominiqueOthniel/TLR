@@ -34,6 +34,7 @@ export class DriversService {
       telephone: dto.telephone,
       cni: dto.cni,
       numeroPermis: dto.numeroPermis,
+      numeroCompteBancaire: dto.numeroCompteBancaire,
       photo,
     });
     const saved = await this.driverRepository.save(driver);

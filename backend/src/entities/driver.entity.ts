@@ -22,6 +22,9 @@ export class Driver {
   numeroPermis?: string;
 
   @Column({ type: 'varchar', nullable: true })
+  numeroCompteBancaire?: string;
+
+  @Column({ type: 'varchar', nullable: true })
   photo?: string;
 
   @OneToMany(() => DriverTransaction, (tx) => tx.driver, { cascade: true })

@@ -46,6 +46,7 @@ export default function Drivers() {
     telephone: '',
     cni: '',
     numeroPermis: '',
+    numeroCompteBancaire: '',
     photo: '',
   });
 
@@ -72,7 +73,7 @@ export default function Drivers() {
   };
 
   const resetDriverForm = () => {
-    setDriverForm({ nom: '', prenom: '', telephone: '', cni: '', numeroPermis: '', photo: '' });
+    setDriverForm({ nom: '', prenom: '', telephone: '', cni: '', numeroPermis: '', numeroCompteBancaire: '', photo: '' });
     setPhotoPreview('');
     setEditingDriver(null);
   };
@@ -85,6 +86,7 @@ export default function Drivers() {
       telephone: driver.telephone,
       cni: driver.cni || '',
       numeroPermis: driver.numeroPermis || '',
+      numeroCompteBancaire: driver.numeroCompteBancaire || '',
       photo: driver.photo || '',
     });
     setPhotoPreview(driver.photo || '');
@@ -103,6 +105,7 @@ export default function Drivers() {
             telephone: driverForm.telephone,
             cni: driverForm.cni || undefined,
             numeroPermis: driverForm.numeroPermis || undefined,
+            numeroCompteBancaire: driverForm.numeroCompteBancaire || undefined,
             photo: driverForm.photo || undefined,
           });
           toast.success('Chauffeur modifié avec succès');
@@ -113,6 +116,7 @@ export default function Drivers() {
             telephone: driverForm.telephone,
             cni: driverForm.cni || undefined,
             numeroPermis: driverForm.numeroPermis || undefined,
+            numeroCompteBancaire: driverForm.numeroCompteBancaire || undefined,
             photo: driverForm.photo || undefined,
             transactions: [],
           });
@@ -183,8 +187,9 @@ export default function Drivers() {
       const matchesTelephone = driver.telephone.includes(search);
       const matchesCni = driver.cni?.toLowerCase().includes(search);
       const matchesPermis = driver.numeroPermis?.toLowerCase().includes(search);
+      const matchesCompte = driver.numeroCompteBancaire?.toLowerCase().includes(search);
       
-      if (!matchesPrenom && !matchesNom && !matchesTelephone && !matchesCni && !matchesPermis) {
+      if (!matchesPrenom && !matchesNom && !matchesTelephone && !matchesCni && !matchesPermis && !matchesCompte) {
         return false;
       }
     }
@@ -270,6 +275,7 @@ export default function Drivers() {
         { header: 'Téléphone', value: (d) => d.telephone },
         { header: 'CNI', value: (d) => d.cni || '-' },
         { header: 'Permis', value: (d) => d.numeroPermis || '-' },
+        { header: 'Compte bancaire', value: (d) => d.numeroCompteBancaire || '-' },
         { header: 'Statut', value: (d) => isDriverOnMission(d.id, trips, parcelExpeditions) ? 'En mission' : 'Disponible' },
         { header: 'Trajets (total)', value: (d) => getDriverTripCounts(d.id, trips).total },
         { header: 'Trajets terminés', value: (d) => getDriverTripCounts(d.id, trips).termines },
@@ -316,6 +322,7 @@ export default function Drivers() {
         { header: 'Téléphone', value: (d) => `${EMOJI.telephone} ${d.telephone}` },
         { header: 'CNI', value: (d) => d.cni ? `🪪 ${d.cni}` : '-' },
         { header: 'Permis', value: (d) => d.numeroPermis ? `🚘 ${d.numeroPermis}` : '-' },
+        { header: 'Compte bancaire', value: (d) => d.numeroCompteBancaire ? `🏦 ${d.numeroCompteBancaire}` : '-' },
         { header: 'Statut', value: (d) => isDriverOnMission(d.id, trips, parcelExpeditions) ? `${EMOJI.camion} En mission` : `${EMOJI.succes} Disponible` },
         { header: 'Total', value: (d) => getDriverTripCounts(d.id, trips).total },
         { header: 'Terminés', value: (d) => getDriverTripCounts(d.id, trips).termines },
@@ -421,6 +428,7 @@ export default function Drivers() {
                 <span>${EMOJI.telephone} ${driver.telephone}</span>
                 ${driver.cni ? `<span>${EMOJI.cni} ${driver.cni}</span>` : ''}
                 ${driver.numeroPermis ? `<span>🚘 Permis: ${driver.numeroPermis}</span>` : ''}
+                ${driver.numeroCompteBancaire ? `<span>🏦 Compte bancaire: ${driver.numeroCompteBancaire}</span>` : ''}
                 <span class="status ${onMission ? 'on-mission' : 'available'}">${onMission ? `${EMOJI.camion} En mission` : `${EMOJI.succes} Disponible`}</span>
               </div>
             </div>
@@ -807,6 +815,15 @@ export default function Drivers() {
                     placeholder="P-1234-2026"
                   />
                 </div>
+                <div>
+                  <Label htmlFor="numeroCompteBancaire">Numéro de compte bancaire</Label>
+                  <Input
+                    id="numeroCompteBancaire"
+                    value={driverForm.numeroCompteBancaire}
+                    onChange={(e) => setDriverForm({ ...driverForm, numeroCompteBancaire: e.target.value })}
+                    placeholder="Ex: CM21 1000 2000 3000 ou 123456789"
+                  />
+                </div>
                   <div>
                     <Label htmlFor="photo">Photo du chauffeur</Label>
                     <Input
@@ -877,7 +894,7 @@ export default function Drivers() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="search-drivers"
-                  placeholder="Rechercher par nom, prénom, téléphone, CNI ou permis..."
+                  placeholder="Rechercher par nom, prénom, téléphone, CNI, permis ou compte bancaire..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -1046,6 +1063,11 @@ export default function Drivers() {
                       {driver.numeroPermis && (
                         <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
                           🚘 Permis: {driver.numeroPermis}
+                        </p>
+                      )}
+                      {driver.numeroCompteBancaire && (
+                        <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                          🏦 Compte bancaire: {driver.numeroCompteBancaire}
                         </p>
                       )}
                       <div className="mt-2 flex flex-wrap items-center gap-2">

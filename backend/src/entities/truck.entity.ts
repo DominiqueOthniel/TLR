@@ -51,6 +51,12 @@ export class Truck {
   @Column({ type: 'uuid', nullable: true })
   chauffeurId?: string;
 
+  @Column({ type: 'varchar', nullable: true })
+  assuranceSociete?: string;
+
+  @Column({ type: 'date', nullable: true })
+  assuranceDateExpiration?: string;
+
   @ManyToOne(() => ThirdParty, { nullable: true })
   @JoinColumn({ name: 'proprietaireId' })
   proprietaire?: ThirdParty;

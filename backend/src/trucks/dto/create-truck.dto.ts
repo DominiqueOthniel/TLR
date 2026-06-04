@@ -38,4 +38,12 @@ export class CreateTruckDto {
   @IsOptional()
   @IsString()
   chauffeurId?: string;
+
+  @IsOptional()
+  @IsString()
+  assuranceSociete?: string;
+
+  @IsOptional()
+  @IsString()
+  assuranceDateExpiration?: string;
 }

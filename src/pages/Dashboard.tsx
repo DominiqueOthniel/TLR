@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Truck, Route, DollarSign, TrendingUp, TrendingDown, FileText, Users, Package, AlertCircle, LayoutDashboard, Building2, CreditCard, Wallet, RefreshCw, HardDrive, Upload, Receipt, Layers } from 'lucide-react';
+import { Truck, Route, DollarSign, TrendingUp, TrendingDown, FileText, Users, Package, AlertCircle, LayoutDashboard, Building2, CreditCard, Wallet, RefreshCw, HardDrive, Upload, Receipt, Layers, ShoppingCart } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, LineChart, Line, Area, AreaChart } from 'recharts';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -174,6 +174,7 @@ export default function Dashboard() {
     { name: 'Camions', href: '/camions', icon: Truck, color: 'from-purple-500 to-pink-500', bgColor: 'bg-purple-50 dark:bg-purple-950/30', borderColor: 'border-purple-200 dark:border-purple-800' },
     { name: 'Trajets', href: '/trajets', icon: Route, color: 'from-green-500 to-emerald-500', bgColor: 'bg-green-50 dark:bg-green-950/30', borderColor: 'border-green-200 dark:border-green-800' },
     { name: 'Caisse', href: '/caisse', icon: Wallet, color: 'from-green-500 to-emerald-500', bgColor: 'bg-green-50 dark:bg-green-950/30', borderColor: 'border-green-200 dark:border-green-800' },
+    { name: 'Frais acquisition', href: '/frais-acquisition', icon: ShoppingCart, color: 'from-teal-500 to-emerald-500', bgColor: 'bg-teal-50 dark:bg-teal-950/30', borderColor: 'border-teal-200 dark:border-teal-800' },
     { name: 'Factures', href: '/factures', icon: FileText, color: 'from-indigo-500 to-blue-500', bgColor: 'bg-indigo-50 dark:bg-indigo-950/30', borderColor: 'border-indigo-200 dark:border-indigo-800' },
     { name: 'Chauffeurs', href: '/chauffeurs', icon: Users, color: 'from-cyan-500 to-teal-500', bgColor: 'bg-cyan-50 dark:bg-cyan-950/30', borderColor: 'border-cyan-200 dark:border-cyan-800' },
     { name: 'Tiers', href: '/tiers', icon: Building2, color: 'from-violet-500 to-purple-500', bgColor: 'bg-violet-50 dark:bg-violet-950/30', borderColor: 'border-violet-200 dark:border-violet-800' },

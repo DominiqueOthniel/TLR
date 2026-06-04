@@ -96,6 +96,8 @@ export interface TruckPayload {
   photo?: string;
   proprietaireId?: string;
   chauffeurId?: string;
+  assuranceSociete?: string;
+  assuranceDateExpiration?: string;
 }
 
 export interface TripPayload {
@@ -166,6 +168,7 @@ export interface DriverPayload {
   telephone: string;
   cni?: string;
   numeroPermis?: string;
+  numeroCompteBancaire?: string;
   photo?: string;
   transactions?: Array<{ type: 'apport' | 'sortie'; montant: number; date: string; description: string }>;
 }

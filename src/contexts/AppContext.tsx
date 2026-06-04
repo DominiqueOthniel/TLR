@@ -30,6 +30,8 @@ export interface Truck {
   photo?: string;
   proprietaireId?: string;
   chauffeurId?: string;
+  assuranceSociete?: string;
+  assuranceDateExpiration?: string;
 }
 
 export type TripStatus = 'planifie' | 'en_cours' | 'termine' | 'annule';
@@ -148,6 +150,7 @@ export interface Driver {
   telephone: string;
   cni?: string;
   numeroPermis?: string;
+  numeroCompteBancaire?: string;
   photo?: string;
   transactions: DriverTransaction[];
 }
@@ -203,6 +206,8 @@ function normalizeTruck(r: Record<string, unknown>): Truck {
     photo: r.photo ? String(r.photo) : undefined,
     proprietaireId: r.proprietaireId ? String(r.proprietaireId) : undefined,
     chauffeurId: r.chauffeurId ? String(r.chauffeurId) : undefined,
+    assuranceSociete: r.assuranceSociete ? String(r.assuranceSociete) : undefined,
+    assuranceDateExpiration: r.assuranceDateExpiration ? String(r.assuranceDateExpiration) : undefined,
   };
 }
 
@@ -377,6 +382,7 @@ function normalizeDriver(r: Record<string, unknown>): Driver {
     telephone: String(r.telephone),
     cni: r.cni ? String(r.cni) : undefined,
     numeroPermis: r.numeroPermis ? String(r.numeroPermis) : undefined,
+    numeroCompteBancaire: r.numeroCompteBancaire ? String(r.numeroCompteBancaire) : undefined,
     photo: r.photo ? String(r.photo) : undefined,
     transactions,
   };

@@ -95,6 +95,8 @@ export default function Trucks() {
     photo: '',
     proprietaireId: '',
     chauffeurId: '',
+    assuranceSociete: '',
+    assuranceDateExpiration: '',
   });
 
   const resetForm = () => {
@@ -109,6 +111,8 @@ export default function Trucks() {
       photo: '',
       proprietaireId: '',
       chauffeurId: '',
+      assuranceSociete: '',
+      assuranceDateExpiration: '',
     });
     setEditingTruck(null);
     setPhotoPreview('');
@@ -155,6 +159,8 @@ export default function Trucks() {
         photo: formData.photo || undefined,
         proprietaireId: formData.proprietaireId || undefined,
         chauffeurId: formData.chauffeurId || undefined,
+        assuranceSociete: formData.assuranceSociete || undefined,
+        assuranceDateExpiration: formData.assuranceDateExpiration || undefined,
       };
       await withGuard(async () => {
         try {
@@ -202,6 +208,8 @@ export default function Trucks() {
       photo: formData.photo || undefined,
       proprietaireId: formData.proprietaireId || undefined,
       chauffeurId: formData.chauffeurId || undefined,
+      assuranceSociete: formData.assuranceSociete || undefined,
+      assuranceDateExpiration: formData.assuranceDateExpiration || undefined,
     };
     await withGuard(async () => {
       try {
@@ -238,6 +246,8 @@ export default function Trucks() {
       photo: truck.photo || '',
       proprietaireId: truck.proprietaireId || '',
       chauffeurId: truck.chauffeurId || '',
+      assuranceSociete: truck.assuranceSociete || '',
+      assuranceDateExpiration: truck.assuranceDateExpiration || '',
     });
     setPhotoPreview(truck.photo || '');
     setIsDialogOpen(true);
@@ -289,8 +299,9 @@ export default function Trucks() {
         const matchesImmatriculation = truck.immatriculation.toLowerCase().includes(search);
         const matchesModele = truck.modele?.toLowerCase().includes(search);
         const matchesProprietaire = truck.proprietaireId ? (thirdParties.find(tp => tp.id === truck.proprietaireId)?.nom || '').toLowerCase().includes(search) : false;
+        const matchesAssurance = truck.assuranceSociete?.toLowerCase().includes(search);
         
-        if (!matchesImmatriculation && !matchesModele && !matchesProprietaire) {
+        if (!matchesImmatriculation && !matchesModele && !matchesProprietaire && !matchesAssurance) {
           return false;
         }
       }
@@ -397,6 +408,8 @@ export default function Trucks() {
           return chauffeur ? `${chauffeur.prenom} ${chauffeur.nom}` : '-';
         }},
         { header: 'Propriétaire', value: (t) => t.proprietaireId ? (thirdParties.find(tp => tp.id === t.proprietaireId)?.nom || '-') : '-' },
+        { header: 'Société assurance', value: (t) => t.assuranceSociete || '-' },
+        { header: 'Expiration assurance', value: (t) => t.assuranceDateExpiration ? new Date(t.assuranceDateExpiration).toLocaleDateString('fr-FR') : '-' },
         { header: 'Trajets terminés', value: (t) => calculateTruckStats(t.id, trips, expenses, invoices, parcelExpeditions).tripsCount },
         { header: 'Trajets annulés', value: (t) => calculateTruckStats(t.id, trips, expenses, invoices, parcelExpeditions).tripsCancelledCount },
         { header: 'Chiffre d’affaires (FCFA)', value: (t) => calculateTruckStats(t.id, trips, expenses, invoices, parcelExpeditions).revenue },
@@ -444,6 +457,11 @@ export default function Trucks() {
           return chauffeur ? `👤 ${chauffeur.prenom} ${chauffeur.nom}` : '-';
         }},
         { header: 'Propriétaire', value: (t) => t.proprietaireId ? (thirdParties.find(tp => tp.id === t.proprietaireId)?.nom || '-') : '-' },
+        { header: 'Assurance', value: (t) => {
+          const expiration = t.assuranceDateExpiration ? new Date(t.assuranceDateExpiration).toLocaleDateString('fr-FR') : null;
+          if (t.assuranceSociete && expiration) return `${t.assuranceSociete} · expire le ${expiration}`;
+          return t.assuranceSociete || (expiration ? `Expire le ${expiration}` : '-');
+        }},
         { header: 'Trajets terminés', value: (t) => calculateTruckStats(t.id, trips, expenses, invoices, parcelExpeditions).tripsCount },
         { header: 'Trajets annulés', value: (t) => calculateTruckStats(t.id, trips, expenses, invoices, parcelExpeditions).tripsCancelledCount },
         { 
@@ -631,6 +649,26 @@ export default function Trucks() {
                     required
                   />
                 </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="assuranceSociete">Société d’assurance</Label>
+                    <Input
+                      id="assuranceSociete"
+                      value={formData.assuranceSociete}
+                      onChange={(e) => setFormData({ ...formData, assuranceSociete: e.target.value })}
+                      placeholder="Ex: AXA, NSIA, Activa..."
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="assuranceDateExpiration">Expiration assurance</Label>
+                    <Input
+                      id="assuranceDateExpiration"
+                      type="date"
+                      value={formData.assuranceDateExpiration}
+                      onChange={(e) => setFormData({ ...formData, assuranceDateExpiration: e.target.value })}
+                    />
+                  </div>
+                </div>
                 <div>
                   <Label htmlFor="proprietaire">
                     Propriétaire
@@ -788,7 +826,7 @@ export default function Trucks() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="search-trucks"
-                  placeholder="Rechercher (immat., modèle, propriétaire)"
+                  placeholder="Rechercher (immat., modèle, propriétaire, assurance)"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 min-w-0 w-full"
@@ -1015,7 +1053,7 @@ export default function Trucks() {
         </CardHeader>
         <CardContent className="p-0 sm:p-6">
           <div className="overflow-x-auto">
-          <Table className="min-w-[900px]">
+          <Table className="min-w-[1050px]">
             <TableHeader>
               <TableRow>
                 <TableHead>Immatriculation</TableHead>
@@ -1024,6 +1062,7 @@ export default function Trucks() {
                 <TableHead>Statut</TableHead>
                 <TableHead>Chauffeur attitré</TableHead>
                 <TableHead>Propriétaire</TableHead>
+                <TableHead>Assurance</TableHead>
                 <TableHead className="whitespace-normal min-w-[7rem]">Trajets</TableHead>
                 <TableHead>Mise en circulation</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -1032,7 +1071,7 @@ export default function Trucks() {
             <TableBody>
               {sortedTrucks.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                     Aucun camion ne correspond aux critères de filtrage sélectionnés
                   </TableCell>
                 </TableRow>
@@ -1087,6 +1126,20 @@ export default function Trucks() {
                       <span className="text-sm">
                         {thirdParties?.find(tp => tp.id === truck.proprietaireId)?.nom || '-'}
                       </span>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">-</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {truck.assuranceSociete || truck.assuranceDateExpiration ? (
+                      <div className="text-sm">
+                        <p className="font-medium">{truck.assuranceSociete || '-'}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {truck.assuranceDateExpiration
+                            ? `Expire le ${new Date(truck.assuranceDateExpiration).toLocaleDateString('fr-FR')}`
+                            : 'Expiration non renseignée'}
+                        </p>
+                      </div>
                     ) : (
                       <span className="text-sm text-muted-foreground">-</span>
                     )}
@@ -1205,6 +1258,17 @@ export default function Trucks() {
                     ? (thirdParties?.find(tp => tp.id === viewingTruck.proprietaireId)?.nom || '-')
                     : <span className="text-muted-foreground">Aucun</span>
                   }
+                </p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Assurance</p>
+                <p className="text-lg font-semibold">
+                  {viewingTruck?.assuranceSociete || <span className="text-muted-foreground">Non renseignée</span>}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {viewingTruck?.assuranceDateExpiration
+                    ? `Expire le ${new Date(viewingTruck.assuranceDateExpiration).toLocaleDateString('fr-FR')}`
+                    : 'Date d’expiration non renseignée'}
                 </p>
               </div>
               <div>
