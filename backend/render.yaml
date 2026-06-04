@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: goofe-api
+    runtime: node
+    region: frankfurt
+    plan: free
+    rootDir: .
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DATABASE_URL
+        sync: false   # à renseigner manuellement dans le dashboard Render
+      - key: DB_SYNCHRONIZE
+        value: "true"   # mettre "false" après le 1er déploiement
+      - key: FRONTEND_URL
+        sync: false   # ex: https://goofe.netlify.app
+    healthCheckPath: /api/health

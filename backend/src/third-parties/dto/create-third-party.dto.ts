@@ -1,0 +1,26 @@
+import { IsString, IsOptional, IsIn } from 'class-validator';
+
+export class CreateThirdPartyDto {
+  @IsString()
+  nom: string;
+
+  @IsOptional()
+  @IsString()
+  telephone?: string;
+
+  @IsOptional()
+  @IsString()
+  email?: string;
+
+  @IsOptional()
+  @IsString()
+  adresse?: string;
+
+  @IsString()
+  @IsIn(['proprietaire', 'client', 'fournisseur'])
+  type: 'proprietaire' | 'client' | 'fournisseur';
+
+  @IsOptional()
+  @IsString()
+  notes?: string;
+}

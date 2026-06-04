@@ -1,0 +1,350 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 25% 97%;
+    --foreground: 222 30% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 30% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 30% 12%;
+
+    --primary: 252 87% 62%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 94%;
+    --secondary-foreground: 222 30% 20%;
+
+    --muted: 220 18% 94%;
+    --muted-foreground: 220 12% 50%;
+
+    --accent: 252 87% 62%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --border: 220 18% 90%;
+    --input: 220 18% 92%;
+    --ring: 252 87% 62%;
+
+    --radius: 0.875rem;
+
+    /* Sidebar */
+    --sidebar-background: 232 35% 14%;
+    --sidebar-foreground: 220 20% 92%;
+    --sidebar-primary: 252 87% 62%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 232 30% 20%;
+    --sidebar-accent-foreground: 220 20% 92%;
+    --sidebar-border: 232 28% 22%;
+    --sidebar-ring: 252 87% 62%;
+
+    /* Charts */
+    --chart-1: 252 87% 62%;
+    --chart-2: 142 71% 45%;
+    --chart-3: 199 89% 48%;
+    --chart-4: 27 96% 55%;
+    --chart-5: 330 80% 55%;
+  }
+
+  .dark {
+    --background: 232 35% 10%;
+    --foreground: 220 20% 94%;
+
+    --card: 232 30% 13%;
+    --card-foreground: 220 20% 94%;
+
+    --popover: 232 30% 13%;
+    --popover-foreground: 220 20% 94%;
+
+    --primary: 252 87% 68%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 232 28% 18%;
+    --secondary-foreground: 220 20% 80%;
+
+    --muted: 232 28% 18%;
+    --muted-foreground: 220 15% 60%;
+
+    --accent: 252 87% 68%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 65% 50%;
+    --success-foreground: 0 0% 100%;
+
+    --border: 232 28% 22%;
+    --input: 232 28% 20%;
+    --ring: 252 87% 68%;
+
+    --sidebar-background: 232 38% 10%;
+    --sidebar-foreground: 220 20% 92%;
+    --sidebar-primary: 252 87% 68%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 232 30% 16%;
+    --sidebar-accent-foreground: 220 20% 92%;
+    --sidebar-border: 232 28% 20%;
+    --sidebar-ring: 252 87% 68%;
+
+    --chart-1: 252 87% 68%;
+    --chart-2: 142 65% 55%;
+    --chart-3: 199 89% 58%;
+    --chart-4: 27 96% 62%;
+    --chart-5: 330 80% 62%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tight;
+  }
+}
+
+/* =====================================================
+   UTILITAIRES PREMIUM
+   ===================================================== */
+@layer components {
+
+  /* Gradient de texte principal */
+  .gradient-text {
+    @apply bg-gradient-to-r from-violet-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent;
+  }
+
+  /* Glassmorphism cards */
+  .glass-card {
+    @apply bg-white/70 dark:bg-white/5 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-xl;
+  }
+
+  /* Hover card avec lift */
+  .card-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10;
+  }
+
+  /* Badge glow */
+  .badge-glow {
+    @apply shadow-lg shadow-primary/30;
+  }
+
+  /* Stat card moderne */
+  .stat-card {
+    @apply relative overflow-hidden rounded-2xl border bg-card p-5 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-0.5;
+  }
+
+  /* Bouton premium */
+  .btn-premium {
+    @apply relative overflow-hidden bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold rounded-xl px-5 py-2.5 shadow-lg shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0;
+  }
+
+  /* Sidebar item */
+  .nav-item {
+    @apply group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 relative cursor-pointer;
+  }
+
+  .nav-item-active {
+    @apply bg-primary/15 text-primary font-semibold;
+  }
+
+  .nav-item-inactive {
+    @apply text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground;
+  }
+}
+
+/* =====================================================
+   ANIMATIONS
+   ===================================================== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4); }
+  50%       { box-shadow: 0 0 0 8px hsl(var(--primary) / 0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-6px); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.animate-fade-in-up     { animation: fadeInUp 0.45s ease-out forwards; }
+.animate-fade-in-scale  { animation: fadeInScale 0.35s ease-out forwards; }
+.animate-float          { animation: float 4s ease-in-out infinite; }
+.animate-spin-slow      { animation: spin-slow 12s linear infinite; }
+.animate-pulse-glow     { animation: pulse-glow 2.5s ease-in-out infinite; }
+
+.shimmer {
+  background: linear-gradient(90deg,
+    hsl(var(--muted)) 25%,
+    hsl(var(--muted-foreground) / 0.1) 50%,
+    hsl(var(--muted)) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Délais d'animation pour les grilles */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+
+/* =====================================================
+   SCROLLBAR PERSONNALISÉE
+   ===================================================== */
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.35);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.6);
+}
+
+/* =====================================================
+   PATTERNS DE FOND (éviter inline styles)
+   ===================================================== */
+.bg-dot-pattern {
+  background-image: radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+.login-orb-2 {
+  animation: float 4s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+/* =====================================================
+   FOCUS VISIBLE
+   ===================================================== */
+*:focus-visible {
+  @apply outline-none ring-2 ring-primary/60 ring-offset-2 ring-offset-background;
+}
+
+/* =====================================================
+   IMPRESSION FACTURES
+   ===================================================== */
+@media print {
+  @page {
+    margin: 14mm 12mm;
+    size: A4;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .invoice-print,
+  .invoice-print * {
+    visibility: visible;
+  }
+
+  .invoice-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    max-width: 100%;
+    min-height: auto;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    color: #0f172a !important;
+    box-shadow: none !important;
+    border: none !important;
+    overflow: visible !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    font-family: ui-sans-serif, system-ui, 'Segoe UI', Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.45;
+  }
+
+  /* Titres */
+  .invoice-print h3 {
+    font-size: 14pt;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .invoice-print h4 {
+    font-size: 11pt;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #0f172a !important;
+    border-bottom: 1px solid #cbd5e1;
+    padding-bottom: 0.25rem;
+  }
+
+  /* Texte atténué → lisible à l’impression */
+  .invoice-print .text-muted-foreground {
+    color: #64748b !important;
+  }
+
+  /* Montants / accents */
+  .invoice-print .text-primary {
+    color: #1d4ed8 !important;
+  }
+  .invoice-print .text-green-600,
+  .invoice-print .text-green-700 {
+    color: #15803d !important;
+  }
+  .invoice-print .text-orange-600,
+  .invoice-print .text-orange-400,
+  .invoice-print .text-orange-700 {
+    color: #c2410c !important;
+  }
+
+  /* Panneaux (remplace fonds semi-transparents peu visibles) */
+  .invoice-print-panel {
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    padding: 14px !important;
+  }
+
+  .invoice-print .border-border {
+    border-color: #cbd5e1 !important;
+  }
+
+  .invoice-print .rounded-lg {
+    border-radius: 6px !important;
+  }
+
+  .no-print,
+  button {
+    display: none !important;
+  }
+}
