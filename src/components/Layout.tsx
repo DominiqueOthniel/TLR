@@ -183,7 +183,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
       {/* ===== SIDEBAR MOBILE ===== */}
       <div className={cn(
-        'fixed inset-y-0 left-0 z-50 w-72 lg:hidden transition-transform duration-300 ease-in-out',
+        'fixed inset-y-0 left-0 z-50 w-72 lg:hidden transition-transform duration-500 ease-out',
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       )}>
         <SidebarContent
@@ -201,7 +201,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       {/* ===== SIDEBAR DESKTOP ===== */}
       <div
         className={cn(
-          'hidden lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-64 lg:flex-col lg:z-30 transition-transform duration-300 ease-in-out',
+          'hidden lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-64 lg:flex-col lg:z-30 transition-transform duration-500 ease-out',
           desktopSidebarHidden && '-translate-x-full pointer-events-none',
         )}
         aria-hidden={desktopSidebarHidden}
@@ -218,13 +218,13 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       </div>
 
       {/* ===== MAIN CONTENT ===== */}
-      <div className={cn('relative z-10 transition-[padding] duration-300 ease-in-out', desktopSidebarHidden ? 'lg:pl-0' : 'lg:pl-64')}>
+      <div className={cn('relative z-10 transition-[padding] duration-500 ease-out', desktopSidebarHidden ? 'lg:pl-0' : 'lg:pl-64')}>
         {/* Topbar */}
-        <header className="sticky top-0 z-40 flex h-14 items-center gap-2 sm:gap-3 border-b border-border/60 bg-card/90 backdrop-blur-md px-4 sm:px-6 shadow-sm">
+        <header className="sticky top-0 z-40 flex h-14 items-center gap-2 sm:gap-3 border-b border-border/60 bg-card/85 backdrop-blur-xl px-4 sm:px-6 shadow-sm transition-all duration-300">
           {/* Bouton menu mobile */}
           <button
             type="button"
-            className="lg:hidden flex items-center justify-center h-9 w-9 rounded-xl bg-muted/60 hover:bg-muted text-foreground transition-colors"
+            className="lg:hidden flex items-center justify-center h-9 w-9 rounded-xl bg-muted/60 hover:bg-muted text-foreground transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
             onClick={() => setSidebarOpen(true)}
             aria-label="Ouvrir le menu"
           >
@@ -234,7 +234,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           {/* Masquer / afficher la sidebar (desktop) */}
           <button
             type="button"
-            className="hidden lg:flex items-center justify-center h-9 w-9 rounded-xl bg-muted/60 hover:bg-muted text-foreground transition-colors shrink-0"
+            className="hidden lg:flex items-center justify-center h-9 w-9 rounded-xl bg-muted/60 hover:bg-muted text-foreground transition-all duration-300 hover:-translate-y-0.5 active:scale-95 shrink-0"
             onClick={toggleDesktopSidebar}
             aria-label={desktopSidebarHidden ? 'Afficher le menu latéral' : 'Masquer le menu latéral'}
             title={desktopSidebarHidden ? 'Afficher le menu' : 'Masquer le menu'}
@@ -244,7 +244,13 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
           {/* Titre de la page courante */}
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <AppLogo variant="header" className="hidden sm:inline-flex" />
+            <div className="hidden sm:flex items-center gap-2 shrink-0">
+              <AppLogo variant="compact" />
+              <div className="leading-tight">
+                <p className="text-sm font-black tracking-tight text-blue-900 dark:text-blue-200">SIA-TLR</p>
+                <p className="text-[9px] uppercase tracking-[0.18em] text-rose-800/70 dark:text-rose-300/70">Transport</p>
+              </div>
+            </div>
             <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50 hidden sm:inline" />
             <h1 className="text-sm font-semibold text-foreground truncate">{currentPage}</h1>
           </div>
@@ -266,7 +272,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         </header>
 
         {/* Contenu principal */}
-        <main className="py-5 px-4 sm:px-6 lg:px-7 min-h-[calc(100vh-3.5rem)]">
+        <main className="py-5 px-4 sm:px-6 lg:px-7 min-h-[calc(100vh-3.5rem)] animate-ios-page-enter">
           {children}
         </main>
       </div>
@@ -308,8 +314,14 @@ function SidebarContent({
 
       {/* Logo */}
       <div className="flex items-center justify-between h-20 px-4 border-b border-sidebar-border/50 flex-shrink-0 gap-2">
-        <div className="flex items-center min-w-0">
-          <AppLogo variant="sidebar" />
+        <div className="flex items-center gap-3 min-w-0">
+          <AppLogo variant="compact" />
+          <div className="min-w-0">
+            <p className="text-lg font-black leading-none tracking-tight text-white">SIA-TLR</p>
+            <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-amber-300/80">
+              Transport · Logistique
+            </p>
+          </div>
         </div>
         <div className="flex items-center gap-0.5 shrink-0">
           {onRequestHideDesktop && (
