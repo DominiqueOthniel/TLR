@@ -1,13 +1,13 @@
 ﻿import { cn } from '@/lib/utils';
 
-/** Logo applicatif — fichier servi depuis `public/logotruck.jpg`. */
-export const APP_LOGO_SRC = `${import.meta.env.BASE_URL}logotruck.jpg`;
+/** Logo officiel servi depuis `public/tlr-logo.jpeg`. */
+export const APP_LOGO_SRC = `${import.meta.env.BASE_URL}tlr-logo.jpeg`;
 
 type AppLogoVariant = 'login' | 'sidebar' | 'header' | 'compact' | 'hero';
 
 /**
- * Le fichier est une image **verticale** (carte + picto). On évite les cadres carrés
- * qui tassent le visuel : contrainte surtout sur la **hauteur**, largeur en auto.
+ * Le fichier TLR est un logo horizontal. Les variantes privilégient une carte
+ * blanche sobre pour préserver le contraste et éviter de rogner le visuel.
  */
 const variantConfig: Record<
   AppLogoVariant,
@@ -15,47 +15,47 @@ const variantConfig: Record<
 > = {
   login: {
     wrapper: cn(
-      'inline-flex items-center justify-center rounded-2xl p-2 sm:p-2.5',
-      'bg-white/10 ring-2 ring-white/25 shadow-2xl backdrop-blur-sm',
+      'inline-flex items-center justify-center rounded-3xl p-3 sm:p-4',
+      'bg-white ring-2 ring-white/70 shadow-2xl shadow-black/25',
     ),
     img: cn(
       'block object-contain object-center select-none',
-      'max-h-[8.5rem] sm:max-h-40 w-auto max-w-[min(11rem,42vw)]',
-      'rounded-xl',
+      'h-auto w-[min(17rem,72vw)] max-h-44',
+      'rounded-2xl',
     ),
   },
   sidebar: {
     wrapper: cn(
-      'inline-flex items-center justify-center shrink-0 rounded-xl overflow-hidden',
-      'h-10 min-w-9 max-w-[2.85rem] px-1',
-      'bg-white/10 ring-1 ring-white/20 shadow-sm',
+      'inline-flex items-center justify-center shrink-0 rounded-2xl overflow-hidden',
+      'h-12 w-32 px-2',
+      'bg-white ring-1 ring-white/30 shadow-lg shadow-black/10',
     ),
-    img: cn('max-h-9 w-auto max-w-full object-contain object-center select-none'),
+    img: cn('max-h-11 w-auto max-w-full object-contain object-center select-none'),
   },
   header: {
     wrapper: cn(
-      'inline-flex items-center justify-center shrink-0 rounded-lg overflow-hidden',
-      'h-9 max-h-9 min-w-8 max-w-[2.6rem] sm:h-10 sm:max-h-10 sm:max-w-[2.85rem] px-0.5',
-      'bg-muted/50 dark:bg-white/10 ring-1 ring-border/80',
+      'inline-flex items-center justify-center shrink-0 rounded-xl overflow-hidden',
+      'h-10 w-28 px-2',
+      'bg-white ring-1 ring-border/80 shadow-sm',
     ),
     img: cn('max-h-full w-auto max-w-full object-contain object-center select-none'),
   },
   compact: {
     wrapper: cn(
-      'inline-flex items-center justify-center rounded-md overflow-hidden h-7 w-7',
-      'bg-muted/40 ring-1 ring-border/60',
+      'inline-flex items-center justify-center rounded-lg overflow-hidden h-8 w-16 px-1',
+      'bg-white ring-1 ring-border/60',
     ),
     img: cn('max-h-full max-w-full object-contain object-center p-px select-none'),
   },
   hero: {
     wrapper: cn(
-      'inline-flex items-center justify-center rounded-xl p-1.5',
-      'bg-muted/30 ring-1 ring-border/50 shadow-sm',
+      'inline-flex items-center justify-center rounded-2xl p-2',
+      'bg-white ring-1 ring-border/50 shadow-md',
     ),
     img: cn(
       'block object-contain object-center select-none',
-      'max-h-20 sm:max-h-24 w-auto max-w-[7rem]',
-      'rounded-lg',
+      'max-h-24 sm:max-h-28 w-auto max-w-[12rem]',
+      'rounded-xl',
     ),
   },
 };

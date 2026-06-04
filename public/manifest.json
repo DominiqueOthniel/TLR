@@ -1,7 +1,7 @@
 {
-  "name": "FleetPro - Gestion de Flotte",
-  "short_name": "FleetPro",
-  "description": "Application de gestion de flotte de camions",
+  "name": "SIA-TLR - Gestion de Flotte",
+  "short_name": "SIA-TLR",
+  "description": "Application professionnelle de gestion de flotte de camions",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1E293B",
@@ -9,15 +9,15 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/placeholder.svg",
+      "src": "/tlr-logo.jpeg",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/jpeg",
       "purpose": "any maskable"
     },
     {
-      "src": "/placeholder.svg",
+      "src": "/tlr-logo.jpeg",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/jpeg",
       "purpose": "any maskable"
     }
   ]

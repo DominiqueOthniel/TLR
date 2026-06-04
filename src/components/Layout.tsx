@@ -305,13 +305,9 @@ function SidebarContent({
     <div className="flex flex-col h-full bg-sidebar border-r border-sidebar-border shadow-xl lg:shadow-none">
 
       {/* Logo */}
-      <div className="flex items-center justify-between h-16 px-4 border-b border-sidebar-border/50 flex-shrink-0 gap-1">
-        <div className="flex items-center gap-2 min-w-0">
+      <div className="flex items-center justify-between h-20 px-4 border-b border-sidebar-border/50 flex-shrink-0 gap-2">
+        <div className="flex items-center min-w-0">
           <AppLogo variant="sidebar" />
-          <div className="min-w-0">
-            <p className="font-bold text-sm text-sidebar-foreground leading-none truncate">SIA-TLR</p>
-            <p className="text-[10px] text-sidebar-foreground/40 leading-none mt-0.5">Cameroun</p>
-          </div>
         </div>
         <div className="flex items-center gap-0.5 shrink-0">
           {onRequestHideDesktop && (

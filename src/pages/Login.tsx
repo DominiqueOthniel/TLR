@@ -77,10 +77,10 @@ export default function Login() {
 
           {/* Header */}
           <div className="flex flex-col items-center mb-8 text-center">
-            {/* Logo marque (squircle aligné sur le halo) */}
+            {/* Logo marque */}
             <div className="relative mb-5 flex justify-center items-center">
               <div
-                className="absolute w-[7.5rem] h-[7.5rem] sm:w-36 sm:h-36 rounded-[22%] bg-gradient-to-br from-violet-500/50 to-indigo-500/35 blur-2xl scale-[1.12] animate-pulse-glow"
+                className="absolute w-[18rem] h-32 sm:w-[21rem] sm:h-40 rounded-[2rem] bg-gradient-to-br from-violet-500/45 to-indigo-500/35 blur-2xl scale-[1.08] animate-pulse-glow"
                 aria-hidden
               />
               <AppLogo variant="login" className="relative z-[1]" />
