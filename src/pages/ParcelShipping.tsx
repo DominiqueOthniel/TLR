@@ -645,11 +645,11 @@ export default function ParcelShipping() {
       title: 'Expéditions colis (Douala)',
       fileName: `expeditions_colis_${new Date().toISOString().split('T')[0]}.pdf`,
       filtersDescription: exportSortLine,
-      headerColor: '#0284c7',
+      headerColor: '#1e3a8a',
       headerTextColor: '#ffffff',
-      evenRowColor: '#f0f9ff',
+      evenRowColor: '#f8fafc',
       oddRowColor: '#ffffff',
-      accentColor: '#0284c7',
+      accentColor: '#7a1f2b',
       totals: [
         { label: 'Expéditions (liste)', value: sorted.length, style: 'neutral', icon: EMOJI.liste },
         {

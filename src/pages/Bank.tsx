@@ -415,12 +415,12 @@ export default function Bank() {
       title: 'Transactions Bancaires',
       fileName: `transactions_bancaires_${new Date().toISOString().split('T')[0]}.pdf`,
       filtersDescription: getExportFiltersDescription(),
-      // Couleurs thématiques pour la banque (ambre/jaune)
-      headerColor: '#d97706',
+      // Couleurs TLR (marine / bordeaux / or)
+      headerColor: '#1e3a8a',
       headerTextColor: '#ffffff',
-      evenRowColor: '#fffbeb',
+      evenRowColor: '#f8fafc',
       oddRowColor: '#ffffff',
-      accentColor: '#d97706',
+      accentColor: '#7a1f2b',
       totals: [
         { label: 'Nombre de transactions', value: sortedFilteredTransactions.length, style: 'neutral', icon: EMOJI.liste },
         { label: 'Total Dépôts', value: `+${totalDepots.toLocaleString('fr-FR')} FCFA`, style: 'positive', icon: EMOJI.entree },

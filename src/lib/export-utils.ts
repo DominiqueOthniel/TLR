@@ -1,5 +1,9 @@
 ﻿import * as XLSX from 'xlsx-js-style';
-import { TRUCK_LOGO_SVG_MARK } from '@/lib/invoice-branding';
+import {
+  COMPANY_LOGO_SRC,
+  COMPANY_NAME,
+  COMPANY_TAGLINE,
+} from '@/lib/invoice-branding';
 
 interface ExportColumn<T> {
   header: string;
@@ -110,21 +114,21 @@ function styleExcelWorksheet<T>(
 
   const titleStyle = {
     font: { bold: true, sz: 16, color: { rgb: '1E3A8A' } },
-    fill: { patternType: 'solid', fgColor: { rgb: 'EFF6FF' } },
+    fill: { patternType: 'solid', fgColor: { rgb: 'EAF1FF' } },
     alignment: { horizontal: 'center', vertical: 'center' },
     border,
   };
 
   const filtersStyle = {
     font: { italic: true, color: { rgb: '92400E' } },
-    fill: { patternType: 'solid', fgColor: { rgb: 'FEF3C7' } },
+    fill: { patternType: 'solid', fgColor: { rgb: 'FFF7E6' } },
     alignment: { horizontal: 'left', vertical: 'center', wrapText: true },
     border,
   };
 
   const headerStyle = {
     font: { bold: true, color: { rgb: 'FFFFFF' } },
-    fill: { patternType: 'solid', fgColor: { rgb: '1D4ED8' } },
+    fill: { patternType: 'solid', fgColor: { rgb: '1E3A8A' } },
     alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
     border,
   };
@@ -230,13 +234,17 @@ export function exportToPrintablePDF<T>(options: ExportOptions<T> | PDFExportOpt
   
   // Couleurs par défaut ou personnalisées
   const pdfOptions = options as PDFExportOptions<T>;
-  const headerColor = pdfOptions.headerColor || '#1e40af'; // Bleu foncé
+  const headerColor = pdfOptions.headerColor || '#1e3a8a'; // Bleu marine TLR
   const headerTextColor = pdfOptions.headerTextColor || '#ffffff'; // Blanc
-  const evenRowColor = pdfOptions.evenRowColor || '#f0f9ff'; // Bleu très clair
+  const evenRowColor = pdfOptions.evenRowColor || '#f8fafc'; // Gris très clair
   const oddRowColor = pdfOptions.oddRowColor || '#ffffff'; // Blanc
-  const accentColor = pdfOptions.accentColor || '#1e40af'; // Bleu foncé
+  const accentColor = pdfOptions.accentColor || '#1e3a8a'; // Bleu marine TLR
   const totals = pdfOptions.totals || [];
-  const branding = pdfOptions.branding;
+  const branding = pdfOptions.branding || {
+    companyName: COMPANY_NAME,
+    tagline: COMPANY_TAGLINE,
+    documentLabel: 'Export officiel',
+  };
   const hideDefaultStatBox = pdfOptions.hideDefaultStatBox === true;
 
   const printWindow = window.open('', '_blank');
@@ -305,30 +313,35 @@ export function exportToPrintablePDF<T>(options: ExportOptions<T> | PDFExportOpt
             gap: 18px;
             margin-bottom: 22px;
             padding: 18px 20px;
-            background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+            background:
+              linear-gradient(135deg, rgba(30,58,138,0.08) 0%, rgba(122,31,43,0.06) 100%),
+              #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 12px;
+            border-top: 4px solid #1e3a8a;
           }
           .pdf-brand-logo {
             flex-shrink: 0;
-            width: 56px;
-            height: 56px;
+            width: 92px;
+            height: 64px;
             border-radius: 12px;
-            background: linear-gradient(135deg, #4f46e5 0%, #2563eb 100%);
-            color: #ffffff;
+            background: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+            padding: 6px;
+            border: 1px solid #dbe4f0;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
           }
-          .pdf-brand-logo svg {
-            width: 32px;
-            height: 32px;
+          .pdf-brand-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
           }
           .pdf-brand-name {
             font-size: 20px;
             font-weight: 800;
-            color: #0f172a;
+            color: #1e3a8a;
             letter-spacing: -0.03em;
             line-height: 1.2;
           }
@@ -341,12 +354,12 @@ export function exportToPrintablePDF<T>(options: ExportOptions<T> | PDFExportOpt
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.14em;
-            color: ${accentColor};
+            color: #7a1f2b;
             font-weight: 700;
             margin-top: 8px;
           }
           .header {
-            border-bottom: 3px solid ${accentColor};
+            border-bottom: 3px solid #7a1f2b;
             padding-bottom: 16px;
             margin-bottom: 20px;
           }
@@ -363,7 +376,7 @@ export function exportToPrintablePDF<T>(options: ExportOptions<T> | PDFExportOpt
             margin: 0;
           }
           .filters-box {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%);
             border: 1px solid #f59e0b;
             border-radius: 8px;
             padding: 12px 16px;
@@ -402,7 +415,7 @@ export function exportToPrintablePDF<T>(options: ExportOptions<T> | PDFExportOpt
             color: #374151;
           }
           tbody tr:hover {
-            background-color: #dbeafe !important;
+            background-color: #eaf1ff !important;
           }
           tbody tr:last-child td {
             border-bottom: none;
@@ -421,14 +434,14 @@ export function exportToPrintablePDF<T>(options: ExportOptions<T> | PDFExportOpt
             margin-bottom: 20px;
           }
           .stat-box {
-            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-            border: 1px solid #22c55e;
+            background: linear-gradient(135deg, #f8fafc 0%, #eaf1ff 100%);
+            border: 1px solid #1e3a8a;
             border-radius: 8px;
             padding: 12px 20px;
             text-align: center;
           }
           .stat-box.primary {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            background: linear-gradient(135deg, #eaf1ff 0%, #dbeafe 100%);
             border-color: ${accentColor};
           }
           .stat-value {
@@ -444,9 +457,9 @@ export function exportToPrintablePDF<T>(options: ExportOptions<T> | PDFExportOpt
           .totals-section {
             margin-top: 24px;
             padding: 20px;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            background: linear-gradient(135deg, #f8fafc 0%, #fff7ed 100%);
             border-radius: 12px;
-            border: 2px solid ${accentColor};
+            border: 2px solid #1e3a8a;
           }
           .totals-title {
             font-size: 14px;
@@ -513,7 +526,7 @@ export function exportToPrintablePDF<T>(options: ExportOptions<T> | PDFExportOpt
       <body>
         ${branding ? `
         <div class="pdf-brand">
-          <div class="pdf-brand-logo">${TRUCK_LOGO_SVG_MARK}</div>
+          <div class="pdf-brand-logo"><img src="${COMPANY_LOGO_SRC}" alt="${COMPANY_NAME}" /></div>
           <div>
             <div class="pdf-brand-name">${branding.companyName}</div>
             ${branding.tagline ? `<div class="pdf-brand-tagline">${branding.tagline}</div>` : ''}

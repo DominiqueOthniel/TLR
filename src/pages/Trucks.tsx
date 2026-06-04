@@ -435,12 +435,12 @@ export default function Trucks() {
       title: 'Liste des Camions',
       fileName: `camions_${new Date().toISOString().split('T')[0]}.pdf`,
       filtersDescription: getFiltersDescription(),
-      // Couleurs thématiques pour les camions (orange/rouge)
-      headerColor: '#ea580c',
+      // Couleurs TLR (marine / bordeaux / or)
+      headerColor: '#1e3a8a',
       headerTextColor: '#ffffff',
-      evenRowColor: '#fff7ed',
+      evenRowColor: '#f8fafc',
       oddRowColor: '#ffffff',
-      accentColor: '#ea580c',
+      accentColor: '#7a1f2b',
       totals: [
         { label: 'Trajets terminés', value: totalTrajetsTermines, style: 'neutral', icon: '🚛' },
         { label: 'Trajets annulés', value: totalTrajetsAnnules, style: totalTrajetsAnnules > 0 ? 'negative' : 'neutral', icon: '❌' },

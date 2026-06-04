@@ -544,12 +544,12 @@ export default function Expenses() {
       title: 'Liste des Dépenses',
       fileName: `depenses_${new Date().toISOString().split('T')[0]}.pdf`,
       filtersDescription: getFiltersDescription(),
-      // Couleurs thématiques pour les dépenses (rouge)
-      headerColor: '#dc2626',
+      // Couleurs TLR (marine / bordeaux / or)
+      headerColor: '#1e3a8a',
       headerTextColor: '#ffffff',
-      evenRowColor: '#fef2f2',
+      evenRowColor: '#f8fafc',
       oddRowColor: '#ffffff',
-      accentColor: '#dc2626',
+      accentColor: '#7a1f2b',
       totals: [
         { label: 'Nombre de dépenses', value: filteredExpenses.length, style: 'neutral', icon: EMOJI.liste },
         { label: 'Total Carburant', value: `-${totalCarburant.toLocaleString('fr-FR')} FCFA`, style: 'negative', icon: EMOJI.carburant },

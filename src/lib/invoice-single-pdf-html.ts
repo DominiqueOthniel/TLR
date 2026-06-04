@@ -1,5 +1,5 @@
 import type { Expense, Invoice, ParcelExpedition, Trip } from '@/contexts/AppContext';
-import { COMPANY_CONTACT, COMPANY_NAME, COMPANY_TAGLINE, TRUCK_LOGO_SVG_MARK } from '@/lib/invoice-branding';
+import { COMPANY_CONTACT, COMPANY_LOGO_SRC, COMPANY_NAME, COMPANY_TAGLINE } from '@/lib/invoice-branding';
 import { formatTripStatusFr } from '@/lib/sync-utils';
 
 function escapeHtml(s: string): string {
@@ -47,7 +47,7 @@ export function buildSingleInvoicePdfInnerHtml(opts: {
                   <h3 class="font-bold mb-2 uppercase" style="letter-spacing:0.06em;font-size:11px;color:#475569;">Détails du transport</h3>
                   <div class="border rounded-lg overflow-hidden" style="border-color:#e2e8f0;">
                     <table class="w-full">
-                      <thead class="bg-gray-100">
+                      <thead style="background:#1e3a8a;color:#ffffff;">
                         <tr>
                           <th class="p-2 text-left font-bold text-xs">Prestation</th>
                           <th class="p-2 text-right font-bold text-xs">Montant TTC</th>
@@ -97,7 +97,7 @@ export function buildSingleInvoicePdfInnerHtml(opts: {
                   <h3 class="font-bold mb-2 uppercase" style="letter-spacing:0.06em;font-size:11px;color:#475569;">Détail de la dépense facturée</h3>
                   <div class="border rounded-lg overflow-hidden" style="border-color:#e2e8f0;">
                     <table class="w-full">
-                      <thead class="bg-gray-100">
+                      <thead style="background:#1e3a8a;color:#ffffff;">
                         <tr>
                           <th class="p-2 text-left font-bold text-xs">Description</th>
                           <th class="p-2 text-right font-bold text-xs">Montant TTC</th>
@@ -139,7 +139,7 @@ export function buildSingleInvoicePdfInnerHtml(opts: {
                   <p class="text-xs text-gray-600 mb-2">Réf. <span class="font-semibold text-black">${escapeHtml(pe.reference)}</span> · ${escapeHtml(pe.origine)} → ${escapeHtml(pe.destination)}</p>
                   <div class="border rounded-lg overflow-hidden" style="border-color:#e2e8f0;">
                     <table class="w-full">
-                      <thead class="bg-gray-100">
+                      <thead style="background:#1e3a8a;color:#ffffff;">
                         <tr>
                           <th class="p-2 text-left font-bold text-xs">Client / ligne</th>
                           <th class="p-2 text-left font-bold text-xs">Unité</th>
@@ -188,21 +188,21 @@ export function buildSingleInvoicePdfInnerHtml(opts: {
 
   return `
         <div style="max-width: 760px; margin: 0 auto;">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:12px 14px;background:linear-gradient(135deg,#f8fafc 0%,#eff6ff 100%);border:1px solid #e2e8f0;border-radius:10px;">
-            <div style="flex-shrink:0;width:42px;height:42px;border-radius:9px;background:linear-gradient(135deg,#4f46e5,#2563eb);display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 3px 10px rgba(37,99,235,0.25);">
-              ${TRUCK_LOGO_SVG_MARK}
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;padding:12px 14px;background:linear-gradient(135deg,rgba(30,58,138,.08) 0%,rgba(122,31,43,.06) 100%);border:1px solid #e2e8f0;border-top:4px solid #1e3a8a;border-radius:10px;">
+            <div style="flex-shrink:0;width:86px;height:58px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;padding:6px;border:1px solid #dbe4f0;box-shadow:0 3px 12px rgba(15,23,42,.12);">
+              <img src="${COMPANY_LOGO_SRC}" alt="${COMPANY_NAME}" style="width:100%;height:100%;object-fit:contain;" />
             </div>
             <div>
-              <div style="font-size:17px;font-weight:800;color:#0f172a;letter-spacing:-0.03em;line-height:1.1;">${COMPANY_NAME}</div>
+              <div style="font-size:17px;font-weight:800;color:#1e3a8a;letter-spacing:-0.03em;line-height:1.1;">${COMPANY_NAME}</div>
               <div style="font-size:11px;color:#64748b;margin-top:3px;">${COMPANY_TAGLINE}</div>
               <div style="font-size:12px;color:#64748b;margin-top:2px;">${COMPANY_CONTACT}</div>
             </div>
           </div>
 
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid #cbd5e1;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid #7a1f2b;">
             <div>
-              <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.14em;color:#64748b;font-weight:700;">Facture</div>
-              <h1 style="font-size:24px;font-weight:800;margin:4px 0 0 0;color:#0f172a;letter-spacing:-0.03em;">${escapeHtml(invoice.numero)}</h1>
+              <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.14em;color:#7a1f2b;font-weight:700;">Facture</div>
+              <h1 style="font-size:24px;font-weight:800;margin:4px 0 0 0;color:#1e3a8a;letter-spacing:-0.03em;">${escapeHtml(invoice.numero)}</h1>
               <p style="font-size:12px;color:#64748b;margin:5px 0 0 0;">Date d'émission : ${new Date(invoice.dateCreation).toLocaleDateString('fr-FR')}</p>
             </div>
             <span style="display:inline-block;padding:7px 12px;border-radius:9px;background:${statusBg};color:${statusFg};font-size:11px;font-weight:700;">${statusLabel}</span>

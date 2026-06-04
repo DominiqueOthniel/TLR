@@ -302,12 +302,12 @@ export default function Drivers() {
       title: 'Liste des Chauffeurs',
       fileName: `chauffeurs_${new Date().toISOString().split('T')[0]}.pdf`,
       filtersDescription: getFiltersDescription(),
-      // Couleurs thématiques pour les chauffeurs (violet/rose)
-      headerColor: '#7c3aed',
+      // Couleurs TLR (marine / bordeaux / or)
+      headerColor: '#1e3a8a',
       headerTextColor: '#ffffff',
-      evenRowColor: '#faf5ff',
+      evenRowColor: '#f8fafc',
       oddRowColor: '#ffffff',
-      accentColor: '#7c3aed',
+      accentColor: '#7a1f2b',
       totals: [
         { label: 'Trajets (total)', value: totalTrajets, style: 'neutral', icon: EMOJI.camion },
         { label: 'Trajets terminés', value: totalTrajetsTermines, style: 'positive', icon: EMOJI.succes },

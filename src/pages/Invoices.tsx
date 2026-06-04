@@ -41,6 +41,7 @@ import {
   upsertSortieFromExpense,
   validateCaisseTransaction,
 } from '@/lib/caisse-local';
+import { AppLogo } from '@/components/AppLogo';
 import { COMPANY_NAME, COMPANY_TAGLINE } from '@/lib/invoice-branding';
 import { buildSingleInvoicePdfInnerHtml } from '@/lib/invoice-single-pdf-html';
 import { frCollator, parseDateMs, stableSort } from '@/lib/list-sort';
@@ -847,11 +848,11 @@ export default function Invoices() {
         documentLabel: 'Synthèse comptable — export filtré',
       },
       hideDefaultStatBox: true,
-      headerColor: '#1d4ed8',
+      headerColor: '#1e3a8a',
       headerTextColor: '#ffffff',
       evenRowColor: '#f8fafc',
       oddRowColor: '#ffffff',
-      accentColor: '#2563eb',
+      accentColor: '#7a1f2b',
       totals: [
         { label: 'Total Factures', value: filteredInvoices.length, style: 'neutral', icon: '📄' },
         { label: 'Montant total (TTC)', value: `${totalTTC.toLocaleString('fr-FR')} FCFA`, style: 'neutral', icon: '📊' },
@@ -1065,7 +1066,7 @@ export default function Invoices() {
                 }
                 table { width: 100%; border-collapse: collapse; }
                 th, td { padding: 8px; text-align: left; vertical-align: top; }
-                th { background: #f3f4f6; font-weight: bold; }
+                th { background: #1e3a8a; color: #ffffff; font-weight: bold; }
                 p, h1, h2, h3 { page-break-after: avoid; }
                 table, tr, .border, .rounded-lg { page-break-inside: avoid; }
                 .border-t { border-top: 1px solid #e5e7eb; }
@@ -1074,7 +1075,7 @@ export default function Invoices() {
                 .border-b-2 { border-bottom: 2px solid #9ca3af; }
                 .rounded { border-radius: 0.375rem; }
                 .rounded-lg { border-radius: 0.5rem; }
-                .bg-gray-100 { background: #f3f4f6; }
+                .bg-gray-100 { background: #eaf1ff; color: #1e3a8a; }
                 .bg-gray-200 { background: #e5e7eb; }
                 .text-gray-600 { color: #4b5563; }
                 .text-gray-700 { color: #374151; }
@@ -2505,8 +2506,16 @@ export default function Invoices() {
                 </div>
                 
                 <div className="space-y-6">
+                  <div className="rounded-xl border border-blue-200/70 bg-gradient-to-br from-blue-50/90 via-white to-rose-50/50 p-4 flex items-center gap-4">
+                    <AppLogo variant="header" />
+                    <div>
+                      <p className="font-bold text-blue-900 text-lg">{COMPANY_NAME}</p>
+                      <p className="text-xs text-muted-foreground">{COMPANY_TAGLINE}</p>
+                    </div>
+                  </div>
+
                   {/* Visible uniquement à l’impression (le bandeau avec boutons est masqué) */}
-                  <div className="hidden print:block border-b-2 border-slate-900 pb-5 mb-0">
+                  <div className="hidden print:block border-b-2 border-blue-900 pb-5 mb-0">
                     <div className="flex justify-between items-start gap-4">
                       <div>
                         <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-semibold">
@@ -2538,15 +2547,13 @@ export default function Invoices() {
                   </div>
 
                   {/* En-tête de facture */}
-                  <div className="border-b pb-4 print:pb-3 print:border-slate-300">
+                  <div className="border-b pb-4 print:pb-3 print:border-blue-200">
                     <div className="grid grid-cols-2 gap-6">
-                      <div>
-                        <h3 className="font-bold text-lg mb-2">SIA-TLR</h3>
+                      <div className="print:hidden">
+                        <h3 className="font-bold text-lg mb-2 text-blue-900">{COMPANY_NAME}</h3>
                         <p className="text-sm text-muted-foreground">
-                          Transport de marchandises<br />
-                          Douala, Cameroun<br />
-                          Tél: +237 6 XX XX XX XX<br />
-                          Email: contact@goofe.cm
+                          {COMPANY_TAGLINE}<br />
+                          Douala, Cameroun
                         </p>
                       </div>
                       <div className="text-right">

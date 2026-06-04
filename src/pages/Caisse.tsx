@@ -587,11 +587,11 @@ export default function Caisse() {
       title: 'Mouvements de Caisse',
       fileName: `caisse_${new Date().toISOString().split('T')[0]}.pdf`,
       filtersDescription: caisseExportSortLine,
-      headerColor: '#059669',
+      headerColor: '#1e3a8a',
       headerTextColor: '#ffffff',
-      evenRowColor: '#ecfdf5',
+      evenRowColor: '#f8fafc',
       oddRowColor: '#ffffff',
-      accentColor: '#059669',
+      accentColor: '#7a1f2b',
       totals: [
         { label: 'Solde initial', value: `${soldeInitial.toLocaleString('fr-FR')} FCFA`, style: 'neutral', icon: EMOJI.argent },
         {

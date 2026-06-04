@@ -235,12 +235,12 @@ export default function ThirdParties() {
       title: 'Liste des Tiers',
       fileName: `tiers_${new Date().toISOString().split('T')[0]}.pdf`,
       filtersDescription: getFiltersDescription(),
-      // Couleurs thématiques pour les tiers (indigo/violet)
-      headerColor: '#4f46e5',
+      // Couleurs TLR (marine / bordeaux / or)
+      headerColor: '#1e3a8a',
       headerTextColor: '#ffffff',
-      evenRowColor: '#eef2ff',
+      evenRowColor: '#f8fafc',
       oddRowColor: '#ffffff',
-      accentColor: '#4f46e5',
+      accentColor: '#7a1f2b',
       totals: [
         { label: 'Total Tiers', value: filteredThirdParties.length, style: 'neutral', icon: EMOJI.liste },
         { label: 'Propriétaires', value: totalProprietaires, style: 'neutral', icon: '🏢' },

@@ -824,12 +824,12 @@ export default function Trips() {
       title: 'Liste des Trajets',
       fileName: `trajets_${new Date().toISOString().split('T')[0]}.pdf`,
       filtersDescription,
-      // Couleurs thématiques pour les trajets (vert/teal)
-      headerColor: '#0d9488',
+      // Couleurs TLR (marine / bordeaux / or)
+      headerColor: '#1e3a8a',
       headerTextColor: '#ffffff',
-      evenRowColor: '#f0fdfa',
+      evenRowColor: '#f8fafc',
       oddRowColor: '#ffffff',
-      accentColor: '#0d9488',
+      accentColor: '#7a1f2b',
       totals: [
         { label: 'Total Trajets', value: sortedTrips.length, style: 'neutral', icon: EMOJI.camion },
         { label: 'Terminés', value: trajetsTermines, style: 'positive', icon: '✅' },
