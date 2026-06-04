@@ -35,9 +35,6 @@
     --brand-navy: 222 76% 36%;
     --brand-burgundy: 351 60% 33%;
     --brand-gold: 38 92% 50%;
-    --ios-ease: cubic-bezier(0.22, 1, 0.36, 1);
-    --ios-spring: cubic-bezier(0.16, 1, 0.3, 1);
-
     --border: 220 18% 90%;
     --input: 220 18% 92%;
     --ring: 222 76% 36%;
@@ -146,10 +143,9 @@
     @apply bg-white/70 dark:bg-white/5 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-xl;
   }
 
-  /* Hover card avec lift */
+  /* Carte sans animation */
   .card-lift {
-    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10;
-    transition-timing-function: var(--ios-spring);
+    @apply hover:shadow-xl hover:shadow-primary/10;
   }
 
   /* Badge glow */
@@ -159,20 +155,17 @@
 
   /* Stat card moderne */
   .stat-card {
-    @apply relative overflow-hidden rounded-2xl border bg-card p-5 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-0.5;
-    transition-timing-function: var(--ios-spring);
+    @apply relative overflow-hidden rounded-2xl border bg-card p-5 hover:shadow-lg hover:shadow-primary/10;
   }
 
   /* Bouton premium (marine → bordeaux) */
   .btn-premium {
-    @apply relative overflow-hidden bg-gradient-to-r from-blue-800 via-blue-700 to-rose-800 text-white font-semibold rounded-xl px-5 py-2.5 shadow-lg shadow-blue-900/30 hover:shadow-rose-900/40 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0;
-    transition-timing-function: var(--ios-spring);
+    @apply relative overflow-hidden bg-gradient-to-r from-blue-800 via-blue-700 to-rose-800 text-white font-semibold rounded-xl px-5 py-2.5 shadow-lg shadow-blue-900/30 hover:shadow-rose-900/40;
   }
 
   /* Sidebar item */
   .nav-item {
-    @apply group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 relative cursor-pointer;
-    transition-timing-function: var(--ios-spring);
+    @apply group flex items-center gap-3 px-4 py-3 rounded-xl relative cursor-pointer;
   }
 
   .nav-item-active {
@@ -185,88 +178,25 @@
 }
 
 /* =====================================================
-   ANIMATIONS
+   MOUVEMENT DÉSACTIVÉ POUR PERFORMANCE
    ===================================================== */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeInScale {
-  from { opacity: 0; transform: scale(0.95); }
-  to   { opacity: 1; transform: scale(1); }
-}
-
-@keyframes shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position:  200% 0; }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4); }
-  50%       { box-shadow: 0 0 0 8px hsl(var(--primary) / 0); }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-6px); }
-}
-
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-@keyframes iosPageEnter {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes iosSurfaceIn {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes iosSoftGlow {
-  0%, 100% { box-shadow: 0 18px 45px hsl(var(--primary) / 0.08); }
-  50% { box-shadow: 0 22px 60px hsl(var(--brand-burgundy) / 0.12); }
-}
-
-.animate-fade-in-up     { animation: fadeInUp 0.45s ease-out forwards; }
-.animate-fade-in-scale  { animation: fadeInScale 0.35s ease-out forwards; }
-.animate-float          { animation: float 4s ease-in-out infinite; }
-.animate-spin-slow      { animation: spin-slow 12s linear infinite; }
-.animate-pulse-glow     { animation: pulse-glow 2.5s ease-in-out infinite; }
-.animate-ios-page-enter { animation: iosPageEnter 0.28s var(--ios-spring) both; }
-.animate-ios-surface    { animation: iosSurfaceIn 0.24s var(--ios-spring) both; }
-
+.animate-fade-in-up,
+.animate-fade-in-scale,
+.animate-float,
+.animate-spin-slow,
+.animate-pulse-glow,
+.animate-ios-page-enter,
+.animate-ios-surface,
 .shimmer {
-  background: linear-gradient(90deg,
-    hsl(var(--muted)) 25%,
-    hsl(var(--muted-foreground) / 0.1) 50%,
-    hsl(var(--muted)) 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  animation: none !important;
 }
 
-/* Délais d'animation pour les grilles */
-.delay-100 { animation-delay: 0.1s; }
-.delay-200 { animation-delay: 0.2s; }
-.delay-300 { animation-delay: 0.3s; }
-.delay-400 { animation-delay: 0.4s; }
+.delay-100,
+.delay-200,
+.delay-300,
+.delay-400 {
+  animation-delay: 0ms !important;
+}
 
 /* =====================================================
    SCROLLBAR PERSONNALISÉE
@@ -290,50 +220,16 @@
 }
 
 .login-orb-2 {
-  animation: float 4s ease-in-out infinite;
-  animation-delay: 2s;
+  animation: none !important;
 }
 
-/* =====================================================
-   FLUIDITÉ TYPE iOS
-   ===================================================== */
-@media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
-  }
-
-  body,
-  button,
-  a,
-  input,
-  textarea,
-  select,
-  [role="button"] {
-    transition-duration: 180ms;
-    transition-property: color, background-color, border-color, box-shadow, opacity, transform;
-    transition-timing-function: var(--ios-spring);
-  }
-
-  button:not(:disabled):active,
-  a:active,
-  [role="button"]:not([aria-disabled="true"]):active {
-    transform: scale(0.975);
-  }
-
-  .ios-surface {
-    animation: iosSurfaceIn 0.22s var(--ios-spring) both;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
-    transition-duration: 0.001ms !important;
-  }
+*,
+*::before,
+*::after {
+  animation: none !important;
+  backdrop-filter: none !important;
+  scroll-behavior: auto !important;
+  transition: none !important;
 }
 
 /* =====================================================
