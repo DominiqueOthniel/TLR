@@ -10,7 +10,6 @@ import {
   Menu,
   X,
   Building2,
-  Loader2,
   AlertCircle,
   LogOut,
   Package,
@@ -107,7 +106,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [desktopSidebarHidden, setDesktopSidebarHidden] = useState(readSidebarHidden);
-  const { isLoading, apiError } = useApp();
+  const { apiError } = useApp();
   const { user, logout } = useAuth();
 
   const navItems = useMemo(
@@ -163,13 +162,6 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           </AlertDescription>
         </Alert>
       )}
-      {isLoading && (
-        <div className="flex items-center gap-2 px-4 py-1.5 bg-primary/5 border-b border-primary/10 text-xs text-muted-foreground z-50 relative">
-          <Loader2 className="h-3 w-3 animate-spin text-primary" />
-          Synchronisation des données...
-        </div>
-      )}
-
       {/* Grille de fond subtile */}
       <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.025] dark:opacity-[0.03] bg-[linear-gradient(to_right,hsl(222,76%,40%)_1px,transparent_1px),linear-gradient(to_bottom,hsl(222,76%,40%)_1px,transparent_1px)] bg-[size:32px_32px]" />
 
@@ -272,7 +264,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         </header>
 
         {/* Contenu principal */}
-        <main className="py-5 px-4 sm:px-6 lg:px-7 min-h-[calc(100vh-3.5rem)] animate-ios-page-enter">
+        <main className="py-5 px-4 sm:px-6 lg:px-7 min-h-[calc(100vh-3.5rem)]">
           {children}
         </main>
       </div>

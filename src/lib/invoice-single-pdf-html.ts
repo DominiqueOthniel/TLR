@@ -212,7 +212,7 @@ export function buildSingleInvoicePdfInnerHtml(opts: {
             <div>
               <h2 class="font-bold text-xs mb-1 uppercase" style="letter-spacing:0.1em;color:#64748b;">Émetteur</h2>
               <p class="font-bold text-base" style="color:#0f172a;">${COMPANY_NAME}</p>
-              <p class="text-xs text-gray-600 mt-1" style="line-height:1.35;">Transport de marchandises<br/>Douala, Cameroun<br/>${COMPANY_CONTACT}</p>
+              <p class="text-xs text-gray-600 mt-1" style="line-height:1.35;">Transport de marchandises<br/>${COMPANY_CONTACT}</p>
             </div>
             <div class="text-right">
               <h2 class="font-bold text-xs mb-1 uppercase" style="letter-spacing:0.1em;color:#64748b;">${partyLabel}</h2>

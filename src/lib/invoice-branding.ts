@@ -6,7 +6,15 @@ export const COMPANY_NAME = 'SIA-TLR';
 
 export const COMPANY_TAGLINE = 'Transport · Logistique · Révolution';
 
-export const COMPANY_CONTACT = 'Douala, Cameroun · Tél. +237';
+export const COMPANY_ADDRESS = 'BP 4807 Douala - Cameroun';
+
+export const COMPANY_PHONE = '+237 698 95 46 43 / 678 97 83 84';
+
+export const COMPANY_EMAIL = 'transportlogistiquerevolution@gmail.com';
+
+export const COMPANY_TAX_ID = '2416943369K';
+
+export const COMPANY_CONTACT = `${COMPANY_ADDRESS} · Tél. ${COMPANY_PHONE} · ${COMPANY_EMAIL} · NIU ${COMPANY_TAX_ID}`;
 
 /** Logo officiel servi depuis le dossier public de Vite. */
 export const COMPANY_LOGO_SRC = '/tlr-logo.jpeg';

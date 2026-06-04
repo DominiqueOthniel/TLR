@@ -42,7 +42,7 @@ import {
   validateCaisseTransaction,
 } from '@/lib/caisse-local';
 import { AppLogo } from '@/components/AppLogo';
-import { COMPANY_NAME, COMPANY_TAGLINE } from '@/lib/invoice-branding';
+import { COMPANY_CONTACT, COMPANY_NAME, COMPANY_TAGLINE } from '@/lib/invoice-branding';
 import { buildSingleInvoicePdfInnerHtml } from '@/lib/invoice-single-pdf-html';
 import { frCollator, parseDateMs, stableSort } from '@/lib/list-sort';
 import { ListSortSelect } from '@/components/ListSortSelect';
@@ -2511,6 +2511,7 @@ export default function Invoices() {
                     <div>
                       <p className="font-bold text-blue-900 text-lg">{COMPANY_NAME}</p>
                       <p className="text-xs text-muted-foreground">{COMPANY_TAGLINE}</p>
+                      <p className="text-xs text-muted-foreground">{COMPANY_CONTACT}</p>
                     </div>
                   </div>
 
@@ -2553,7 +2554,7 @@ export default function Invoices() {
                         <h3 className="font-bold text-lg mb-2 text-blue-900">{COMPANY_NAME}</h3>
                         <p className="text-sm text-muted-foreground">
                           {COMPANY_TAGLINE}<br />
-                          Douala, Cameroun
+                          {COMPANY_CONTACT}
                         </p>
                       </div>
                       <div className="text-right">

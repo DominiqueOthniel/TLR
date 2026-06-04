@@ -636,7 +636,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
           refreshExpenses(),
           refreshInvoices(),
           refreshThirdParties(),
-          refreshPersonnel(),
           ...(isRemoteCaisse()
             ? [refreshCaisseFromApi(), refreshBankFromApi()]
             : []),

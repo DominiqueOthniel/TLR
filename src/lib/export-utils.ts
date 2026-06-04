@@ -1,5 +1,6 @@
 ﻿import type * as XLSX from 'xlsx-js-style';
 import {
+  COMPANY_CONTACT,
   COMPANY_LOGO_SRC,
   COMPANY_NAME,
   COMPANY_TAGLINE,
@@ -354,6 +355,12 @@ export function exportToPrintablePDF<T>(options: ExportOptions<T> | PDFExportOpt
             color: #64748b;
             margin-top: 4px;
           }
+          .pdf-brand-contact {
+            font-size: 11px;
+            color: #475569;
+            margin-top: 5px;
+            line-height: 1.45;
+          }
           .pdf-brand-doc {
             font-size: 11px;
             text-transform: uppercase;
@@ -534,6 +541,7 @@ export function exportToPrintablePDF<T>(options: ExportOptions<T> | PDFExportOpt
           <div>
             <div class="pdf-brand-name">${branding.companyName}</div>
             ${branding.tagline ? `<div class="pdf-brand-tagline">${branding.tagline}</div>` : ''}
+            <div class="pdf-brand-contact">${COMPANY_CONTACT}</div>
             ${branding.documentLabel ? `<div class="pdf-brand-doc">${branding.documentLabel}</div>` : ''}
           </div>
         </div>
