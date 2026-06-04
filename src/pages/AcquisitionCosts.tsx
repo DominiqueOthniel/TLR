@@ -55,7 +55,7 @@ function getMonthKey(date = new Date()): string {
 
 export default function AcquisitionCosts() {
   const navigate = useNavigate();
-  const { expenses, trucks, drivers, thirdParties, personnel } = useApp();
+  const { expenses, trucks, drivers, thirdParties } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategorie, setFilterCategorie] = useState('all');
   const [filterFournisseur, setFilterFournisseur] = useState('all');
@@ -74,12 +74,6 @@ export default function AcquisitionCosts() {
     if (!id) return '';
     const driver = drivers.find((item) => item.id === id);
     return driver ? `${driver.prenom} ${driver.nom}` : '';
-  };
-
-  const getPersonnelLabel = (id?: string) => {
-    if (!id) return '';
-    const item = personnel.find((row) => row.id === id);
-    return item ? `${item.prenom} ${item.nom}` : '';
   };
 
   const getSupplierLabel = (id?: string) => {
@@ -116,7 +110,6 @@ export default function AcquisitionCosts() {
         getTruckLabel(expense.camionId),
         getSupplierLabel(expense.fournisseurId),
         getDriverLabel(expense.chauffeurId),
-        getPersonnelLabel(expense.personnelId),
       ]
         .filter(Boolean)
         .join(' ')

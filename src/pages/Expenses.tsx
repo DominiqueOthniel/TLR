@@ -48,7 +48,7 @@ function nextExpenseInvoiceNumero(invoicesList: Invoice[]): string {
 }
 
 export default function Expenses() {
-  const { expenses, trucks, drivers, thirdParties, personnel, subCategories, setSubCategories, invoices, trips, createExpense, updateExpense, deleteExpense, createInvoice, updateInvoice } = useApp();
+  const { expenses, trucks, drivers, thirdParties, subCategories, setSubCategories, invoices, trips, createExpense, updateExpense, deleteExpense, createInvoice, updateInvoice } = useApp();
   const { canManageAccounting } = useAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false);
@@ -62,7 +62,6 @@ export default function Expenses() {
   const [filterSousCategorie, setFilterSousCategorie] = useState<string>('all');
   const [filterFournisseur, setFilterFournisseur] = useState<string>('all');
   const [filterChauffeur, setFilterChauffeur] = useState<string>('all');
-  const [filterPersonnel, setFilterPersonnel] = useState<string>('all');
   const [filterDateFrom, setFilterDateFrom] = useState<string>('');
   const [filterDateTo, setFilterDateTo] = useState<string>('');
   const [filterMontantMin, setFilterMontantMin] = useState<string>('');
@@ -74,7 +73,6 @@ export default function Expenses() {
     camionId: '',
     tripId: '',
     chauffeurId: '',
-    personnelId: '',
     categorie: 'Carburant',
     sousCategorie: '',
     fournisseurId: '',
@@ -97,7 +95,6 @@ export default function Expenses() {
       camionId: '',
       tripId: '',
       chauffeurId: '',
-      personnelId: '',
       categorie: 'Carburant',
       sousCategorie: '',
       fournisseurId: '',
@@ -163,11 +160,6 @@ export default function Expenses() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (formData.categorie === 'Salaire' && !formData.personnelId) {
-      toast.error('Pour une dépense de salaire, sélectionnez un personnel.');
-      return;
-    }
     
     let finalMontant = formData.montant;
     if (formData.quantite !== undefined && formData.prixUnitaire !== undefined && 
@@ -179,7 +171,6 @@ export default function Expenses() {
       ...(formData.camionId ? { camionId: formData.camionId } : {}),
       tripId: formData.tripId || undefined,
       chauffeurId: formData.chauffeurId || undefined,
-      personnelId: formData.personnelId || undefined,
       categorie: formData.categorie,
       sousCategorie: formData.sousCategorie || undefined,
       fournisseurId: formData.fournisseurId || undefined,
@@ -291,7 +282,6 @@ export default function Expenses() {
       camionId: expense.camionId ?? '',
       tripId: expense.tripId || '',
       chauffeurId: expense.chauffeurId || '',
-      personnelId: expense.personnelId || '',
       categorie: expense.categorie,
       sousCategorie: expense.sousCategorie || '',
       fournisseurId: expense.fournisseurId || '',
@@ -397,12 +387,6 @@ export default function Expenses() {
     return driver ? `${driver.prenom} ${driver.nom}` : '-';
   };
 
-  const getPersonnelLabel = (id?: string) => {
-    if (!id) return '-';
-    const item = personnel.find(p => p.id === id);
-    return item ? `${item.prenom} ${item.nom}` : '-';
-  };
-
   const filteredExpenses = expenses.filter(exp => {
     // Filtre par camion
     if (filterCamion !== 'all') {
@@ -432,12 +416,6 @@ export default function Expenses() {
       if (filterChauffeur !== 'none' && exp.chauffeurId !== filterChauffeur) return false;
     }
 
-    // Filtre par personnel
-    if (filterPersonnel !== 'all') {
-      if (filterPersonnel === 'none' && exp.personnelId) return false;
-      if (filterPersonnel !== 'none' && exp.personnelId !== filterPersonnel) return false;
-    }
-    
     // Filtre par date (du)
     if (filterDateFrom && exp.date < filterDateFrom) return false;
     
@@ -458,10 +436,9 @@ export default function Expenses() {
       const matchesSousCategorie = exp.sousCategorie?.toLowerCase().includes(search);
       const matchesCamion = getTruckLabel(exp.camionId).toLowerCase().includes(search);
       const matchesChauffeur = getDriverLabel(exp.chauffeurId).toLowerCase().includes(search);
-      const matchesPersonnel = getPersonnelLabel(exp.personnelId).toLowerCase().includes(search);
       const matchesFournisseur = exp.fournisseurId ? (thirdParties.find(tp => tp.id === exp.fournisseurId)?.nom || '').toLowerCase().includes(search) : false;
       
-      if (!matchesDescription && !matchesCategorie && !matchesSousCategorie && !matchesCamion && !matchesChauffeur && !matchesPersonnel && !matchesFournisseur) {
+      if (!matchesDescription && !matchesCategorie && !matchesSousCategorie && !matchesCamion && !matchesChauffeur && !matchesFournisseur) {
         return false;
       }
     }
@@ -523,10 +500,6 @@ export default function Expenses() {
       if (filterChauffeur === 'none') filters.push('Chauffeur: Aucun');
       else filters.push(`Chauffeur: ${getDriverLabel(filterChauffeur)}`);
     }
-    if (filterPersonnel !== 'all') {
-      if (filterPersonnel === 'none') filters.push('Personnel: Aucun');
-      else filters.push(`Personnel: ${getPersonnelLabel(filterPersonnel)}`);
-    }
     if (filterDateFrom) filters.push(`Du: ${new Date(filterDateFrom).toLocaleDateString('fr-FR')}`);
     if (filterDateTo) filters.push(`Au: ${new Date(filterDateTo).toLocaleDateString('fr-FR')}`);
     if (filterMontantMin) filters.push(`Min: ${filterMontantMin} FCFA`);
@@ -549,7 +522,6 @@ export default function Expenses() {
         { header: 'Description', value: (e) => e.description },
         { header: 'Camion', value: (e) => getTruckLabel(e.camionId) },
         { header: 'Chauffeur', value: (e) => getDriverLabel(e.chauffeurId) },
-        { header: 'Personnel', value: (e) => getPersonnelLabel(e.personnelId) },
         { header: 'Fournisseur', value: (e) => e.fournisseurId ? (thirdParties.find(tp => tp.id === e.fournisseurId)?.nom || '-') : '-' },
         { header: 'Quantité', value: (e) => e.quantite !== undefined && e.quantite > 0 ? `${e.quantite} ${getUnite(e.categorie)}` : '-' },
         { header: 'Prix unitaire (FCFA)', value: (e) => e.prixUnitaire !== undefined && e.prixUnitaire > 0 ? e.prixUnitaire : '-' },
@@ -600,7 +572,6 @@ export default function Expenses() {
         { header: 'Description', value: (e) => e.description },
         { header: 'Camion', value: (e) => `${EMOJI.camion} ${getTruckLabel(e.camionId)}` },
         { header: 'Chauffeur', value: (e) => e.chauffeurId ? `${EMOJI.personne} ${getDriverLabel(e.chauffeurId)}` : '-' },
-        { header: 'Personnel', value: (e) => e.personnelId ? `${EMOJI.personne} ${getPersonnelLabel(e.personnelId)}` : '-' },
         { header: 'Quantité', value: (e) => e.quantite !== undefined && e.quantite > 0 ? `${e.quantite} ${getUnite(e.categorie)}` : '-' },
         { 
           header: 'Prix unitaire', 
@@ -740,27 +711,6 @@ export default function Expenses() {
                     </p>
                   )}
                 </div>
-              </div>
-              <div>
-                <Label htmlFor="personnel">Personnel (salaires, primes, avances)</Label>
-                <Select value={formData.personnelId || 'none'} onValueChange={(value) => setFormData({ ...formData, personnelId: value === 'none' ? '' : value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner un personnel" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Aucun personnel</SelectItem>
-                    {personnel
-                      .filter(p => p.statut === 'actif')
-                      .map(p => (
-                        <SelectItem key={p.id} value={p.id}>
-                          {p.prenom} {p.nom} - {p.type === 'stagiaire' ? 'Stagiaire' : 'Employé'}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Utilisez la catégorie "Salaire" pour suivre les dépenses salariales par personne.
-                </p>
               </div>
               <div>
                 <Label htmlFor="tripId">Trajet (optionnel)</Label>
@@ -968,7 +918,7 @@ export default function Expenses() {
               </div>
               <h3 className="text-lg font-semibold text-foreground">Filtres</h3>
             </div>
-            {(filterCamion !== 'all' || filterCategorie !== 'all' || filterSousCategorie !== 'all' || filterFournisseur !== 'all' || filterChauffeur !== 'all' || filterPersonnel !== 'all' || filterDateFrom || filterDateTo || filterMontantMin || filterMontantMax || searchTerm) && (
+            {(filterCamion !== 'all' || filterCategorie !== 'all' || filterSousCategorie !== 'all' || filterFournisseur !== 'all' || filterChauffeur !== 'all' || filterDateFrom || filterDateTo || filterMontantMin || filterMontantMax || searchTerm) && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -978,7 +928,6 @@ export default function Expenses() {
                   setFilterSousCategorie('all');
                   setFilterFournisseur('all');
                   setFilterChauffeur('all');
-                  setFilterPersonnel('all');
                   setFilterDateFrom('');
                   setFilterDateTo('');
                   setFilterMontantMin('');
@@ -1003,7 +952,7 @@ export default function Expenses() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 id="search-expenses"
-                placeholder="Rechercher par description, catégorie, camion, chauffeur, personnel, fournisseur..."
+                placeholder="Rechercher par description, catégorie, camion, chauffeur, fournisseur..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -1012,7 +961,7 @@ export default function Expenses() {
           </div>
 
           {/* Filtres actifs */}
-          {(filterCamion !== 'all' || filterCategorie !== 'all' || filterSousCategorie !== 'all' || filterFournisseur !== 'all' || filterChauffeur !== 'all' || filterPersonnel !== 'all' || filterDateFrom || filterDateTo || filterMontantMin || filterMontantMax) && (
+          {(filterCamion !== 'all' || filterCategorie !== 'all' || filterSousCategorie !== 'all' || filterFournisseur !== 'all' || filterChauffeur !== 'all' || filterDateFrom || filterDateTo || filterMontantMin || filterMontantMax) && (
             <div className="flex flex-wrap gap-2 pb-2">
               {filterCamion !== 'all' && (
                 <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 px-3 py-1.5">
@@ -1081,20 +1030,6 @@ export default function Expenses() {
                     className="ml-2 hover:bg-primary/20 rounded-full p-0.5"
                     aria-label="Retirer le filtre chauffeur"
                     title="Retirer le filtre chauffeur"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              )}
-              {filterPersonnel !== 'all' && (
-                <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 px-3 py-1.5">
-                  <User className="h-3 w-3 mr-1.5" />
-                  {filterPersonnel === 'none' ? 'Sans personnel' : getPersonnelLabel(filterPersonnel)}
-                  <button
-                    onClick={() => setFilterPersonnel('all')}
-                    className="ml-2 hover:bg-primary/20 rounded-full p-0.5"
-                    aria-label="Retirer le filtre personnel"
-                    title="Retirer le filtre personnel"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -1355,7 +1290,6 @@ export default function Expenses() {
                 <TableHead>Fournisseur</TableHead>
                 <TableHead>Camion</TableHead>
                 <TableHead>Chauffeur</TableHead>
-                <TableHead>Personnel</TableHead>
                 <TableHead>Trajet</TableHead>
                 <TableHead>Description</TableHead>
                 <TableHead>Date</TableHead>
@@ -1377,7 +1311,6 @@ export default function Expenses() {
                     <TableCell>{supplier ? supplier.nom : '-'}</TableCell>
                   <TableCell>{getTruckLabel(expense.camionId)}</TableCell>
                   <TableCell>{getDriverLabel(expense.chauffeurId)}</TableCell>
-                  <TableCell>{getPersonnelLabel(expense.personnelId)}</TableCell>
                   <TableCell>
                     {expense.tripId ? (() => {
                       const trip = trips.find(t => t.id === expense.tripId);

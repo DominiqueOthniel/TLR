@@ -80,7 +80,7 @@ export default function Caisse() {
     description: '',
     categorie: '',
     reference: '',
-    /** Financement (entrée uniquement) : hors encaissement d’activité sur le tableau de bord. */
+    /** Option UI : applique la catégorie Financement sur une entrée. */
     exclutRevenu: false,
   });
 
@@ -238,6 +238,9 @@ export default function Caisse() {
   const creancesClients = useMemo(() => getTotalCreancesClients(invoices), [invoices]);
   const positionEntreprise = tresorerieTotale + creancesClients;
 
+  const isCategorieFinancement = (t: CaisseTransaction): boolean =>
+    t.type === 'entree' && (t.categorie || '').trim().toLowerCase() === 'financement';
+
   const totalEntrees = transactions.filter((t) => t.type === 'entree').reduce((sum, t) => sum + t.montant, 0);
   const totalEntreesFinancement = transactions.filter(isFinancementEntree).reduce((sum, t) => sum + t.montant, 0);
   const totalEntreesActivite = totalEntrees - totalEntreesFinancement;
@@ -291,7 +294,7 @@ export default function Caisse() {
         utilisateur: editingTransaction.utilisateur || user?.login || 'system',
         compteBanqueId: undefined,
         bankTransactionId: undefined,
-        exclutRevenu: formData.type === 'entree' && formData.exclutRevenu ? true : undefined,
+        exclutRevenu: undefined,
       };
 
       const caisseCheck = validateCaisseTransaction(base, {
@@ -352,7 +355,7 @@ export default function Caisse() {
       id: newId,
       montant,
       utilisateur: user?.login || 'system',
-      exclutRevenu: formData.type === 'entree' && formData.exclutRevenu ? true : undefined,
+      exclutRevenu: undefined,
     };
 
     const caisseCheck = validateCaisseTransaction(newTransaction, { transactions, soldeInitial });
@@ -433,7 +436,7 @@ export default function Caisse() {
       description: t.description,
       categorie: t.categorie || '',
       reference: t.reference || '',
-      exclutRevenu: t.type === 'entree' && Boolean(t.exclutRevenu),
+      exclutRevenu: isCategorieFinancement(t),
     });
     const accs = getBankAccounts();
     setDeduireSurBanque(Boolean(t.bankTransactionId) || accs.length > 0);
@@ -513,7 +516,7 @@ export default function Caisse() {
 
   const filteredTransactions = transactions.filter((t) => {
     if (filterType === 'financement') {
-      if (!isFinancementEntree(t)) return false;
+      if (!isCategorieFinancement(t)) return false;
     } else if (filterType !== 'all' && t.type !== filterType) return false;
     if (
       searchTerm &&
@@ -565,8 +568,8 @@ export default function Caisse() {
         { header: 'Utilisateur', value: (t) => t.utilisateur || '-' },
         { header: 'Catégorie', value: (t) => t.categorie || '-' },
         {
-          header: 'Financement (hors encaissement)',
-          value: (t) => (isFinancementEntree(t) ? 'Oui' : '—'),
+          header: 'Catégorie financement',
+          value: (t) => (isCategorieFinancement(t) ? 'Oui' : '—'),
         },
       ],
       rows: sortedTransactions,
@@ -586,17 +589,19 @@ export default function Caisse() {
       totals: [
         { label: 'Solde initial', value: `${soldeInitial.toLocaleString('fr-FR')} FCFA`, style: 'neutral', icon: EMOJI.argent },
         {
-          label: 'Entrées activité (hors financement)',
+          label: 'Entrées caisse',
           value: `+${totalEntreesActivite.toLocaleString('fr-FR')} FCFA`,
           style: 'positive',
           icon: EMOJI.entree,
         },
-        {
-          label: 'Financement reçu (hors encaissement)',
-          value: `+${totalEntreesFinancement.toLocaleString('fr-FR')} FCFA`,
-          style: 'neutral',
-          icon: EMOJI.entree,
-        },
+        ...(totalEntreesFinancement > 0
+          ? [{
+              label: 'Entrées exclues des encaissements',
+              value: `+${totalEntreesFinancement.toLocaleString('fr-FR')} FCFA`,
+              style: 'neutral' as const,
+              icon: EMOJI.entree,
+            }]
+          : []),
         {
           label: 'Total entrées caisse',
           value: `+${totalEntrees.toLocaleString('fr-FR')} FCFA`,
@@ -638,7 +643,7 @@ export default function Caisse() {
     <div className="space-y-6 p-1">
       <PageHeader
         title="Caisse"
-        description="Entrées et sorties de caisse. Pour une entrée, cochez « Financement » si le montant ne doit pas compter comme encaissement d’activité (le tableau de bord reste basé sur les factures et dépenses)."
+        description="Entrées et sorties de caisse. Pour une entrée de financement, cochez « Catégorie Financement » : le montant reste inclus dans les entrées de caisse."
         icon={Wallet}
         gradient="from-green-500/20 via-emerald-500/10 to-transparent"
         actions={
@@ -799,15 +804,20 @@ export default function Caisse() {
                       <div className="flex items-start gap-2">
                         <Checkbox
                           id="exclut-revenu"
-                          checked={formData.exclutRevenu}
+                          checked={
+                            formData.exclutRevenu ||
+                            formData.categorie.trim().toLowerCase() === 'financement'
+                          }
                           onCheckedChange={(c) => {
                             const on = c === true;
                             setFormData((f) => ({
                               ...f,
                               exclutRevenu: on,
                               categorie:
-                                on && !f.categorie.trim()
+                                on
                                   ? 'Financement'
+                                  : !on && f.categorie.trim().toLowerCase() === 'financement'
+                                    ? ''
                                   : f.categorie,
                             }));
                           }}
@@ -816,10 +826,10 @@ export default function Caisse() {
                         <div className="space-y-1">
                           <Label htmlFor="exclut-revenu" className="font-medium cursor-pointer flex items-center gap-1.5">
                             <Heart className="h-3.5 w-3.5 text-violet-600" />
-                            Financement (hors encaissement / bénéfice)
+                            Catégorie Financement (incluse dans l’encaissement)
                           </Label>
                           <p className="text-xs text-muted-foreground leading-snug">
-                            Le montant augmente le solde caisse mais n’entre pas dans l’« encaissement » du tableau de bord (basé sur les factures).
+                            Le montant augmente la caisse et reste compté dans les entrées/encaissements de caisse.
                           </p>
                         </div>
                       </div>
@@ -877,7 +887,7 @@ export default function Caisse() {
               {statsBanque.totalDisponible.toLocaleString('fr-FR')} FCFA
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Somme des comptes — mis à jour via l’API et les prélèvements caisse
+              Somme des comptes — mis à jour via l’API et les prélèvements vers la caisse
             </p>
             {statsBanque.parCompte.length > 1 && (
               <ul className="mt-2 text-xs text-muted-foreground space-y-0.5 max-h-20 overflow-y-auto">
@@ -914,7 +924,7 @@ export default function Caisse() {
           </CardHeader>
           <CardContent className="space-y-2">
             <div>
-              <p className="text-xs text-muted-foreground">Activité (hors financement)</p>
+              <p className="text-xs text-muted-foreground">Toutes les entrées</p>
               <div className="text-xl font-bold text-green-600 tabular-nums">
                 +{totalEntreesActivite.toLocaleString('fr-FR')} FCFA
               </div>
@@ -922,7 +932,7 @@ export default function Caisse() {
             {totalEntreesFinancement > 0 && (
               <div className="pt-1 border-t border-border/60">
                 <p className="text-xs text-muted-foreground flex items-center gap-1">
-                  <Heart className="h-3 w-3 text-violet-600" /> Financement (hors encaissement)
+                  <Heart className="h-3 w-3 text-violet-600" /> Entrées exclues des encaissements
                 </p>
                 <div className="text-sm font-semibold text-violet-700 dark:text-violet-400 tabular-nums">
                   +{totalEntreesFinancement.toLocaleString('fr-FR')} FCFA
@@ -1040,7 +1050,7 @@ export default function Caisse() {
                   <SelectItem value="all">Tous les types</SelectItem>
                   <SelectItem value="entree">Entrées</SelectItem>
                   <SelectItem value="sortie">Sorties</SelectItem>
-                  <SelectItem value="financement">Financement (entrées hors encaissement)</SelectItem>
+                  <SelectItem value="financement">Catégorie Financement</SelectItem>
                 </SelectContent>
               </Select>
               <ListSortSelect
@@ -1087,7 +1097,7 @@ export default function Caisse() {
                           <Badge variant={t.type === 'entree' ? 'default' : 'secondary'}>
                             {t.type === 'entree' ? 'Entrée' : 'Sortie'}
                           </Badge>
-                          {isFinancementEntree(t) && (
+                          {isCategorieFinancement(t) && (
                             <Badge variant="outline" className="gap-0.5 border-violet-400/50 text-violet-600 dark:text-violet-400">
                               <Heart className="h-3 w-3" />
                               Financement
