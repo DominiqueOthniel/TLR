@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Shield, Eye, EyeOff, Lock } from 'lucide-react';
+import { Loader2, Shield, Eye, EyeOff, Lock, User, ArrowRight } from 'lucide-react';
 import { AppLogo } from '@/components/AppLogo';
 import { useAuth, LOGIN_USER_OPTIONS } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -56,40 +56,47 @@ export default function Login() {
     : LOGIN_USER_OPTIONS.find(o => o.login === selectedUser);
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-[#0f1117]">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-[#0a1330]">
 
-      {/* Fond animé — orbes de couleur */}
+      {/* Fond animé — orbes aux couleurs du logo (marine + bordeaux) */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full bg-violet-600/20 blur-[120px] animate-float" />
-        <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full bg-indigo-600/20 blur-[100px] login-orb-2" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-purple-600/10 blur-[80px]" />
+        <div className="absolute -top-48 -left-40 w-[620px] h-[620px] rounded-full bg-[#1e3a8a]/30 blur-[130px] animate-float" />
+        <div className="absolute -bottom-48 -right-40 w-[560px] h-[560px] rounded-full bg-[#7a1f2b]/35 blur-[120px] login-orb-2" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[460px] h-[460px] rounded-full bg-[#2447a3]/15 blur-[90px]" />
         {/* Grille subtile */}
-        <div className="absolute inset-0 opacity-[0.04] bg-dot-pattern" />
+        <div className="absolute inset-0 text-white opacity-[0.035] bg-dot-pattern" />
+        {/* Filet doré séparateur haut */}
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-amber-300/40 to-transparent" />
       </div>
 
       {/* Carte de connexion */}
       <div className="relative w-full max-w-md mx-4 animate-fade-in-scale">
 
-        {/* Halo derrière la carte */}
-        <div className="absolute inset-0 bg-gradient-to-br from-violet-500/30 to-indigo-500/30 rounded-3xl blur-2xl scale-105 opacity-70" />
+        {/* Halo derrière la carte (marine → bordeaux) */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#1e3a8a]/40 via-transparent to-[#7a1f2b]/40 rounded-[2rem] blur-2xl scale-105 opacity-80" />
 
-        <div className="relative bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 shadow-2xl">
+        <div className="relative bg-white/[0.06] backdrop-blur-2xl border border-white/12 rounded-[2rem] p-8 shadow-2xl shadow-black/40">
+
+          {/* Liseré supérieur dégradé marque */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[3px] w-2/3 rounded-full bg-gradient-to-r from-[#1e3a8a] via-amber-300 to-[#7a1f2b]" />
 
           {/* Header */}
           <div className="flex flex-col items-center mb-8 text-center">
             {/* Logo marque */}
             <div className="relative mb-5 flex justify-center items-center">
               <div
-                className="absolute w-[18rem] h-32 sm:w-[21rem] sm:h-40 rounded-[2rem] bg-gradient-to-br from-violet-500/45 to-indigo-500/35 blur-2xl scale-[1.08] animate-pulse-glow"
+                className="absolute w-[18rem] h-32 sm:w-[21rem] sm:h-40 rounded-[2rem] bg-gradient-to-br from-[#1e3a8a]/50 to-[#7a1f2b]/45 blur-2xl scale-[1.08] animate-pulse-glow"
                 aria-hidden
               />
               <AppLogo variant="login" className="relative z-[1]" />
             </div>
 
-            <h1 className="text-3xl font-bold text-white mb-1">
-              <span className="bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent">SIA-TLR</span>
+            <h1 className="text-3xl font-bold tracking-tight mb-1.5">
+              <span className="bg-gradient-to-r from-blue-300 via-white to-rose-300 bg-clip-text text-transparent">
+                Transport · Logistique · Révolution
+              </span>
             </h1>
-            <p className="text-white/50 text-sm">Gestion de flotte · Cameroun</p>
+            <p className="text-white/45 text-sm">Plateforme de gestion de flotte · Cameroun</p>
           </div>
 
           {/* Formulaire */}
@@ -97,12 +104,15 @@ export default function Login() {
 
             {/* Sélecteur utilisateur */}
             <div className="space-y-2">
-              <Label className="text-white/70 text-sm font-medium">Utilisateur</Label>
+              <Label className="text-white/65 text-xs font-semibold uppercase tracking-wider">Utilisateur</Label>
               <Select value={selectedUser} onValueChange={setSelectedUser} disabled={loading}>
-                <SelectTrigger className="bg-white/5 border-white/10 text-white h-12 rounded-xl hover:bg-white/8 focus:ring-violet-500/50 focus:border-violet-500/50 transition-all">
-                  <SelectValue placeholder="Choisir un utilisateur" />
+                <SelectTrigger className="bg-white/[0.04] border-white/10 text-white h-12 rounded-xl hover:bg-white/[0.07] focus:ring-blue-400/40 focus:border-blue-400/50 transition-all">
+                  <span className="flex items-center gap-2.5">
+                    <User className="h-4 w-4 text-blue-300/70" />
+                    <SelectValue placeholder="Choisir un utilisateur" />
+                  </span>
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a1d2e] border-white/10">
+                <SelectContent className="bg-[#101a3a] border-white/10">
                   {users.map((opt) => {
                     const roleOption = LOGIN_USER_OPTIONS.find(o => o.login === opt.role);
                     return (
@@ -110,7 +120,7 @@ export default function Login() {
                       key={opt.login}
                       value={opt.login}
                       textValue={opt.login}
-                      className="text-white/80 focus:bg-violet-500/20 focus:text-white"
+                      className="text-white/80 focus:bg-blue-500/20 focus:text-white"
                     >
                       {opt.login} <span className="text-white/45">({roleOption?.label ?? opt.role})</span>
                     </SelectItem>
@@ -122,12 +132,12 @@ export default function Login() {
 
             {/* Rôle sélectionné : rappel des responsabilités */}
             {selectedOption && (
-              <div className="rounded-xl border border-violet-500/25 bg-violet-500/10 px-3 py-3 space-y-2">
+              <div className="rounded-xl border border-blue-400/20 bg-blue-500/[0.08] px-3 py-3 space-y-2">
                 <div className="flex items-center gap-2">
-                  <Shield className="h-4 w-4 text-violet-400 flex-shrink-0" />
-                  <span className="text-violet-200 text-sm font-semibold">{selectedOption.label}</span>
+                  <Shield className="h-4 w-4 text-amber-300 flex-shrink-0" />
+                  <span className="text-blue-100 text-sm font-semibold">{selectedOption.label}</span>
                 </div>
-                <p className="text-violet-200/80 text-xs leading-relaxed pl-6 border-l-2 border-violet-500/30 ml-1">
+                <p className="text-blue-100/70 text-xs leading-relaxed pl-6 border-l-2 border-[#7a1f2b]/50 ml-1">
                   {selectedOption.description}
                 </p>
               </div>
@@ -135,9 +145,9 @@ export default function Login() {
 
             {/* Mot de passe */}
             <div className="space-y-2">
-              <Label className="text-white/70 text-sm font-medium">Mot de passe</Label>
+              <Label className="text-white/65 text-xs font-semibold uppercase tracking-wider">Mot de passe</Label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-300/60" />
                 <Input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
@@ -145,37 +155,42 @@ export default function Login() {
                   placeholder="••••••••"
                   autoComplete="current-password"
                   disabled={loading}
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/25 h-12 pl-10 pr-10 rounded-xl focus:border-violet-500/60 focus:ring-violet-500/30 transition-all"
+                  className="bg-white/[0.04] border-white/10 text-white placeholder:text-white/25 h-12 pl-10 pr-10 rounded-xl focus:border-blue-400/60 focus:ring-blue-400/25 transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(v => !v)}
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/70 transition-colors"
                   tabIndex={-1}
+                  aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
             </div>
 
-            {/* Bouton connexion */}
+            {/* Bouton connexion (marine → bordeaux) */}
             <Button
               type="submit"
               disabled={loading}
-              className="w-full h-12 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-semibold rounded-xl shadow-lg shadow-violet-500/30 hover:shadow-violet-500/50 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 mt-2"
+              className="group w-full h-12 bg-gradient-to-r from-[#1e3a8a] via-[#3b2a78] to-[#7a1f2b] hover:from-[#234aa8] hover:via-[#4a3290] hover:to-[#94283a] text-white font-semibold rounded-xl shadow-lg shadow-[#1e3a8a]/30 hover:shadow-[#7a1f2b]/40 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 mt-2"
             >
               {loading ? (
                 <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Connexion...</>
               ) : (
-                'Se connecter'
+                <span className="flex items-center justify-center gap-2">
+                  Se connecter
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </span>
               )}
             </Button>
           </form>
 
           {/* Footer */}
-          <p className="text-center text-white/25 text-xs mt-6">
-            SIA-TLR © {new Date().getFullYear()}
-          </p>
+          <div className="mt-7 flex items-center justify-center gap-2 text-white/30 text-xs">
+            <Lock className="h-3 w-3" />
+            <span>Connexion sécurisée · SIA-TLR © {new Date().getFullYear()}</span>
+          </div>
         </div>
       </div>
     </div>
