@@ -2229,8 +2229,9 @@ export default function Invoices() {
             </span>
           </CardTitle>
         </CardHeader>
-        <CardContent className="px-3 sm:px-6 pb-4 pt-0">
-          <Table className="min-w-[1040px] w-full">
+        <CardContent className="px-0 sm:px-6 pb-4 pt-0">
+          <div className="overflow-x-auto">
+          <Table className="min-w-[1180px] w-full">
             <TableHeader>
               <TableRow>
                 <TableHead className="min-w-[11rem] w-[11rem] whitespace-nowrap">Numéro</TableHead>
@@ -2239,8 +2240,8 @@ export default function Invoices() {
                 <TableHead className="whitespace-nowrap w-28">Date création</TableHead>
                 <TableHead className="text-right whitespace-nowrap min-w-[7.5rem]">Montant TTC</TableHead>
                 <TableHead className="w-32 min-w-[8rem]">Statut</TableHead>
-                <TableHead className="min-w-[6rem] max-w-[10rem]">Notes</TableHead>
-                <TableHead className="text-right w-36 min-w-[9rem] whitespace-nowrap">Actions</TableHead>
+                <TableHead className="min-w-[8rem] max-w-[12rem]">Notes</TableHead>
+                <TableHead className="text-right w-[16rem] min-w-[16rem] whitespace-nowrap">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -2403,7 +2404,7 @@ export default function Invoices() {
                         )}
                       </TableCell>
                       <TableCell className="text-right align-top">
-                        <div className="flex flex-nowrap justify-end gap-1.5 sm:gap-2 shrink-0">
+                        <div className="ml-auto flex max-w-[15rem] flex-wrap justify-end gap-1.5">
                           <Button 
                             size="sm"
                             variant="outline"
@@ -2411,7 +2412,8 @@ export default function Invoices() {
                               setSelectedInvoice(invoice);
                               setIsViewDialogOpen(true);
                             }}
-                            className="hover:shadow-md transition-all duration-200"
+                            className="h-9 w-10 px-0 hover:shadow-md transition-all duration-200"
+                            title="Voir la facture"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -2420,10 +2422,12 @@ export default function Invoices() {
                               size="sm"
                     variant="default"
                     onClick={() => handleMarkPaid(invoice.id)}
-                              className="hover:shadow-md transition-all duration-200"
+                              className="h-9 whitespace-nowrap px-3 hover:shadow-md transition-all duration-200"
                   >
                               <CheckCircle2 className="mr-1 h-4 w-4" />
-                              {invoice.montantPaye && invoice.montantPaye > 0 ? 'Modifier paiement' : 'Marquer payée'}
+                              <span className="text-xs font-semibold">
+                                {invoice.montantPaye && invoice.montantPaye > 0 ? 'Modifier paiement' : 'Marquer payée'}
+                              </span>
                   </Button>
                 )}
                           {canManageAccounting && (
@@ -2431,7 +2435,7 @@ export default function Invoices() {
                             size="sm"
                             variant="destructive"
                             onClick={() => handleDeleteInvoice(invoice.id)}
-                            className="hover:shadow-md transition-all duration-200"
+                            className="h-9 w-10 px-0 hover:shadow-md transition-all duration-200"
                             title="Supprimer la facture"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -2445,6 +2449,7 @@ export default function Invoices() {
               )}
             </TableBody>
           </Table>
+          </div>
             </CardContent>
           </Card>
 
