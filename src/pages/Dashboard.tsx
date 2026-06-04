@@ -821,34 +821,7 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      <Suspense
-        fallback={
-          <>
-            <div className="grid gap-6 md:grid-cols-2">
-              {[0, 1].map((item) => (
-                <Card key={item} className="shadow-md">
-                  <CardHeader className="space-y-3">
-                    <div className="h-5 w-44 rounded-full bg-muted" />
-                    <div className="h-3 w-28 rounded-full bg-muted/70" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-[300px] rounded-2xl bg-gradient-to-br from-muted via-muted/70 to-muted/40" />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-            <Card className="shadow-md">
-              <CardHeader className="space-y-3">
-                <div className="h-5 w-64 rounded-full bg-muted" />
-                <div className="h-3 w-36 rounded-full bg-muted/70" />
-              </CardHeader>
-              <CardContent>
-                <div className="h-[260px] rounded-2xl bg-gradient-to-br from-muted via-muted/70 to-muted/40" />
-              </CardContent>
-            </Card>
-          </>
-        }
-      >
+      <Suspense fallback={null}>
         <DashboardCharts
           truckRevenue={truckRevenue}
           expensesData={expensesData}

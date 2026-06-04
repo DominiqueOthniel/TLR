@@ -35,6 +35,8 @@
     --brand-navy: 222 76% 36%;
     --brand-burgundy: 351 60% 33%;
     --brand-gold: 38 92% 50%;
+    --ios-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --ios-spring: cubic-bezier(0.16, 1, 0.3, 1);
     --border: 220 18% 90%;
     --input: 220 18% 92%;
     --ring: 222 76% 36%;
@@ -143,9 +145,10 @@
     @apply bg-white/70 dark:bg-white/5 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-xl;
   }
 
-  /* Carte sans animation */
+  /* Hover card léger */
   .card-lift {
-    @apply hover:shadow-xl hover:shadow-primary/10;
+    @apply transition-shadow duration-200 hover:shadow-xl hover:shadow-primary/10;
+    transition-timing-function: var(--ios-spring);
   }
 
   /* Badge glow */
@@ -155,17 +158,20 @@
 
   /* Stat card moderne */
   .stat-card {
-    @apply relative overflow-hidden rounded-2xl border bg-card p-5 hover:shadow-lg hover:shadow-primary/10;
+    @apply relative overflow-hidden rounded-2xl border bg-card p-5 transition-shadow duration-200 hover:shadow-lg hover:shadow-primary/10;
+    transition-timing-function: var(--ios-spring);
   }
 
   /* Bouton premium (marine → bordeaux) */
   .btn-premium {
-    @apply relative overflow-hidden bg-gradient-to-r from-blue-800 via-blue-700 to-rose-800 text-white font-semibold rounded-xl px-5 py-2.5 shadow-lg shadow-blue-900/30 hover:shadow-rose-900/40;
+    @apply relative overflow-hidden bg-gradient-to-r from-blue-800 via-blue-700 to-rose-800 text-white font-semibold rounded-xl px-5 py-2.5 shadow-lg shadow-blue-900/30 transition-shadow duration-200 hover:shadow-rose-900/40;
+    transition-timing-function: var(--ios-spring);
   }
 
   /* Sidebar item */
   .nav-item {
-    @apply group flex items-center gap-3 px-4 py-3 rounded-xl relative cursor-pointer;
+    @apply group flex items-center gap-3 px-4 py-3 rounded-xl transition-colors duration-150 relative cursor-pointer;
+    transition-timing-function: var(--ios-spring);
   }
 
   .nav-item-active {
@@ -178,15 +184,39 @@
 }
 
 /* =====================================================
-   MOUVEMENT DÉSACTIVÉ POUR PERFORMANCE
+   ANIMATIONS MODÉRÉES
    ===================================================== */
+@keyframes iosPageEnter {
+  from {
+    opacity: 0.92;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes iosSurfaceIn {
+  from {
+    opacity: 0.94;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-ios-page-enter { animation: iosPageEnter 0.18s var(--ios-spring) both; }
+.animate-ios-surface    { animation: iosSurfaceIn 0.16s var(--ios-spring) both; }
+
+/* Pas d'animations infinies décoratives. */
 .animate-fade-in-up,
 .animate-fade-in-scale,
 .animate-float,
 .animate-spin-slow,
 .animate-pulse-glow,
-.animate-ios-page-enter,
-.animate-ios-surface,
 .shimmer {
   animation: none !important;
 }
@@ -223,13 +253,35 @@
   animation: none !important;
 }
 
-*,
-*::before,
-*::after {
-  animation: none !important;
-  backdrop-filter: none !important;
-  scroll-behavior: auto !important;
-  transition: none !important;
+@media (prefers-reduced-motion: no-preference) {
+  body,
+  button,
+  a,
+  input,
+  textarea,
+  select,
+  [role="button"] {
+    transition-duration: 150ms;
+    transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+    transition-timing-function: var(--ios-spring);
+  }
+
+  button:not(:disabled):active,
+  a:active,
+  [role="button"]:not([aria-disabled="true"]):active {
+    transform: scale(0.985);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
 }
 
 /* =====================================================
