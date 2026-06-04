@@ -1,9 +1,10 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { Driver } from './driver.entity';
 
 export type DriverTransactionType = 'apport' | 'sortie';
 
 @Entity('driver_transactions')
+@Index('idx_driver_transactions_driver_id', ['driverId'])
 export class DriverTransaction {
   @PrimaryColumn('uuid')
   id: string;

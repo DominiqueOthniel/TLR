@@ -118,7 +118,6 @@ export class BankService {
 
   async findAllTransactions(): Promise<BankTransaction[]> {
     return this.transactionRepository.find({
-      relations: ['compte'],
       order: { date: 'DESC' },
     });
   }
@@ -126,7 +125,6 @@ export class BankService {
   async findTransactionsByAccount(compteId: string): Promise<BankTransaction[]> {
     return this.transactionRepository.find({
       where: { compteId },
-      relations: ['compte'],
       order: { date: 'DESC' },
     });
   }

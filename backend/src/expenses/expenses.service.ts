@@ -53,7 +53,6 @@ export class ExpensesService {
 
   async findAll(): Promise<Expense[]> {
     return this.expenseRepository.find({
-      relations: ['camion', 'fournisseur', 'personnel'],
       order: { date: 'DESC' },
     });
   }

@@ -1,8 +1,12 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
+import { Entity, PrimaryColumn, Column, Index } from 'typeorm';
 
 export type InvoiceStatus = 'en_attente' | 'payee';
 
 @Entity('invoices')
+@Index('idx_invoices_date_creation', ['dateCreation'])
+@Index('idx_invoices_statut', ['statut'])
+@Index('idx_invoices_trajet_id', ['trajetId'])
+@Index('idx_invoices_parcel_expedition_id', ['parcelExpeditionId'])
 export class Invoice {
   @PrimaryColumn('uuid')
   id: string;

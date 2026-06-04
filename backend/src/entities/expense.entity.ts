@@ -1,9 +1,13 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { Truck } from './truck.entity';
 import { ThirdParty } from './third-party.entity';
 import { Personnel } from './personnel.entity';
 
 @Entity('expenses')
+@Index('idx_expenses_date', ['date'])
+@Index('idx_expenses_trip_id', ['tripId'])
+@Index('idx_expenses_chauffeur_id', ['chauffeurId'])
+@Index('idx_expenses_camion_id', ['camionId'])
 export class Expense {
   @PrimaryColumn('uuid')
   id: string;

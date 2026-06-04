@@ -75,7 +75,6 @@ export class TrucksService {
 
   async findAll(): Promise<Truck[]> {
     return this.truckRepository.find({
-      relations: ['proprietaire', 'chauffeur'],
       order: { immatriculation: 'ASC' },
     });
   }

@@ -17,11 +17,18 @@ export default defineConfig(({ mode }) => ({
     },
   },
   optimizeDeps: {
-    include: ['xlsx', 'react', 'react-dom', 'react-router-dom'],
+    include: ['react', 'react-dom', 'react-router-dom'],
   },
   build: {
     rollupOptions: {
       input: path.resolve(__dirname, './index.html'),
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return;
+          if (id.includes('recharts')) return 'recharts';
+          if (id.includes('xlsx')) return 'xlsx';
+        },
+      },
     },
   },
 }));

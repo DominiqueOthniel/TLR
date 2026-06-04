@@ -77,7 +77,14 @@ async function request<T>(
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ message: res.statusText }));
-    throw new Error(err.message || `Erreur ${res.status}`);
+    const raw = err?.message;
+    const message =
+      typeof raw === 'string'
+        ? raw
+        : Array.isArray(raw)
+          ? raw.join(' ')
+          : `Erreur ${res.status}`;
+    throw new Error(message);
   }
 
   if (res.status === 204) return undefined as T;

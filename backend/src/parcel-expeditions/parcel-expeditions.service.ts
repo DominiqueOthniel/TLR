@@ -102,12 +102,7 @@ export class ParcelExpeditionsService {
   }
 
   async findAll(query?: ParcelExpeditionQueryDto): Promise<ParcelExpedition[]> {
-    const qb = this.repo
-      .createQueryBuilder('e')
-      .leftJoinAndSelect('e.tracteur', 'tracteur')
-      .leftJoinAndSelect('e.remorqueuse', 'remorqueuse')
-      .leftJoinAndSelect('e.chauffeur', 'chauffeur')
-      .orderBy('e.dateDepart', 'DESC');
+    const qb = this.repo.createQueryBuilder('e').orderBy('e.dateDepart', 'DESC');
 
     if (query?.statut) {
       qb.andWhere('e.statut = :statut', { statut: query.statut });

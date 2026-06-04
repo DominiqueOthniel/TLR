@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo } from 'react';
+import { lazy, Suspense, useRef, useState, useMemo } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Truck, Route, DollarSign, TrendingUp, TrendingDown, FileText, Users, Package, AlertCircle, LayoutDashboard, Building2, CreditCard, Wallet, RefreshCw, HardDrive, Upload, Receipt, Layers, ShoppingCart } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, LineChart, Line, Area, AreaChart } from 'recharts';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -22,6 +21,8 @@ import { useAuth, UserRole } from '@/contexts/AuthContext';
 import { adminApi } from '@/lib/api';
 import { toast } from 'sonner';
 import { getCaisseSoldeActuel, getTotalBanqueDisponible } from '@/lib/bank-local';
+
+const DashboardCharts = lazy(() => import('@/components/DashboardCharts'));
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -221,42 +222,49 @@ export default function Dashboard() {
   );
 
   // Top camions par encaissement (basé sur les montants payés)
-  const truckRevenue = trucks.map(truck => {
-    const truckTrips = trips.filter(t => t.tracteurId === truck.id || t.remorqueuseId === truck.id);
-    const truckExpeditions = parcelExpeditions.filter(
-      (ex) => ex.tracteurId === truck.id || ex.remorqueuseId === truck.id,
-    );
-    // Encaissements à partir des montants payés
-    const revenueTrips = truckTrips.reduce((sum, trip) => {
-      return sum + calculatePaidAmountForTrip(trip.id, invoices);
-    }, 0);
-    const revenueExpeditions = truckExpeditions.reduce((sum, ex) => {
-      return sum + calculatePaidAmountForParcelExpedition(ex.id, invoices);
-    }, 0);
-    const revenue = revenueTrips + revenueExpeditions;
-    const tripsCount = truckTrips.length + truckExpeditions.length;
-    return { 
-      name: truck.immatriculation, 
-      revenue,
-      tripsCount,
-      model: truck.modele 
-    };
-  }).sort((a, b) => b.revenue - a.revenue).slice(0, 5);
+  const truckRevenue = useMemo(() => {
+    return trucks
+      .map((truck) => {
+        const truckTrips = trips.filter(
+          (t) => t.tracteurId === truck.id || t.remorqueuseId === truck.id,
+        );
+        const truckExpeditions = parcelExpeditions.filter(
+          (ex) => ex.tracteurId === truck.id || ex.remorqueuseId === truck.id,
+        );
+        const revenueTrips = truckTrips.reduce(
+          (sum, trip) => sum + calculatePaidAmountForTrip(trip.id, invoices),
+          0,
+        );
+        const revenueExpeditions = truckExpeditions.reduce(
+          (sum, ex) => sum + calculatePaidAmountForParcelExpedition(ex.id, invoices),
+          0,
+        );
+        return {
+          name: truck.immatriculation,
+          revenue: revenueTrips + revenueExpeditions,
+          tripsCount: truckTrips.length + truckExpeditions.length,
+          model: truck.modele,
+        };
+      })
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 5);
+  }, [trucks, trips, parcelExpeditions, invoices]);
 
-  // Dépenses par catégorie
-  const expensesByCategory = expenses.reduce((acc, exp) => {
-    acc[exp.categorie] = (acc[exp.categorie] || 0) + exp.montant;
-    return acc;
-  }, {} as Record<string, number>);
+  const expensesData = useMemo(() => {
+    const expensesByCategory = expenses.reduce((acc, exp) => {
+      acc[exp.categorie] = (acc[exp.categorie] || 0) + exp.montant;
+      return acc;
+    }, {} as Record<string, number>);
 
-  const expensesData = Object.entries(expensesByCategory).map(([name, value]) => ({ 
-    name, 
-    value,
-    percentage: ((value / totalDepenses) * 100).toFixed(1)
-  }));
+    return Object.entries(expensesByCategory).map(([name, value]) => ({
+      name,
+      value,
+      percentage: totalDepenses > 0 ? ((value / totalDepenses) * 100).toFixed(1) : '0',
+    }));
+  }, [expenses, totalDepenses]);
 
   // Évolution mensuelle basée sur les vraies données
-  const monthlyData = (() => {
+  const monthlyData = useMemo(() => {
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
@@ -302,15 +310,7 @@ export default function Dashboard() {
     }
     
     return months;
-  })();
-
-  const COLORS = [
-    'hsl(var(--chart-1))', 
-    'hsl(var(--chart-2))', 
-    'hsl(var(--chart-3))', 
-    'hsl(var(--chart-4))',
-    'hsl(var(--chart-5))'
-  ];
+  }, [trips, parcelExpeditions, expenses, invoices]);
 
   return (
     <div className="space-y-6 p-1">
@@ -821,172 +821,21 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* Charts - Design amélioré */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Top 5 Camions */}
-        {truckRevenue.length > 0 && truckRevenue.some(t => t.revenue > 0) ? (
-        <Card className="shadow-md hover:shadow-lg transition-shadow">
-          <CardHeader className="bg-gradient-to-br from-background to-muted/20 border-b">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-lg">{EMOJI.classement} Top 5 Camions — Encaissement</CardTitle>
-                <p className="text-sm text-muted-foreground mt-1">Classement par performance</p>
-              </div>
-              <Package className="h-8 w-8 text-primary opacity-50" />
-            </div>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <ResponsiveContainer width="100%" height={350}>
-              <BarChart data={truckRevenue} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-                <XAxis type="number" stroke="hsl(var(--muted-foreground))" />
-                <YAxis dataKey="name" type="category" stroke="hsl(var(--muted-foreground))" width={80} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'hsl(var(--card))', 
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: 'var(--radius)',
-                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                  }}
-                  formatter={(value: number) => [
-                    `${value.toLocaleString('fr-FR')} FCFA`,
-                    'Encaissement'
-                  ]}
-                />
-                <Bar dataKey="revenue" fill="url(#colorRevenue)" radius={[0, 8, 8, 0]} />
-                <defs>
-                  <linearGradient id="colorRevenue" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.8} />
-                    <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={1} />
-                  </linearGradient>
-                </defs>
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-        ) : null}
-
-        {/* Dépenses par catégorie */}
-        {expensesData.length > 0 && expensesData.some(e => e.value > 0) ? (
-        <Card className="shadow-md hover:shadow-lg transition-shadow">
-          <CardHeader className="bg-gradient-to-br from-background to-muted/20 border-b">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-lg">{EMOJI.argent} Répartition des Dépenses</CardTitle>
-                <p className="text-sm text-muted-foreground mt-1">Par catégorie</p>
-              </div>
-              <DollarSign className="h-8 w-8 text-destructive opacity-50" />
-            </div>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <ResponsiveContainer width="100%" height={350}>
-              <PieChart>
-                <Pie
-                  data={expensesData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={true}
-                  label={({ name, percentage }) => `${name}: ${percentage}%`}
-                  outerRadius={100}
-                  innerRadius={60}
-                  fill="hsl(var(--primary))"
-                  dataKey="value"
-                  paddingAngle={2}
-                >
-                  {expensesData.map((entry, index) => (
-                    <Cell 
-                      key={`cell-${index}`} 
-                      fill={COLORS[index % COLORS.length]}
-                      stroke="hsl(var(--background))"
-                      strokeWidth={2}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'hsl(var(--card))', 
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: 'var(--radius)',
-                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                  }}
-                  formatter={(value: number) => [
-                    `${value.toLocaleString('fr-FR')} FCFA`,
-                    'Montant'
-                  ]}
-                />
-                <Legend 
-                  verticalAlign="bottom" 
-                  height={36}
-                  iconType="circle"
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-        ) : null}
-      </div>
-
-      {/* Graphique d'évolution mensuelle */}
-      {monthlyData.some(m => m.recettes > 0 || m.depenses > 0) ? (
-      <Card className="shadow-md hover:shadow-lg transition-shadow">
-        <CardHeader className="bg-gradient-to-br from-background to-muted/20 border-b">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-lg">{EMOJI.graphique} Évolution Chiffre d&apos;affaires vs Dépenses</CardTitle>
-              <p className="text-sm text-muted-foreground mt-1">Tendance sur 3 mois</p>
-            </div>
-            <TrendingUp className="h-8 w-8 text-primary opacity-50" />
-          </div>
-        </CardHeader>
-        <CardContent className="pt-6">
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={monthlyData}>
-              <defs>
-                <linearGradient id="colorRecettes" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(var(--chart-2))" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="hsl(var(--chart-2))" stopOpacity={0.1}/>
-                </linearGradient>
-                <linearGradient id="colorDepenses" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(var(--chart-1))" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="hsl(var(--chart-1))" stopOpacity={0.1}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-              <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
-              <YAxis stroke="hsl(var(--muted-foreground))" />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: 'hsl(var(--card))', 
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: 'var(--radius)',
-                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                }}
-                formatter={(value: number) => `${value.toLocaleString('fr-FR')} FCFA`}
-              />
-              <Legend />
-              <Area 
-                type="monotone" 
-                dataKey="recettes" 
-                stroke="hsl(var(--chart-2))" 
-                fillOpacity={1} 
-                fill="url(#colorRecettes)" 
-                strokeWidth={3}
-                name="Chiffre d&apos;affaires"
-              />
-              <Area 
-                type="monotone" 
-                dataKey="depenses" 
-                stroke="hsl(var(--chart-1))" 
-                fillOpacity={1} 
-                fill="url(#colorDepenses)" 
-                strokeWidth={3}
-                name="Dépenses"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-      ) : null}
+      <Suspense
+        fallback={
+          <Card className="shadow-md">
+            <CardContent className="py-10 text-center text-sm text-muted-foreground">
+              Chargement des graphiques...
+            </CardContent>
+          </Card>
+        }
+      >
+        <DashboardCharts
+          truckRevenue={truckRevenue}
+          expensesData={expensesData}
+          monthlyData={monthlyData}
+        />
+      </Suspense>
 
       {/* Recent Activity - Amélioré */}
       <Card className="shadow-md hover:shadow-lg transition-shadow">

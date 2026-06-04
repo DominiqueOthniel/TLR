@@ -1,4 +1,4 @@
-﻿import * as XLSX from 'xlsx-js-style';
+﻿import type * as XLSX from 'xlsx-js-style';
 import {
   COMPANY_LOGO_SRC,
   COMPANY_NAME,
@@ -21,7 +21,10 @@ interface ExportOptions<T> {
   rows: T[];
 }
 
-export function exportToExcel<T>(options: ExportOptions<T>) {
+type XlsxModule = typeof XLSX;
+
+export async function exportToExcel<T>(options: ExportOptions<T>) {
+  const XLSX = await import('xlsx-js-style');
   const { title, fileName, sheetName = 'Données', filtersDescription, columns, rows } = options;
 
   const data: (string | number)[][] = [];
@@ -54,7 +57,7 @@ export function exportToExcel<T>(options: ExportOptions<T>) {
   });
 
   const worksheet = XLSX.utils.aoa_to_sheet(data);
-  styleExcelWorksheet(worksheet, {
+  styleExcelWorksheet(XLSX, worksheet, {
     columnCount: columns.length,
     rowCount: data.length,
     headerRowIndex: filtersDescription ? 3 : 2,
@@ -68,6 +71,7 @@ export function exportToExcel<T>(options: ExportOptions<T>) {
 }
 
 function styleExcelWorksheet<T>(
+  XLSX: XlsxModule,
   worksheet: XLSX.WorkSheet,
   config: {
     columnCount: number;

@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { Truck } from './truck.entity';
 import { Driver } from './driver.entity';
@@ -25,6 +26,9 @@ export type ParcelExpeditionStatus =
   | 'annule';
 
 @Entity('parcel_expeditions')
+@Index('idx_parcel_expeditions_date_depart', ['dateDepart'])
+@Index('idx_parcel_expeditions_chauffeur_id', ['chauffeurId'])
+@Index('idx_parcel_expeditions_statut', ['statut'])
 export class ParcelExpedition {
   @PrimaryColumn('uuid')
   id: string;

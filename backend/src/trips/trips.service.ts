@@ -23,7 +23,6 @@ export class TripsService {
 
   async findAll(): Promise<Trip[]> {
     return this.tripRepository.find({
-      relations: ['tracteur', 'remorqueuse', 'chauffeur', 'chauffeurRemplacant'],
       order: { dateDepart: 'DESC' },
     });
   }

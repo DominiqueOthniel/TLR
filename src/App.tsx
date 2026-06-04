@@ -1,24 +1,26 @@
+import { lazy, Suspense } from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { AppProvider } from "./contexts/AppContext";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { Layout } from "./components/Layout";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Trucks from "./pages/Trucks";
-import Trips from "./pages/Trips";
-import Expenses from "./pages/Expenses";
-import AcquisitionCosts from "./pages/AcquisitionCosts";
-import Invoices from "./pages/Invoices";
-import Drivers from "./pages/Drivers";
-import ThirdParties from "./pages/ThirdParties";
-import ParcelShipping from "./pages/ParcelShipping";
-import Caisse from "./pages/Caisse";
-import Credits from "./pages/Credits";
-import AuditLogs from "./pages/AuditLogs";
-import NotFound from "./pages/NotFound";
+
+const Login = lazy(() => import("./pages/Login"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Trucks = lazy(() => import("./pages/Trucks"));
+const Trips = lazy(() => import("./pages/Trips"));
+const Expenses = lazy(() => import("./pages/Expenses"));
+const AcquisitionCosts = lazy(() => import("./pages/AcquisitionCosts"));
+const Invoices = lazy(() => import("./pages/Invoices"));
+const Drivers = lazy(() => import("./pages/Drivers"));
+const ThirdParties = lazy(() => import("./pages/ThirdParties"));
+const ParcelShipping = lazy(() => import("./pages/ParcelShipping"));
+const Caisse = lazy(() => import("./pages/Caisse"));
+const Credits = lazy(() => import("./pages/Credits"));
+const AuditLogs = lazy(() => import("./pages/AuditLogs"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
 
@@ -28,32 +30,54 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function PageLoader() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background text-sm text-muted-foreground">
+      Chargement...
+    </div>
+  );
+}
+
+function ProtectedAppShell() {
+  return (
+    <ProtectedRoute>
+      <AppProvider>
+        <Layout>
+          <Outlet />
+        </Layout>
+      </AppProvider>
+    </ProtectedRoute>
+  );
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AuthProvider>
-        <AppProvider>
-          <Sonner />
-          <BrowserRouter>
+        <Sonner />
+        <BrowserRouter>
+          <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/login" element={<Login />} />
-              <Route path="/" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
-            <Route path="/camions" element={<ProtectedRoute><Layout><Trucks /></Layout></ProtectedRoute>} />
-            <Route path="/trajets" element={<ProtectedRoute><Layout><Trips /></Layout></ProtectedRoute>} />
-            <Route path="/depenses" element={<ProtectedRoute><Layout><Expenses /></Layout></ProtectedRoute>} />
-            <Route path="/frais-acquisition" element={<ProtectedRoute><Layout><AcquisitionCosts /></Layout></ProtectedRoute>} />
-            <Route path="/factures" element={<ProtectedRoute><Layout><Invoices /></Layout></ProtectedRoute>} />
-              <Route path="/chauffeurs" element={<ProtectedRoute><Layout><Drivers /></Layout></ProtectedRoute>} />
-              <Route path="/tiers" element={<ProtectedRoute><Layout><ThirdParties /></Layout></ProtectedRoute>} />
-              <Route path="/envoi-colis" element={<ProtectedRoute><Layout><ParcelShipping /></Layout></ProtectedRoute>} />
-              <Route path="/banque" element={<ProtectedRoute><Navigate to="/caisse" replace /></ProtectedRoute>} />
-              <Route path="/caisse" element={<ProtectedRoute><Layout><Caisse /></Layout></ProtectedRoute>} />
-              <Route path="/credits" element={<ProtectedRoute><Layout><Credits /></Layout></ProtectedRoute>} />
-              <Route path="/historique" element={<ProtectedRoute><Layout><AuditLogs /></Layout></ProtectedRoute>} />
+              <Route element={<ProtectedAppShell />}>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/camions" element={<Trucks />} />
+                <Route path="/trajets" element={<Trips />} />
+                <Route path="/depenses" element={<Expenses />} />
+                <Route path="/frais-acquisition" element={<AcquisitionCosts />} />
+                <Route path="/factures" element={<Invoices />} />
+                <Route path="/chauffeurs" element={<Drivers />} />
+                <Route path="/tiers" element={<ThirdParties />} />
+                <Route path="/envoi-colis" element={<ParcelShipping />} />
+                <Route path="/banque" element={<Navigate to="/caisse" replace />} />
+                <Route path="/caisse" element={<Caisse />} />
+                <Route path="/credits" element={<Credits />} />
+                <Route path="/historique" element={<AuditLogs />} />
+              </Route>
               <Route path="*" element={<NotFound />} />
-          </Routes>
+            </Routes>
+          </Suspense>
         </BrowserRouter>
-        </AppProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>

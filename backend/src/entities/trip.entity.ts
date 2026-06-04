@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { Truck } from './truck.entity';
 import { Driver } from './driver.entity';
@@ -11,6 +12,9 @@ import { Driver } from './driver.entity';
 export type TripStatus = 'planifie' | 'en_cours' | 'termine' | 'annule';
 
 @Entity('trips')
+@Index('idx_trips_date_depart', ['dateDepart'])
+@Index('idx_trips_chauffeur_id', ['chauffeurId'])
+@Index('idx_trips_statut', ['statut'])
 export class Trip {
   @PrimaryColumn('uuid')
   id: string;
