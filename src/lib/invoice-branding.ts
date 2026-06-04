@@ -12,7 +12,7 @@ export const COMPANY_PHONE = '+237 698 95 46 43 / 678 97 83 84';
 
 export const COMPANY_EMAIL = 'transportlogistiquerevolution@gmail.com';
 
-export const COMPANY_TAX_ID = '2416943369K';
+export const COMPANY_TAX_ID = 'M072416943369K';
 
 export const COMPANY_CONTACT = `${COMPANY_ADDRESS} · Tél. ${COMPANY_PHONE} · ${COMPANY_EMAIL} · NIU ${COMPANY_TAX_ID}`;
 
