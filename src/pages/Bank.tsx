@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Plus, Edit, Trash2, Landmark, TrendingUp, TrendingDown, Search, X, FileDown, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import PageHeader from '@/components/PageHeader';
+import { EmptyState } from '@/components/EmptyState';
 import { useAuth } from '@/contexts/AuthContext';
 import { exportToExcel, exportToPrintablePDF } from '@/lib/export-utils';
 import { EMOJI } from '@/lib/emoji-palette';
@@ -908,8 +909,12 @@ export default function Bank() {
               <TableBody>
                 {sortedFilteredTransactions.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                      Aucune transaction trouvée
+                    <TableCell colSpan={8} className="py-4">
+                      <EmptyState
+                        icon={Landmark}
+                        title="Aucune transaction trouvée"
+                        hint="Les mouvements bancaires apparaîtront ici."
+                      />
                     </TableCell>
                   </TableRow>
                 ) : (

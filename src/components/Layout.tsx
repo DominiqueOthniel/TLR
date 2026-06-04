@@ -44,18 +44,18 @@ function readSidebarHidden(): boolean {
 }
 
 const navigation = [
-  { name: 'Dashboard',  href: '/',          icon: LayoutDashboard, color: 'from-violet-500 to-indigo-500' },
-  { name: 'Historique', href: '/historique', icon: History,         color: 'from-slate-500 to-zinc-500', adminOnly: true },
-  { name: 'Camions',    href: '/camions',    icon: Truck,           color: 'from-purple-500 to-pink-500' },
-  { name: 'Trajets',    href: '/trajets',    icon: Route,           color: 'from-emerald-500 to-teal-500' },
-  { name: 'Dépenses',   href: '/depenses',   icon: DollarSign,      color: 'from-orange-500 to-red-500' },
-  { name: 'Frais acquisition', href: '/frais-acquisition', icon: ShoppingCart, color: 'from-teal-500 to-emerald-500' },
-  { name: 'Factures',   href: '/factures',   icon: FileText,        color: 'from-blue-500 to-cyan-500' },
-  { name: 'Chauffeurs', href: '/chauffeurs', icon: Users,           color: 'from-cyan-500 to-sky-500' },
-  { name: 'Tiers',      href: '/tiers',      icon: Building2,       color: 'from-violet-500 to-purple-500' },
-  { name: 'Expéditions', href: '/envoi-colis', icon: Package,       color: 'from-sky-500 to-cyan-500' },
-  { name: 'Caisse',     href: '/caisse',     icon: Wallet,          color: 'from-green-500 to-emerald-500' },
-  { name: 'Suivi créances', href: '/credits', icon: CreditCard,      color: 'from-rose-500 to-pink-500' },
+  { name: 'Dashboard',  href: '/',          icon: LayoutDashboard, color: 'from-blue-600 to-blue-800' },
+  { name: 'Historique', href: '/historique', icon: History,         color: 'from-slate-500 to-slate-700', adminOnly: true },
+  { name: 'Camions',    href: '/camions',    icon: Truck,           color: 'from-blue-700 to-indigo-800' },
+  { name: 'Trajets',    href: '/trajets',    icon: Route,           color: 'from-sky-600 to-blue-700' },
+  { name: 'Dépenses',   href: '/depenses',   icon: DollarSign,      color: 'from-rose-700 to-rose-900' },
+  { name: 'Frais acquisition', href: '/frais-acquisition', icon: ShoppingCart, color: 'from-rose-600 to-rose-800' },
+  { name: 'Factures',   href: '/factures',   icon: FileText,        color: 'from-blue-600 to-cyan-700' },
+  { name: 'Chauffeurs', href: '/chauffeurs', icon: Users,           color: 'from-cyan-600 to-blue-700' },
+  { name: 'Tiers',      href: '/tiers',      icon: Building2,       color: 'from-indigo-600 to-blue-800' },
+  { name: 'Expéditions', href: '/envoi-colis', icon: Package,       color: 'from-amber-500 to-amber-700' },
+  { name: 'Caisse',     href: '/caisse',     icon: Wallet,          color: 'from-blue-600 to-blue-800' },
+  { name: 'Suivi créances', href: '/credits', icon: CreditCard,      color: 'from-rose-600 to-rose-800' },
 ];
 
 function NavItem({
@@ -81,7 +81,7 @@ function NavItem({
     >
       {/* Indicateur actif */}
       {isActive && (
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-gradient-to-b from-violet-400 to-indigo-400 rounded-r-full" />
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-gradient-to-b from-blue-400 via-blue-500 to-amber-400 rounded-r-full" />
       )}
 
       {/* Icône */}
@@ -149,8 +149,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
   const roleColor = user?.role === 'pdg' ? 'bg-amber-500/15 text-amber-400 border-amber-500/20'
     : user?.role === 'gestion_manager' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20'
-      : user?.role === 'comptable' ? 'bg-blue-500/15 text-blue-400 border-blue-500/20'
-        : 'bg-violet-500/15 text-violet-400 border-violet-500/20';
+      : user?.role === 'comptable' ? 'bg-sky-500/15 text-sky-400 border-sky-500/20'
+        : 'bg-blue-500/15 text-blue-300 border-blue-500/25';
 
   return (
     <div className="min-h-screen bg-background relative">
@@ -171,7 +171,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       )}
 
       {/* Grille de fond subtile */}
-      <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.025] dark:opacity-[0.03] bg-[linear-gradient(to_right,hsl(252,87%,62%)_1px,transparent_1px),linear-gradient(to_bottom,hsl(252,87%,62%)_1px,transparent_1px)] bg-[size:32px_32px]" />
+      <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.025] dark:opacity-[0.03] bg-[linear-gradient(to_right,hsl(222,76%,40%)_1px,transparent_1px),linear-gradient(to_bottom,hsl(222,76%,40%)_1px,transparent_1px)] bg-[size:32px_32px]" />
 
       {/* ===== OVERLAY MOBILE ===== */}
       {sidebarOpen && (

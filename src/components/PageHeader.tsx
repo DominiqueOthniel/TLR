@@ -25,8 +25,8 @@ export default function PageHeader({
   title,
   description,
   icon: Icon,
-  gradient = 'from-violet-500/15 via-purple-500/8 to-transparent',
-  iconColor = 'from-violet-600 via-purple-600 to-indigo-700',
+  gradient = 'from-blue-600/15 via-blue-500/8 to-transparent',
+  iconColor = 'from-blue-700 via-blue-600 to-rose-800',
   stats,
   actions,
   className,
@@ -43,7 +43,7 @@ export default function PageHeader({
       <div className="absolute inset-0 opacity-[0.025] dark:opacity-[0.04] bg-dot-pattern" />
 
       {/* Ligne décorative haute */}
-      <div className={cn('absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent', iconColor.includes('violet') ? 'via-violet-500/60' : 'via-primary/60', 'to-transparent')} />
+      <div className={cn('absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent')} />
 
       {/* Contenu */}
       <div className="relative p-4 sm:p-5 md:p-7">

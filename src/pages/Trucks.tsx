@@ -18,6 +18,7 @@ import {
   countTracteursJumeles,
 } from '@/lib/sync-utils';
 import PageHeader from '@/components/PageHeader';
+import { EmptyState } from '@/components/EmptyState';
 import { useAuth } from '@/contexts/AuthContext';
 import { exportToExcel, exportToPrintablePDF } from '@/lib/export-utils';
 import { EMOJI } from '@/lib/emoji-palette';
@@ -1071,8 +1072,12 @@ export default function Trucks() {
             <TableBody>
               {sortedTrucks.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
-                    Aucun camion ne correspond aux critères de filtrage sélectionnés
+                  <TableCell colSpan={10} className="py-4">
+                    <EmptyState
+                      icon={TruckIcon}
+                      title="Aucun camion trouvé"
+                      hint="Aucun camion ne correspond aux critères de filtrage sélectionnés."
+                    />
                   </TableCell>
                 </TableRow>
               ) : (

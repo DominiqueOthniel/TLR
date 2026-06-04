@@ -13,6 +13,7 @@ import { useSubmitGuard } from '@/hooks/useSubmitGuard';
 import { toast } from 'sonner';
 import PageHeader from '@/components/PageHeader';
 import { useAuth } from '@/contexts/AuthContext';
+import { EmptyState } from '@/components/EmptyState';
 import { exportToExcel, exportToPrintablePDF } from '@/lib/export-utils';
 import { EMOJI } from '@/lib/emoji-palette';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -1115,9 +1116,12 @@ export default function Caisse() {
               <TableBody>
                 {sortedTransactions.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={canManageTreasury ? 9 : 8} className="text-center py-8 text-muted-foreground">
-                      <Wallet className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                      <p>Aucune transaction enregistrée</p>
+                    <TableCell colSpan={canManageTreasury ? 9 : 8} className="py-4">
+                      <EmptyState
+                        icon={Wallet}
+                        title="Aucune transaction enregistrée"
+                        hint="Ajoutez une entrée ou une sortie pour démarrer le suivi de caisse."
+                      />
                     </TableCell>
                   </TableRow>
                 ) : (

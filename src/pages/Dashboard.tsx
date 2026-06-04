@@ -171,15 +171,15 @@ export default function Dashboard() {
 
   // Définition des raccourcis vers les écrans
   const shortcuts = [
-    { name: 'Camions', href: '/camions', icon: Truck, color: 'from-purple-500 to-pink-500', bgColor: 'bg-purple-50 dark:bg-purple-950/30', borderColor: 'border-purple-200 dark:border-purple-800' },
-    { name: 'Trajets', href: '/trajets', icon: Route, color: 'from-green-500 to-emerald-500', bgColor: 'bg-green-50 dark:bg-green-950/30', borderColor: 'border-green-200 dark:border-green-800' },
-    { name: 'Caisse', href: '/caisse', icon: Wallet, color: 'from-green-500 to-emerald-500', bgColor: 'bg-green-50 dark:bg-green-950/30', borderColor: 'border-green-200 dark:border-green-800' },
-    { name: 'Frais acquisition', href: '/frais-acquisition', icon: ShoppingCart, color: 'from-teal-500 to-emerald-500', bgColor: 'bg-teal-50 dark:bg-teal-950/30', borderColor: 'border-teal-200 dark:border-teal-800' },
-    { name: 'Factures', href: '/factures', icon: FileText, color: 'from-indigo-500 to-blue-500', bgColor: 'bg-indigo-50 dark:bg-indigo-950/30', borderColor: 'border-indigo-200 dark:border-indigo-800' },
-    { name: 'Chauffeurs', href: '/chauffeurs', icon: Users, color: 'from-cyan-500 to-teal-500', bgColor: 'bg-cyan-50 dark:bg-cyan-950/30', borderColor: 'border-cyan-200 dark:border-cyan-800' },
-    { name: 'Tiers', href: '/tiers', icon: Building2, color: 'from-violet-500 to-purple-500', bgColor: 'bg-violet-50 dark:bg-violet-950/30', borderColor: 'border-violet-200 dark:border-violet-800' },
-    { name: 'Expéditions', href: '/envoi-colis', icon: Package, color: 'from-sky-500 to-cyan-500', bgColor: 'bg-sky-50 dark:bg-sky-950/30', borderColor: 'border-sky-200 dark:border-sky-800' },
-    { name: 'Suivi créances', href: '/credits', icon: CreditCard, color: 'from-emerald-500 to-teal-500', bgColor: 'bg-emerald-50 dark:bg-emerald-950/30', borderColor: 'border-emerald-200 dark:border-emerald-800' },
+    { name: 'Camions', href: '/camions', icon: Truck, color: 'from-blue-700 to-indigo-800', bgColor: 'bg-blue-50 dark:bg-blue-950/30', borderColor: 'border-blue-200 dark:border-blue-800' },
+    { name: 'Trajets', href: '/trajets', icon: Route, color: 'from-sky-600 to-blue-700', bgColor: 'bg-sky-50 dark:bg-sky-950/30', borderColor: 'border-sky-200 dark:border-sky-800' },
+    { name: 'Caisse', href: '/caisse', icon: Wallet, color: 'from-blue-600 to-blue-800', bgColor: 'bg-blue-50 dark:bg-blue-950/30', borderColor: 'border-blue-200 dark:border-blue-800' },
+    { name: 'Frais acquisition', href: '/frais-acquisition', icon: ShoppingCart, color: 'from-rose-600 to-rose-800', bgColor: 'bg-rose-50 dark:bg-rose-950/30', borderColor: 'border-rose-200 dark:border-rose-800' },
+    { name: 'Factures', href: '/factures', icon: FileText, color: 'from-blue-600 to-cyan-700', bgColor: 'bg-cyan-50 dark:bg-cyan-950/30', borderColor: 'border-cyan-200 dark:border-cyan-800' },
+    { name: 'Chauffeurs', href: '/chauffeurs', icon: Users, color: 'from-cyan-600 to-blue-700', bgColor: 'bg-cyan-50 dark:bg-cyan-950/30', borderColor: 'border-cyan-200 dark:border-cyan-800' },
+    { name: 'Tiers', href: '/tiers', icon: Building2, color: 'from-indigo-600 to-blue-800', bgColor: 'bg-indigo-50 dark:bg-indigo-950/30', borderColor: 'border-indigo-200 dark:border-indigo-800' },
+    { name: 'Expéditions', href: '/envoi-colis', icon: Package, color: 'from-amber-500 to-amber-700', bgColor: 'bg-amber-50 dark:bg-amber-950/30', borderColor: 'border-amber-200 dark:border-amber-800' },
+    { name: 'Suivi créances', href: '/credits', icon: CreditCard, color: 'from-rose-600 to-rose-800', bgColor: 'bg-rose-50 dark:bg-rose-950/30', borderColor: 'border-rose-200 dark:border-rose-800' },
   ];
 
   // Chiffre d’affaires (montants payés sur factures trajets + expéditions)
@@ -319,7 +319,7 @@ export default function Dashboard() {
         title="Tableau de Bord"
         description="Encaissements et bénéfice : factures (montants payés sur trajets et expéditions) et dépenses enregistrées — les dons saisis uniquement en Caisse n’y sont pas inclus."
         icon={LayoutDashboard}
-        gradient="from-violet-500/20 via-fuchsia-500/10 to-transparent"
+        gradient="from-blue-600/20 via-rose-500/10 to-transparent"
         stats={[
           {
             label: 'Encaissement',
@@ -725,21 +725,21 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className={`bg-gradient-to-br ${totalProfit >= 0 ? 'from-purple-50 to-purple-100 dark:from-purple-950/30 dark:to-purple-900/30 border-purple-200 dark:border-purple-800' : 'from-orange-50 to-orange-100 dark:from-orange-950/30 dark:to-orange-900/30 border-orange-200 dark:border-orange-800'} hover:shadow-lg transition-all duration-300`}>
+        <Card className={`bg-gradient-to-br ${totalProfit >= 0 ? 'from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/30 border-blue-200 dark:border-blue-800' : 'from-orange-50 to-orange-100 dark:from-orange-950/30 dark:to-orange-900/30 border-orange-200 dark:border-orange-800'} hover:shadow-lg transition-all duration-300`}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className={`text-sm font-medium ${totalProfit >= 0 ? 'text-purple-700 dark:text-purple-400' : 'text-orange-700 dark:text-orange-400'}`}>
+            <CardTitle className={`text-sm font-medium ${totalProfit >= 0 ? 'text-blue-700 dark:text-blue-400' : 'text-orange-700 dark:text-orange-400'}`}>
               Bénéfice Net
             </CardTitle>
-            <div className={`p-2 ${totalProfit >= 0 ? 'bg-purple-200 dark:bg-purple-900' : 'bg-orange-200 dark:bg-orange-900'} rounded-lg`}>
+            <div className={`p-2 ${totalProfit >= 0 ? 'bg-blue-200 dark:bg-blue-900' : 'bg-orange-200 dark:bg-orange-900'} rounded-lg`}>
               {totalProfit >= 0 ? (
-                <TrendingUp className="h-5 w-5 text-purple-700 dark:text-purple-400" />
+                <TrendingUp className="h-5 w-5 text-blue-700 dark:text-blue-400" />
               ) : (
                 <TrendingDown className="h-5 w-5 text-orange-700 dark:text-orange-400" />
               )}
             </div>
           </CardHeader>
           <CardContent>
-            <div className={`text-xl sm:text-3xl font-bold ${totalProfit >= 0 ? 'text-purple-900 dark:text-purple-300' : 'text-orange-900 dark:text-orange-300'}`}>
+            <div className={`text-xl sm:text-3xl font-bold ${totalProfit >= 0 ? 'text-blue-900 dark:text-blue-300' : 'text-orange-900 dark:text-orange-300'}`}>
               {totalProfit.toLocaleString('fr-FR', { maximumFractionDigits: 0 })}
             </div>
             <p className="text-xs text-muted-foreground mt-2">
