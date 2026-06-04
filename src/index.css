@@ -220,20 +220,18 @@
 @keyframes iosPageEnter {
   from {
     opacity: 0;
-    transform: translateY(14px) scale(0.985);
-    filter: blur(8px);
+    transform: translateY(6px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
+    transform: translateY(0);
   }
 }
 
 @keyframes iosSurfaceIn {
   from {
     opacity: 0;
-    transform: translateY(10px) scale(0.98);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -251,8 +249,8 @@
 .animate-float          { animation: float 4s ease-in-out infinite; }
 .animate-spin-slow      { animation: spin-slow 12s linear infinite; }
 .animate-pulse-glow     { animation: pulse-glow 2.5s ease-in-out infinite; }
-.animate-ios-page-enter { animation: iosPageEnter 0.62s var(--ios-spring) both; }
-.animate-ios-surface    { animation: iosSurfaceIn 0.48s var(--ios-spring) both; }
+.animate-ios-page-enter { animation: iosPageEnter 0.28s var(--ios-spring) both; }
+.animate-ios-surface    { animation: iosSurfaceIn 0.24s var(--ios-spring) both; }
 
 .shimmer {
   background: linear-gradient(90deg,
@@ -311,8 +309,8 @@
   textarea,
   select,
   [role="button"] {
-    transition-duration: 260ms;
-    transition-property: color, background-color, border-color, box-shadow, opacity, transform, filter;
+    transition-duration: 180ms;
+    transition-property: color, background-color, border-color, box-shadow, opacity, transform;
     transition-timing-function: var(--ios-spring);
   }
 
@@ -322,18 +320,8 @@
     transform: scale(0.975);
   }
 
-  main > * {
-    animation: iosPageEnter 0.58s var(--ios-spring) both;
-  }
-
-  main > *:nth-child(2) { animation-delay: 45ms; }
-  main > *:nth-child(3) { animation-delay: 90ms; }
-  main > *:nth-child(4) { animation-delay: 135ms; }
-
-  .ios-surface,
-  .stat-card,
-  .glass-card {
-    animation: iosSurfaceIn 0.5s var(--ios-spring) both;
+  .ios-surface {
+    animation: iosSurfaceIn 0.22s var(--ios-spring) both;
   }
 }
 
