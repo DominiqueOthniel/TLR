@@ -140,7 +140,7 @@ export default function Caisse() {
         type: 'sortie' as const,
         categorie: tx.categorie === 'Encaissements clients' ? 'Factures fournisseurs' : tx.categorie || 'Factures fournisseurs',
         description: tx.description.replace(/^Encaissement facture/, 'Paiement facture fournisseur'),
-        exclutRevenu: undefined,
+        exclutRevenu: formData.type === 'entree' && formData.exclutRevenu ? true : undefined,
       };
     });
 
@@ -355,7 +355,7 @@ export default function Caisse() {
       id: newId,
       montant,
       utilisateur: user?.login || 'system',
-      exclutRevenu: undefined,
+      exclutRevenu: formData.type === 'entree' && formData.exclutRevenu ? true : undefined,
     };
 
     const caisseCheck = validateCaisseTransaction(newTransaction, { transactions, soldeInitial });
@@ -436,7 +436,7 @@ export default function Caisse() {
       description: t.description,
       categorie: t.categorie || '',
       reference: t.reference || '',
-      exclutRevenu: isCategorieFinancement(t),
+      exclutRevenu: t.type === 'entree' && Boolean(t.exclutRevenu),
     });
     const accs = getBankAccounts();
     setDeduireSurBanque(Boolean(t.bankTransactionId) || accs.length > 0);
@@ -568,8 +568,13 @@ export default function Caisse() {
         { header: 'Utilisateur', value: (t) => t.utilisateur || '-' },
         { header: 'Catégorie', value: (t) => t.categorie || '-' },
         {
-          header: 'Catégorie financement',
-          value: (t) => (isCategorieFinancement(t) ? 'Oui' : '—'),
+          header: 'Financement',
+          value: (t) =>
+            isFinancementEntree(t)
+              ? 'Hors encaissement'
+              : isCategorieFinancement(t)
+                ? 'Inclus dans encaissement'
+                : '—',
         },
       ],
       rows: sortedTransactions,
@@ -589,14 +594,14 @@ export default function Caisse() {
       totals: [
         { label: 'Solde initial', value: `${soldeInitial.toLocaleString('fr-FR')} FCFA`, style: 'neutral', icon: EMOJI.argent },
         {
-          label: 'Entrées caisse',
+          label: 'Entrées incluses dans l’encaissement',
           value: `+${totalEntreesActivite.toLocaleString('fr-FR')} FCFA`,
           style: 'positive',
           icon: EMOJI.entree,
         },
         ...(totalEntreesFinancement > 0
           ? [{
-              label: 'Entrées exclues des encaissements',
+              label: 'Financement hors encaissement',
               value: `+${totalEntreesFinancement.toLocaleString('fr-FR')} FCFA`,
               style: 'neutral' as const,
               icon: EMOJI.entree,
@@ -643,7 +648,7 @@ export default function Caisse() {
     <div className="space-y-6 p-1">
       <PageHeader
         title="Caisse"
-        description="Entrées et sorties de caisse. Pour une entrée de financement, cochez « Catégorie Financement » : le montant reste inclus dans les entrées de caisse."
+        description="Entrées et sorties de caisse. Pour une entrée de financement, choisissez si le montant doit être inclus dans l’encaissement ou seulement ajouter de la trésorerie."
         icon={Wallet}
         gradient="from-green-500/20 via-emerald-500/10 to-transparent"
         actions={
@@ -800,36 +805,63 @@ export default function Caisse() {
                     </div>
 
                     {formData.type === 'entree' && (
-                    <div className="rounded-lg border border-violet-200/80 dark:border-violet-900/50 bg-violet-50/60 dark:bg-violet-950/25 p-3 space-y-2">
+                    <div className="rounded-lg border border-violet-200/80 dark:border-violet-900/50 bg-violet-50/60 dark:bg-violet-950/25 p-3 space-y-3">
                       <div className="flex items-start gap-2">
                         <Checkbox
-                          id="exclut-revenu"
+                          id="financement-inclus"
                           checked={
-                            formData.exclutRevenu ||
+                            !formData.exclutRevenu &&
                             formData.categorie.trim().toLowerCase() === 'financement'
                           }
                           onCheckedChange={(c) => {
                             const on = c === true;
                             setFormData((f) => ({
                               ...f,
-                              exclutRevenu: on,
-                              categorie:
-                                on
-                                  ? 'Financement'
-                                  : !on && f.categorie.trim().toLowerCase() === 'financement'
-                                    ? ''
+                              exclutRevenu: false,
+                              categorie: on
+                                ? 'Financement'
+                                : f.categorie.trim().toLowerCase() === 'financement'
+                                  ? ''
                                   : f.categorie,
                             }));
                           }}
                           className="mt-1"
                         />
                         <div className="space-y-1">
-                          <Label htmlFor="exclut-revenu" className="font-medium cursor-pointer flex items-center gap-1.5">
+                          <Label htmlFor="financement-inclus" className="font-medium cursor-pointer flex items-center gap-1.5">
                             <Heart className="h-3.5 w-3.5 text-violet-600" />
-                            Catégorie Financement (incluse dans l’encaissement)
+                            Financement inclus dans l’encaissement
                           </Label>
                           <p className="text-xs text-muted-foreground leading-snug">
-                            Le montant augmente la caisse et reste compté dans les entrées/encaissements de caisse.
+                            Le montant augmente la caisse et compte dans les entrées/encaissements.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2 border-t border-violet-200/70 pt-3 dark:border-violet-900/50">
+                        <Checkbox
+                          id="financement-hors-encaissement"
+                          checked={formData.exclutRevenu}
+                          onCheckedChange={(c) => {
+                            const on = c === true;
+                            setFormData((f) => ({
+                              ...f,
+                              exclutRevenu: on,
+                              categorie: on
+                                ? 'Financement'
+                                : f.categorie.trim().toLowerCase() === 'financement'
+                                  ? ''
+                                  : f.categorie,
+                            }));
+                          }}
+                          className="mt-1"
+                        />
+                        <div className="space-y-1">
+                          <Label htmlFor="financement-hors-encaissement" className="font-medium cursor-pointer flex items-center gap-1.5">
+                            <Heart className="h-3.5 w-3.5 text-violet-600" />
+                            Financement hors encaissement
+                          </Label>
+                          <p className="text-xs text-muted-foreground leading-snug">
+                            Le montant augmente la caisse, mais ne compte pas dans l’encaissement/bénéfice.
                           </p>
                         </div>
                       </div>
@@ -924,7 +956,7 @@ export default function Caisse() {
           </CardHeader>
           <CardContent className="space-y-2">
             <div>
-              <p className="text-xs text-muted-foreground">Toutes les entrées</p>
+              <p className="text-xs text-muted-foreground">Incluses dans l’encaissement</p>
               <div className="text-xl font-bold text-green-600 tabular-nums">
                 +{totalEntreesActivite.toLocaleString('fr-FR')} FCFA
               </div>
@@ -932,7 +964,7 @@ export default function Caisse() {
             {totalEntreesFinancement > 0 && (
               <div className="pt-1 border-t border-border/60">
                 <p className="text-xs text-muted-foreground flex items-center gap-1">
-                  <Heart className="h-3 w-3 text-violet-600" /> Entrées exclues des encaissements
+                  <Heart className="h-3 w-3 text-violet-600" /> Financement hors encaissement
                 </p>
                 <div className="text-sm font-semibold text-violet-700 dark:text-violet-400 tabular-nums">
                   +{totalEntreesFinancement.toLocaleString('fr-FR')} FCFA
@@ -1100,7 +1132,7 @@ export default function Caisse() {
                           {isCategorieFinancement(t) && (
                             <Badge variant="outline" className="gap-0.5 border-violet-400/50 text-violet-600 dark:text-violet-400">
                               <Heart className="h-3 w-3" />
-                              Financement
+                              {isFinancementEntree(t) ? 'Financement hors encaissement' : 'Financement inclus'}
                             </Badge>
                           )}
                         </div>

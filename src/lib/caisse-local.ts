@@ -175,13 +175,9 @@ export async function persistCaisseSoldeInitial(value: number): Promise<void> {
   }
 }
 
-/** Ancien marquage d'entrée exclue des encaissements d'activité. */
+/** Entrée explicitement exclue des encaissements d'activité. */
 export function isFinancementEntree(t: CaisseTransaction): boolean {
-  return (
-    t.type === 'entree' &&
-    t.exclutRevenu === true &&
-    (t.categorie || '').trim().toLowerCase() !== 'financement'
-  );
+  return t.type === 'entree' && t.exclutRevenu === true;
 }
 
 /** @deprecated utiliser isFinancementEntree */
