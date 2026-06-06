@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useSubmitGuard } from '@/hooks/useSubmitGuard';
 import { useApp, Expense, Invoice } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
@@ -48,6 +49,7 @@ function nextExpenseInvoiceNumero(invoicesList: Invoice[]): string {
 }
 
 export default function Expenses() {
+  const [searchParams] = useSearchParams();
   const { expenses, trucks, drivers, thirdParties, subCategories, setSubCategories, invoices, trips, createExpense, updateExpense, deleteExpense, createInvoice, updateInvoice } = useApp();
   const { canManageAccounting } = useAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -68,6 +70,9 @@ export default function Expenses() {
   const [filterMontantMax, setFilterMontantMax] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [listSort, setListSort] = useState<string>('date_desc');
+  const highlightedExpenseId = searchParams.get('expenseId') || '';
+  const createExpenseTripId = searchParams.get('tripId') || '';
+  const shouldOpenCreateExpense = searchParams.get('new') === '1';
 
   const [formData, setFormData] = useState({
     camionId: '',
@@ -117,6 +122,55 @@ export default function Expenses() {
     });
     setSelectedExpenseForInvoice(null);
   };
+
+  useEffect(() => {
+    if (!shouldOpenCreateExpense || !createExpenseTripId) return;
+
+    const trip = trips.find(t => t.id === createExpenseTripId);
+    if (!trip) return;
+
+    const camionId = trip.tracteurId || trip.remorqueuseId || '';
+    setEditingExpense(null);
+    setFormData({
+      camionId,
+      tripId: trip.id,
+      chauffeurId: trip.chauffeurRemplacantId || trip.chauffeurId || '',
+      categorie: 'Carburant',
+      sousCategorie: '',
+      fournisseurId: '',
+      montant: 0,
+      paiementStatut: 'solde',
+      quantite: undefined,
+      prixUnitaire: undefined,
+      date: trip.dateDepart || new Date().toISOString().split('T')[0],
+      description: `Dépense trajet ${trip.origine} → ${trip.destination}`,
+    });
+    setIsDialogOpen(true);
+  }, [shouldOpenCreateExpense, createExpenseTripId, trips]);
+
+  useEffect(() => {
+    if (!highlightedExpenseId) return;
+    const expense = expenses.find(e => e.id === highlightedExpenseId);
+    if (!expense) return;
+
+    setFilterCamion('all');
+    setFilterCategorie('all');
+    setFilterSousCategorie('all');
+    setFilterFournisseur('all');
+    setFilterChauffeur('all');
+    setFilterDateFrom('');
+    setFilterDateTo('');
+    setFilterMontantMin('');
+    setFilterMontantMax('');
+    setSearchTerm(expense.id);
+
+    window.setTimeout(() => {
+      document.getElementById(`expense-row-${expense.id}`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }, 100);
+  }, [highlightedExpenseId, expenses]);
 
   const handleAddSubCategory = () => {
     if (!newSubCategory.trim() || !formData.categorie) return;
@@ -387,6 +441,18 @@ export default function Expenses() {
     return driver ? `${driver.prenom} ${driver.nom}` : '-';
   };
 
+  const getTripRouteLabel = (id?: string) => {
+    if (!id) return '-';
+    const trip = trips.find(t => t.id === id);
+    return trip ? `${trip.origine} → ${trip.destination}` : 'Trajet introuvable';
+  };
+
+  const getTripTruckId = (id?: string) => {
+    if (!id) return '';
+    const trip = trips.find(t => t.id === id);
+    return trip?.tracteurId || trip?.remorqueuseId || '';
+  };
+
   const filteredExpenses = expenses.filter(exp => {
     // Filtre par camion
     if (filterCamion !== 'all') {
@@ -431,14 +497,17 @@ export default function Expenses() {
     // Recherche générale
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
+      const matchesExpenseId = exp.id.toLowerCase().includes(search);
       const matchesDescription = exp.description?.toLowerCase().includes(search);
       const matchesCategorie = exp.categorie.toLowerCase().includes(search);
       const matchesSousCategorie = exp.sousCategorie?.toLowerCase().includes(search);
       const matchesCamion = getTruckLabel(exp.camionId).toLowerCase().includes(search);
       const matchesChauffeur = getDriverLabel(exp.chauffeurId).toLowerCase().includes(search);
+      const matchesTripId = exp.tripId?.toLowerCase().includes(search);
+      const matchesTrip = getTripRouteLabel(exp.tripId).toLowerCase().includes(search);
       const matchesFournisseur = exp.fournisseurId ? (thirdParties.find(tp => tp.id === exp.fournisseurId)?.nom || '').toLowerCase().includes(search) : false;
       
-      if (!matchesDescription && !matchesCategorie && !matchesSousCategorie && !matchesCamion && !matchesChauffeur && !matchesFournisseur) {
+      if (!matchesExpenseId && !matchesDescription && !matchesCategorie && !matchesSousCategorie && !matchesCamion && !matchesChauffeur && !matchesTripId && !matchesTrip && !matchesFournisseur) {
         return false;
       }
     }
@@ -522,6 +591,8 @@ export default function Expenses() {
         { header: 'Description', value: (e) => e.description },
         { header: 'Camion', value: (e) => getTruckLabel(e.camionId) },
         { header: 'Chauffeur', value: (e) => getDriverLabel(e.chauffeurId) },
+        { header: 'ID trajet', value: (e) => e.tripId || '-' },
+        { header: 'Trajet', value: (e) => getTripRouteLabel(e.tripId) },
         { header: 'Fournisseur', value: (e) => e.fournisseurId ? (thirdParties.find(tp => tp.id === e.fournisseurId)?.nom || '-') : '-' },
         { header: 'Quantité', value: (e) => e.quantite !== undefined && e.quantite > 0 ? `${e.quantite} ${getUnite(e.categorie)}` : '-' },
         { header: 'Prix unitaire (FCFA)', value: (e) => e.prixUnitaire !== undefined && e.prixUnitaire > 0 ? e.prixUnitaire : '-' },
@@ -572,6 +643,8 @@ export default function Expenses() {
         { header: 'Description', value: (e) => e.description },
         { header: 'Camion', value: (e) => `${EMOJI.camion} ${getTruckLabel(e.camionId)}` },
         { header: 'Chauffeur', value: (e) => e.chauffeurId ? `${EMOJI.personne} ${getDriverLabel(e.chauffeurId)}` : '-' },
+        { header: 'ID trajet', value: (e) => e.tripId || '-' },
+        { header: 'Trajet', value: (e) => getTripRouteLabel(e.tripId) },
         { header: 'Quantité', value: (e) => e.quantite !== undefined && e.quantite > 0 ? `${e.quantite} ${getUnite(e.categorie)}` : '-' },
         { 
           header: 'Prix unitaire', 
@@ -714,7 +787,23 @@ export default function Expenses() {
               </div>
               <div>
                 <Label htmlFor="tripId">Trajet (optionnel)</Label>
-                <Select value={formData.tripId || 'none'} onValueChange={(value) => setFormData({ ...formData, tripId: value === 'none' ? '' : value })}>
+                <Select
+                  value={formData.tripId || 'none'}
+                  onValueChange={(value) => {
+                    if (value === 'none') {
+                      setFormData({ ...formData, tripId: '' });
+                      return;
+                    }
+                    const trip = trips.find(t => t.id === value);
+                    setFormData({
+                      ...formData,
+                      tripId: value,
+                      camionId: getTripTruckId(value) || formData.camionId,
+                      chauffeurId: trip?.chauffeurRemplacantId || trip?.chauffeurId || formData.chauffeurId,
+                      date: formData.date || trip?.dateDepart || '',
+                    });
+                  }}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Lier à un trajet" />
                   </SelectTrigger>
@@ -722,12 +811,14 @@ export default function Expenses() {
                     <SelectItem value="none">Aucun trajet</SelectItem>
                     {trips.map(trip => (
                       <SelectItem key={trip.id} value={trip.id}>
-                        {trip.origine} → {trip.destination} {trip.client && `(${trip.client})`} - {new Date(trip.dateDepart).toLocaleDateString('fr-FR')}
+                        ID {trip.id} - {trip.origine} → {trip.destination} {trip.client && `(${trip.client})`} - {new Date(trip.dateDepart).toLocaleDateString('fr-FR')}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-muted-foreground mt-1">Lier cette dépense à un trajet spécifique</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Le choix du trajet préremplit le camion, le chauffeur et la date si possible.
+                </p>
               </div>
               <div>
                 <Label htmlFor="categorie">Catégorie</Label>
@@ -1282,7 +1373,7 @@ export default function Expenses() {
         </CardHeader>
         <CardContent className="p-0 sm:p-6">
           <div className="overflow-x-auto">
-          <Table className="min-w-[1000px]">
+          <Table className="min-w-[1220px]">
             <TableHeader>
               <TableRow>
                 <TableHead>Catégorie</TableHead>
@@ -1290,6 +1381,7 @@ export default function Expenses() {
                 <TableHead>Fournisseur</TableHead>
                 <TableHead>Camion</TableHead>
                 <TableHead>Chauffeur</TableHead>
+                <TableHead className="min-w-[220px]">ID trajet</TableHead>
                 <TableHead>Trajet</TableHead>
                 <TableHead>Description</TableHead>
                 <TableHead>Date</TableHead>
@@ -1305,12 +1397,25 @@ export default function Expenses() {
                 const supplier = expense.fournisseurId ? thirdParties.find(tp => tp.id === expense.fournisseurId) : null;
                 
                 return (
-                <TableRow key={expense.id} className="hover:bg-muted/50 transition-colors duration-200">
+                <TableRow
+                  key={expense.id}
+                  id={`expense-row-${expense.id}`}
+                  className={`hover:bg-muted/50 transition-colors duration-200 ${
+                    highlightedExpenseId === expense.id ? 'bg-primary/10 ring-2 ring-primary/40' : ''
+                  }`}
+                >
                   <TableCell className="font-semibold">{expense.categorie}</TableCell>
                     <TableCell>{expense.sousCategorie || '-'}</TableCell>
                     <TableCell>{supplier ? supplier.nom : '-'}</TableCell>
                   <TableCell>{getTruckLabel(expense.camionId)}</TableCell>
                   <TableCell>{getDriverLabel(expense.chauffeurId)}</TableCell>
+                  <TableCell>
+                    {expense.tripId ? (
+                      <code className="text-xs font-mono break-all">{expense.tripId}</code>
+                    ) : (
+                      <span className="text-muted-foreground text-xs">-</span>
+                    )}
+                  </TableCell>
                   <TableCell>
                     {expense.tripId ? (() => {
                       const trip = trips.find(t => t.id === expense.tripId);
@@ -1319,7 +1424,9 @@ export default function Expenses() {
                           <div className="font-medium">{trip.origine} → {trip.destination}</div>
                           {trip.client && <div className="text-muted-foreground">{trip.client}</div>}
                         </div>
-                      ) : '-';
+                      ) : (
+                        <span className="text-muted-foreground text-xs">Trajet introuvable</span>
+                      );
                     })() : (
                       <span className="text-muted-foreground text-xs">-</span>
                     )}

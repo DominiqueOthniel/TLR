@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSubmitGuard } from '@/hooks/useSubmitGuard';
 import { useApp, Trip, TripStatus } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
@@ -94,6 +95,7 @@ async function getRoadDistanceKm(a: GeoPoint, b: GeoPoint): Promise<number | nul
 }
 
 export default function Trips() {
+  const navigate = useNavigate();
   const {
     trips,
     trucks,
@@ -383,6 +385,22 @@ export default function Trips() {
     return `${initial} → ${getDriverLabel(trip.chauffeurRemplacantId)}`;
   };
 
+  const getTripTrucksLabel = (trip: Trip) => {
+    const labels = [
+      trip.tracteurId ? `Tracteur: ${getTruckLabel(trip.tracteurId)}` : '',
+      trip.remorqueuseId ? `Remorque: ${getTruckLabel(trip.remorqueuseId)}` : '',
+    ].filter(Boolean);
+    return labels.length > 0 ? labels.join(' / ') : '-';
+  };
+
+  const openExpenseFromTrip = (expenseId: string) => {
+    navigate(`/depenses?expenseId=${encodeURIComponent(expenseId)}`);
+  };
+
+  const createExpenseFromTrip = (trip: Trip) => {
+    navigate(`/depenses?new=1&tripId=${encodeURIComponent(trip.id)}`);
+  };
+
   const handleUpdateStatus = async (tripId: string, newStatus: TripStatus, currentStatus: TripStatus) => {
     const statusOrder: TripStatus[] = ['planifie', 'en_cours', 'termine', 'annule'];
     const currentIndex = statusOrder.indexOf(currentStatus);
@@ -596,8 +614,9 @@ export default function Trips() {
           const matchesDescription = trip.description?.toLowerCase().includes(search);
           const matchesItineraire = `${trip.origine} → ${trip.destination}`.toLowerCase().includes(search);
           const matchesChauffeur = getTripDriversLabel(trip).toLowerCase().includes(search);
+          const matchesCamion = getTripTrucksLabel(trip).toLowerCase().includes(search);
           
-          if (!matchesClient && !matchesMarchandise && !matchesDescription && !matchesItineraire && !matchesChauffeur) {
+          if (!matchesClient && !matchesMarchandise && !matchesDescription && !matchesItineraire && !matchesChauffeur && !matchesCamion) {
             return false;
           }
         }
@@ -795,10 +814,12 @@ export default function Trips() {
       sheetName: 'Trajets',
       filtersDescription,
       columns: [
+        { header: 'ID trajet', value: (t) => t.id },
         { header: 'Itinéraire', value: (t) => `${t.origine} → ${t.destination}` },
         { header: 'Distance (km)', value: (t) => getTripDistanceKm(t) ?? '' },
         { header: 'Client', value: (t) => t.client || '-' },
         { header: 'Chauffeur(s)', value: (t) => getTripDriversLabel(t) },
+        { header: 'Camion(s)', value: (t) => getTripTrucksLabel(t) },
         { header: 'Statut', value: (t) => formatTripStatusFr(t.statut) },
         { header: 'Départ', value: (t) => t.dateDepart },
         { header: 'Arrivée', value: (t) => t.dateArrivee || '' },
@@ -839,6 +860,7 @@ export default function Trips() {
         { label: 'Chiffre d’affaires', value: `+${totalRecettes.toLocaleString('fr-FR')} FCFA`, style: 'positive', icon: EMOJI.argent },
       ],
       columns: [
+        { header: 'ID trajet', value: (t) => t.id },
         { header: 'Itinéraire', value: (t) => `${EMOJI.adresse} ${t.origine} → ${t.destination}` },
         {
           header: 'Distance',
@@ -849,6 +871,7 @@ export default function Trips() {
         },
         { header: 'Client', value: (t) => t.client || '-' },
         { header: 'Chauffeur(s)', value: (t) => `${EMOJI.personne} ${getTripDriversLabel(t)}` },
+        { header: 'Camion(s)', value: (t) => `${EMOJI.camion} ${getTripTrucksLabel(t)}` },
         { header: 'Statut', value: (t) => {
           const statuts: Record<string, string> = {
             'planifie': `${EMOJI.date} Planifié`,
@@ -1423,12 +1446,14 @@ export default function Trips() {
             </CardHeader>
             <CardContent className="p-0">
           <div className="overflow-x-auto">
-          <Table className="min-w-[900px]">
+          <Table className="min-w-[1180px]">
             <TableHeader>
               <TableRow>
+                <TableHead className="min-w-[220px]">ID trajet</TableHead>
                 <TableHead className="min-w-[160px]">Itinéraire</TableHead>
                 <TableHead className="min-w-[120px]">Client</TableHead>
                 <TableHead className="min-w-[180px]">Chauffeur(s)</TableHead>
+                <TableHead className="min-w-[180px]">Camion(s)</TableHead>
                 <TableHead className="min-w-[120px]">Statut</TableHead>
                 <TableHead className="min-w-[90px]">Départ</TableHead>
                 <TableHead className="min-w-[90px]">Arrivée</TableHead>
@@ -1443,7 +1468,7 @@ export default function Trips() {
             <TableBody>
               {sortedTrips.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={12} className="text-center text-muted-foreground">
+                  <TableCell colSpan={14} className="text-center text-muted-foreground">
                     {trips.length === 0 
                       ? 'Aucun trajet enregistré'
                       : hasActiveFilters
@@ -1455,6 +1480,9 @@ export default function Trips() {
               ) : (
                 sortedTrips.map((trip) => (
                   <TableRow key={trip.id} className="hover:bg-muted/50 transition-colors duration-200">
+                    <TableCell>
+                      <code className="text-xs font-mono break-all">{trip.id}</code>
+                    </TableCell>
                     <TableCell className="font-medium">
                       <div>{trip.origine} → {trip.destination}</div>
                       {trip.description && <div className="text-xs text-muted-foreground mt-1">{trip.description}</div>}
@@ -1468,6 +1496,13 @@ export default function Trips() {
                           {trip.remplacementDate && ` le ${new Date(trip.remplacementDate).toLocaleDateString('fr-FR')}`}
                         </div>
                       )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-xs space-y-1">
+                        {trip.tracteurId && <div>{getTruckLabel(trip.tracteurId)}</div>}
+                        {trip.remorqueuseId && <div className="text-muted-foreground">{getTruckLabel(trip.remorqueuseId)}</div>}
+                        {!trip.tracteurId && !trip.remorqueuseId && <span className="text-muted-foreground">-</span>}
+                      </div>
                     </TableCell>
                     <TableCell>{getStatusBadge(trip.statut)}</TableCell>
                     <TableCell>{new Date(trip.dateDepart).toLocaleDateString('fr-FR')}</TableCell>
@@ -1545,6 +1580,17 @@ export default function Trips() {
                             <SelectItem value="annule" disabled={trip.statut === 'termine' || trip.statut === 'annule'}>Annulé</SelectItem>
                           </SelectContent>
                         </Select>
+                        {canManageAccounting && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => createExpenseFromTrip(trip)}
+                            className="h-8 w-8 p-0"
+                            title="Ajouter une dépense pour ce trajet"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        )}
                         {(() => {
                           const stats = calculateTripStats(trip.id, expenses, trip, invoices);
                           return stats.linkedExpensesCount > 0 && (
@@ -1871,7 +1917,7 @@ export default function Trips() {
                   <div>
                     <h4 className="font-semibold mb-3">Détail des dépenses</h4>
                     <div className="overflow-x-auto">
-                    <Table className="min-w-[500px]">
+                      <Table className="min-w-[620px]">
                       <TableHeader>
                         <TableRow>
                           <TableHead>Date</TableHead>
@@ -1879,17 +1925,31 @@ export default function Trips() {
                           <TableHead>Sous-catégorie</TableHead>
                           <TableHead>Description</TableHead>
                           <TableHead className="text-right">Montant</TableHead>
+                          <TableHead className="text-right">Action</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {tripExpenses.map((expense) => (
-                          <TableRow key={expense.id}>
+                          <TableRow key={expense.id} className="cursor-pointer hover:bg-muted/50" onClick={() => openExpenseFromTrip(expense.id)}>
                             <TableCell>{new Date(expense.date).toLocaleDateString('fr-FR')}</TableCell>
                             <TableCell className="font-medium">{expense.categorie}</TableCell>
                             <TableCell>{expense.sousCategorie || '-'}</TableCell>
                             <TableCell>{expense.description}</TableCell>
                             <TableCell className="text-right font-semibold text-red-600 dark:text-red-400">
                               {expense.montant.toLocaleString('fr-FR')} FCFA
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  openExpenseFromTrip(expense.id);
+                                }}
+                                className="h-8"
+                              >
+                                Ouvrir
+                              </Button>
                             </TableCell>
                           </TableRow>
                         ))}
