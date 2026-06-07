@@ -27,6 +27,7 @@ import {
 } from '@/lib/caisse-local';
 import { frCollator, parseDateMs, stableSort } from '@/lib/list-sort';
 import { ListSortSelect } from '@/components/ListSortSelect';
+import { formatTripDisplayId } from '@/lib/trip-id';
 
 const categories = ['Carburant', 'Maintenance', 'Péage', 'Assurance', 'Salaire', 'Don', 'Autre'];
 
@@ -504,10 +505,11 @@ export default function Expenses() {
       const matchesCamion = getTruckLabel(exp.camionId).toLowerCase().includes(search);
       const matchesChauffeur = getDriverLabel(exp.chauffeurId).toLowerCase().includes(search);
       const matchesTripId = exp.tripId?.toLowerCase().includes(search);
+      const matchesTripDisplayId = formatTripDisplayId(exp.tripId).toLowerCase().includes(search);
       const matchesTrip = getTripRouteLabel(exp.tripId).toLowerCase().includes(search);
       const matchesFournisseur = exp.fournisseurId ? (thirdParties.find(tp => tp.id === exp.fournisseurId)?.nom || '').toLowerCase().includes(search) : false;
       
-      if (!matchesExpenseId && !matchesDescription && !matchesCategorie && !matchesSousCategorie && !matchesCamion && !matchesChauffeur && !matchesTripId && !matchesTrip && !matchesFournisseur) {
+      if (!matchesExpenseId && !matchesDescription && !matchesCategorie && !matchesSousCategorie && !matchesCamion && !matchesChauffeur && !matchesTripId && !matchesTripDisplayId && !matchesTrip && !matchesFournisseur) {
         return false;
       }
     }
@@ -591,7 +593,7 @@ export default function Expenses() {
         { header: 'Description', value: (e) => e.description },
         { header: 'Camion', value: (e) => getTruckLabel(e.camionId) },
         { header: 'Chauffeur', value: (e) => getDriverLabel(e.chauffeurId) },
-        { header: 'ID trajet', value: (e) => e.tripId || '-' },
+        { header: 'ID trajet', value: (e) => formatTripDisplayId(e.tripId) },
         { header: 'Trajet', value: (e) => getTripRouteLabel(e.tripId) },
         { header: 'Fournisseur', value: (e) => e.fournisseurId ? (thirdParties.find(tp => tp.id === e.fournisseurId)?.nom || '-') : '-' },
         { header: 'Quantité', value: (e) => e.quantite !== undefined && e.quantite > 0 ? `${e.quantite} ${getUnite(e.categorie)}` : '-' },
@@ -643,7 +645,7 @@ export default function Expenses() {
         { header: 'Description', value: (e) => e.description },
         { header: 'Camion', value: (e) => `${EMOJI.camion} ${getTruckLabel(e.camionId)}` },
         { header: 'Chauffeur', value: (e) => e.chauffeurId ? `${EMOJI.personne} ${getDriverLabel(e.chauffeurId)}` : '-' },
-        { header: 'ID trajet', value: (e) => e.tripId || '-' },
+        { header: 'ID trajet', value: (e) => formatTripDisplayId(e.tripId) },
         { header: 'Trajet', value: (e) => getTripRouteLabel(e.tripId) },
         { header: 'Quantité', value: (e) => e.quantite !== undefined && e.quantite > 0 ? `${e.quantite} ${getUnite(e.categorie)}` : '-' },
         { 
@@ -811,7 +813,7 @@ export default function Expenses() {
                     <SelectItem value="none">Aucun trajet</SelectItem>
                     {trips.map(trip => (
                       <SelectItem key={trip.id} value={trip.id}>
-                        ID {trip.id} - {trip.origine} → {trip.destination} {trip.client && `(${trip.client})`} - {new Date(trip.dateDepart).toLocaleDateString('fr-FR')}
+                        {formatTripDisplayId(trip.id)} - {trip.origine} → {trip.destination} {trip.client && `(${trip.client})`} - {new Date(trip.dateDepart).toLocaleDateString('fr-FR')}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -1381,7 +1383,7 @@ export default function Expenses() {
                 <TableHead>Fournisseur</TableHead>
                 <TableHead>Camion</TableHead>
                 <TableHead>Chauffeur</TableHead>
-                <TableHead className="min-w-[220px]">ID trajet</TableHead>
+                <TableHead className="min-w-[110px]">ID trajet</TableHead>
                 <TableHead>Trajet</TableHead>
                 <TableHead>Description</TableHead>
                 <TableHead>Date</TableHead>
@@ -1411,7 +1413,7 @@ export default function Expenses() {
                   <TableCell>{getDriverLabel(expense.chauffeurId)}</TableCell>
                   <TableCell>
                     {expense.tripId ? (
-                      <code className="text-xs font-mono break-all">{expense.tripId}</code>
+                      <code className="text-xs font-mono">{formatTripDisplayId(expense.tripId)}</code>
                     ) : (
                       <span className="text-muted-foreground text-xs">-</span>
                     )}

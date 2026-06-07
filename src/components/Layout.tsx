@@ -239,7 +239,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className="hidden sm:flex items-center gap-2 shrink-0">
               <AppLogo variant="compact" />
               <div className="leading-tight">
-                <p className="text-sm font-black tracking-tight text-blue-900 dark:text-blue-200">SIA-TLR</p>
+                <p className="text-sm font-black tracking-tight text-blue-900 dark:text-blue-200">DIDDI S.A-TLR</p>
                 <p className="text-[9px] uppercase tracking-[0.18em] text-rose-800/70 dark:text-rose-300/70">Transport</p>
               </div>
             </div>
@@ -309,7 +309,7 @@ function SidebarContent({
         <div className="flex items-center gap-3 min-w-0">
           <AppLogo variant="compact" />
           <div className="min-w-0">
-            <p className="text-lg font-black leading-none tracking-tight text-white">SIA-TLR</p>
+            <p className="text-lg font-black leading-none tracking-tight text-white">DIDDI S.A-TLR</p>
             <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-amber-300/80">
               Transport · Logistique
             </p>
@@ -378,7 +378,7 @@ function SidebarContent({
           Déconnexion
         </button>
         <p className="text-center text-[10px] text-sidebar-foreground/25 mt-3">
-          © {new Date().getFullYear()} SIA-TLR
+          © {new Date().getFullYear()} DIDDI S.A-TLR
         </p>
       </div>
     </div>

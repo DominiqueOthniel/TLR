@@ -47,6 +47,7 @@ import { buildSingleInvoicePdfInnerHtml } from '@/lib/invoice-single-pdf-html';
 import { frCollator, parseDateMs, stableSort } from '@/lib/list-sort';
 import { ListSortSelect } from '@/components/ListSortSelect';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { formatTripDisplayId } from '@/lib/trip-id';
 
 const INVOICE_SORT_OPTIONS = [
   { value: 'date_desc', label: 'Date création (récent → ancien)' },
@@ -504,8 +505,8 @@ export default function Invoices() {
   const getTripLabel = (tripId?: string) => {
     if (!tripId) return 'N/A';
     const trip = trips.find(t => t.id === tripId);
-    if (!trip) return 'N/A';
-    return `${trip.origine} → ${trip.destination}`;
+    if (!trip) return formatTripDisplayId(tripId);
+    return `${formatTripDisplayId(tripId)} · ${trip.origine} → ${trip.destination}`;
   };
 
   const getTrip = (tripId?: string): Trip | undefined => {
@@ -1261,8 +1262,7 @@ export default function Invoices() {
                         {selectedTripId && (() => {
                           const selectedTrip = getTrip(selectedTripId);
                           if (!selectedTrip) return selectedTripId;
-                          const shortId = selectedTripId.slice(-6);
-                          return `[ID: ${shortId}] ${selectedTrip.origine} → ${selectedTrip.destination}`;
+                          return `${formatTripDisplayId(selectedTripId)} · ${selectedTrip.origine} → ${selectedTrip.destination}`;
                         })()}
                       </SelectValue>
                     </SelectTrigger>
@@ -1286,15 +1286,13 @@ export default function Invoices() {
                           };
                           const tripDetails = getTrip(trip.id);
                           const driver = tripDetails ? drivers.find(d => d.id === tripDetails.chauffeurId) : null;
-                          // Extraire les 6 derniers caractères de l'ID pour un affichage plus court
-                          const shortId = trip.id.slice(-6);
                           const dateDepart = tripDetails ? new Date(tripDetails.dateDepart).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
                           
                           return (
                             <SelectItem key={trip.id} value={trip.id} className="py-2">
                               <div className="flex flex-col gap-1">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="font-mono text-xs font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">ID: {shortId}</span>
+                                  <span className="font-mono text-xs font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">{formatTripDisplayId(trip.id)}</span>
                                   <span className="font-semibold">{trip.origine} → {trip.destination}</span>
                                 </div>
                                 <div className="text-xs text-muted-foreground flex items-center gap-2 flex-wrap">
@@ -2080,7 +2078,7 @@ export default function Invoices() {
                     if (!trip) return null;
                     return (
                       <SelectItem key={tripId} value={tripId}>
-                        {trip.origine} → {trip.destination}
+                        {formatTripDisplayId(tripId)} · {trip.origine} → {trip.destination}
                       </SelectItem>
                     );
                   })}

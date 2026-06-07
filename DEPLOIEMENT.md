@@ -1,4 +1,4 @@
-﻿# Guide de Déploiement — SIA-TLR
+﻿# Guide de Déploiement — DIDDI S.A-TLR
 
 ## Stack de production
 - **Frontend** : Netlify (gratuit)
@@ -82,7 +82,7 @@
 1. Aller sur [uptimerobot.com](https://uptimerobot.com) → créer un compte gratuit
 2. **New Monitor** :
    - Type : **HTTP(s)**
-   - Name : `SIA-TLR API`
+   - Name : `DIDDI S.A-TLR API`
    - URL : `https://goofe-api.onrender.com/api/health`
    - Interval : **5 minutes**
 3. Sauvegarder → ton backend ne dormira plus jamais ✅

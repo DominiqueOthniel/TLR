@@ -581,7 +581,7 @@ export function exportToPrintablePDF<T>(options: ExportOptions<T> | PDFExportOpt
         </div>
         ` : ''}
         <div class="footer">
-          Document généré automatiquement par SIA-TLR • ${currentDate}
+          Document généré automatiquement par DIDDI S.A-TLR • ${currentDate}
         </div>
       </body>
     </html>

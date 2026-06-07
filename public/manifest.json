@@ -1,6 +1,6 @@
 {
-  "name": "SIA-TLR - Gestion de Flotte",
-  "short_name": "SIA-TLR",
+  "name": "DIDDI S.A-TLR - Gestion de Flotte",
+  "short_name": "DIDDI S.A-TLR",
   "description": "Application professionnelle de gestion de flotte de camions",
   "start_url": "/",
   "display": "standalone",

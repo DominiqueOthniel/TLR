@@ -23,6 +23,7 @@ import { EMOJI } from '@/lib/emoji-palette';
 import { frCollator, parseDateMs, stableSort } from '@/lib/list-sort';
 import { ListSortSelect } from '@/components/ListSortSelect';
 import { appendEntreeFromInvoicePayment } from '@/lib/caisse-local';
+import { formatTripDisplayId } from '@/lib/trip-id';
 
 const TRIP_STATUT_ORDER: Record<TripStatus, number> = {
   planifie: 0,
@@ -379,6 +380,20 @@ export default function Trips() {
     return driver ? `${driver.prenom} ${driver.nom}` : '-';
   };
 
+  const getExpenseUnit = (categorie: string) => {
+    switch (categorie) {
+      case 'Carburant':
+        return 'Litres';
+      case 'Maintenance':
+        return 'Pièces';
+      case 'Don':
+      case 'Salaire':
+        return 'FCFA';
+      default:
+        return 'Unités';
+    }
+  };
+
   const getTripDriversLabel = (trip: Trip) => {
     const initial = getDriverLabel(trip.chauffeurId);
     if (!trip.chauffeurRemplacantId) return initial;
@@ -615,8 +630,9 @@ export default function Trips() {
           const matchesItineraire = `${trip.origine} → ${trip.destination}`.toLowerCase().includes(search);
           const matchesChauffeur = getTripDriversLabel(trip).toLowerCase().includes(search);
           const matchesCamion = getTripTrucksLabel(trip).toLowerCase().includes(search);
+          const matchesTripId = formatTripDisplayId(trip.id).toLowerCase().includes(search);
           
-          if (!matchesClient && !matchesMarchandise && !matchesDescription && !matchesItineraire && !matchesChauffeur && !matchesCamion) {
+          if (!matchesClient && !matchesMarchandise && !matchesDescription && !matchesItineraire && !matchesChauffeur && !matchesCamion && !matchesTripId) {
             return false;
           }
         }
@@ -814,7 +830,7 @@ export default function Trips() {
       sheetName: 'Trajets',
       filtersDescription,
       columns: [
-        { header: 'ID trajet', value: (t) => t.id },
+        { header: 'ID trajet', value: (t) => formatTripDisplayId(t.id) },
         { header: 'Itinéraire', value: (t) => `${t.origine} → ${t.destination}` },
         { header: 'Distance (km)', value: (t) => getTripDistanceKm(t) ?? '' },
         { header: 'Client', value: (t) => t.client || '-' },
@@ -860,7 +876,7 @@ export default function Trips() {
         { label: 'Chiffre d’affaires', value: `+${totalRecettes.toLocaleString('fr-FR')} FCFA`, style: 'positive', icon: EMOJI.argent },
       ],
       columns: [
-        { header: 'ID trajet', value: (t) => t.id },
+        { header: 'ID trajet', value: (t) => formatTripDisplayId(t.id) },
         { header: 'Itinéraire', value: (t) => `${EMOJI.adresse} ${t.origine} → ${t.destination}` },
         {
           header: 'Distance',
@@ -1344,7 +1360,7 @@ export default function Trips() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="search"
-                  placeholder="Rechercher par client, marchandise, description, itinéraire ou chauffeur..."
+                  placeholder="Rechercher par ID, client, marchandise, description, itinéraire ou chauffeur..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -1449,7 +1465,7 @@ export default function Trips() {
           <Table className="min-w-[1180px]">
             <TableHeader>
               <TableRow>
-                <TableHead className="min-w-[220px]">ID trajet</TableHead>
+                  <TableHead className="min-w-[110px]">ID trajet</TableHead>
                 <TableHead className="min-w-[160px]">Itinéraire</TableHead>
                 <TableHead className="min-w-[120px]">Client</TableHead>
                 <TableHead className="min-w-[180px]">Chauffeur(s)</TableHead>
@@ -1481,7 +1497,7 @@ export default function Trips() {
                 sortedTrips.map((trip) => (
                   <TableRow key={trip.id} className="hover:bg-muted/50 transition-colors duration-200">
                     <TableCell>
-                      <code className="text-xs font-mono break-all">{trip.id}</code>
+                      <code className="text-xs font-mono">{formatTripDisplayId(trip.id)}</code>
                     </TableCell>
                     <TableCell className="font-medium">
                       <div>{trip.origine} → {trip.destination}</div>
@@ -1917,14 +1933,16 @@ export default function Trips() {
                   <div>
                     <h4 className="font-semibold mb-3">Détail des dépenses</h4>
                     <div className="overflow-x-auto">
-                      <Table className="min-w-[620px]">
+                      <Table className="min-w-[820px]">
                       <TableHeader>
                         <TableRow>
                           <TableHead>Date</TableHead>
                           <TableHead>Catégorie</TableHead>
                           <TableHead>Sous-catégorie</TableHead>
                           <TableHead>Description</TableHead>
-                          <TableHead className="text-right">Montant</TableHead>
+                          <TableHead className="text-right">Quantité</TableHead>
+                          <TableHead className="text-right">Prix unitaire</TableHead>
+                          <TableHead className="text-right">Montant total</TableHead>
                           <TableHead className="text-right">Action</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -1935,6 +1953,16 @@ export default function Trips() {
                             <TableCell className="font-medium">{expense.categorie}</TableCell>
                             <TableCell>{expense.sousCategorie || '-'}</TableCell>
                             <TableCell>{expense.description}</TableCell>
+                            <TableCell className="text-right">
+                              {expense.quantite !== undefined && expense.quantite > 0
+                                ? `${expense.quantite.toLocaleString('fr-FR')} ${getExpenseUnit(expense.categorie)}`
+                                : '-'}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {expense.prixUnitaire !== undefined && expense.prixUnitaire > 0
+                                ? `${expense.prixUnitaire.toLocaleString('fr-FR')} FCFA`
+                                : '-'}
+                            </TableCell>
                             <TableCell className="text-right font-semibold text-red-600 dark:text-red-400">
                               {expense.montant.toLocaleString('fr-FR')} FCFA
                             </TableCell>

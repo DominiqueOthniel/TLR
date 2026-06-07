@@ -2,7 +2,7 @@
  * Identité visuelle commune aux PDF factures (liste + facture unitaire).
  */
 
-export const COMPANY_NAME = 'SIA-TLR';
+export const COMPANY_NAME = 'DIDDI S.A-TLR';
 
 export const COMPANY_TAGLINE = 'Transport · Logistique · Révolution';
 

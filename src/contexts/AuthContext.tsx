@@ -52,7 +52,9 @@ function getStoredUsers(): StoredUser[] {
       const parsed = JSON.parse(raw);
       return Array.isArray(parsed) ? normalizeStoredUsers(parsed) : defaultUsers;
     }
-  } catch {}
+  } catch {
+    /* ignore malformed auth storage */
+  }
   // Utilisateurs par défaut (admin: admin123, pdg: pdg123, gestionmanager: gestion123, comptable: comptable123)
   return defaultUsers;
 }
@@ -110,9 +112,7 @@ function initUsers() {
 
     for (const def of defaultUsers) {
       const idx = merged.findIndex(u => u.login.toLowerCase() === def.login);
-      if (idx >= 0) {
-        merged[idx] = { ...merged[idx], role: def.role };
-      } else {
+      if (idx < 0) {
         merged.push(def);
       }
     }
@@ -140,6 +140,12 @@ function validateLogin(login: string) {
   }
 }
 
+function validateRole(role: UserRole) {
+  if (!['admin', 'pdg', 'gestion_manager', 'comptable'].includes(role)) {
+    throw new Error('Rôle invalide.');
+  }
+}
+
 interface AuthContextType {
   user: User | null;
   login: (login: string, password: string) => Promise<boolean>;
@@ -147,6 +153,7 @@ interface AuthContextType {
   users: UserSummary[];
   createUser: (login: string, role: UserRole, password: string) => Promise<void>;
   changeUserPassword: (targetLogin: string, newPassword: string) => Promise<void>;
+  changeUserRole: (targetLogin: string, role: UserRole) => Promise<void>;
   changeOwnPassword: (currentPassword: string, newPassword: string) => Promise<void>;
   /** Flotte : camions, trajets, chauffeurs, tiers (pas les dépenses — comptable) */
   canManageFleet: boolean;
@@ -248,6 +255,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     refreshUserSummaries(stored);
   };
 
+  const changeUserRole = async (targetLogin: string, role: UserRole): Promise<void> => {
+    if (!user || user.role !== 'admin') {
+      throw new Error('Action réservée à l’administrateur.');
+    }
+    const normalizedLogin = normalizeLogin(targetLogin);
+    validateLogin(normalizedLogin);
+    validateRole(role);
+
+    const stored = getStoredUsers();
+    const idx = stored.findIndex((u) => u.login.toLowerCase() === normalizedLogin);
+    if (idx < 0) throw new Error('Utilisateur introuvable.');
+
+    const currentRole = normalizeRole(stored[idx].role);
+    if (currentRole === 'admin' && role !== 'admin') {
+      const adminCount = stored.filter((u) => normalizeRole(u.role) === 'admin').length;
+      if (adminCount <= 1) {
+        throw new Error('Impossible de retirer le rôle du dernier administrateur.');
+      }
+    }
+
+    stored[idx] = { ...stored[idx], role };
+    saveStoredUsers(stored);
+    refreshUserSummaries(stored);
+    if (user.login.toLowerCase() === normalizedLogin) {
+      setUser({ login: stored[idx].login, role });
+    }
+  };
+
   const changeOwnPassword = async (currentPassword: string, newPassword: string): Promise<void> => {
     if (!user) throw new Error('Utilisateur non connecté.');
     validateNewPassword(newPassword);
@@ -285,6 +320,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         users,
         createUser,
         changeUserPassword,
+        changeUserRole,
         changeOwnPassword,
         canManageFleet,
         canManageAccounting,

@@ -189,7 +189,7 @@ export default function Login() {
           {/* Footer */}
           <div className="mt-7 flex items-center justify-center gap-2 text-white/30 text-xs">
             <Lock className="h-3 w-3" />
-            <span>Connexion sécurisée · SIA-TLR © {new Date().getFullYear()}</span>
+            <span>Connexion sécurisée · DIDDI S.A-TLR © {new Date().getFullYear()}</span>
           </div>
         </div>
       </div>

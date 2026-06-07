@@ -63,7 +63,7 @@ const variantConfig: Record<
 export function AppLogo({
   variant = 'sidebar',
   className,
-  alt = 'SIA-TLR — gestion de flotte',
+  alt = 'DIDDI S.A-TLR — gestion de flotte',
 }: {
   variant?: AppLogoVariant;
   className?: string;

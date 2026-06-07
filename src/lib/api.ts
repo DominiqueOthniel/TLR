@@ -1,5 +1,5 @@
 ﻿/**
- * Client API pour SIA-TLR
+ * Client API pour DIDDI S.A-TLR
  * Communique avec le backend NestJS (préfixe global `/api` sur le serveur).
  */
 

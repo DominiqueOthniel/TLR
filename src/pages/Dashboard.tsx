@@ -27,7 +27,7 @@ const DashboardCharts = lazy(() => import('@/components/DashboardCharts'));
 export default function Dashboard() {
   const navigate = useNavigate();
   const { trucks, trips, parcelExpeditions, expenses, invoices, drivers, refreshTrucks, refreshDrivers, refreshTrips, refreshParcelExpeditions, refreshExpenses, refreshInvoices, refreshThirdParties, refreshPersonnel } = useApp();
-  const { user, users, createUser, changeUserPassword, changeOwnPassword } = useAuth();
+  const { user, users, createUser, changeUserPassword, changeUserRole, changeOwnPassword } = useAuth();
   const [isBackingUp, setIsBackingUp] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [isPwdDialogOpen, setIsPwdDialogOpen] = useState(false);
@@ -39,6 +39,8 @@ export default function Dashboard() {
   const [createRole, setCreateRole] = useState<UserRole>('comptable');
   const [createPassword, setCreatePassword] = useState('');
   const [createConfirmPassword, setCreateConfirmPassword] = useState('');
+  const [targetRoleLogin, setTargetRoleLogin] = useState('admin');
+  const [targetRole, setTargetRole] = useState<UserRole>('admin');
   const [currentPassword, setCurrentPassword] = useState('');
   const [ownNewPassword, setOwnNewPassword] = useState('');
   const [ownConfirmPassword, setOwnConfirmPassword] = useState('');
@@ -144,6 +146,21 @@ export default function Dashboard() {
       setCreateConfirmPassword('');
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Erreur création utilisateur');
+    }
+  };
+
+  const handleChangeRole = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!targetRoleLogin) {
+      toast.error('Sélectionnez un utilisateur.');
+      return;
+    }
+
+    try {
+      await changeUserRole(targetRoleLogin, targetRole);
+      toast.success(`Rôle mis à jour pour ${targetRoleLogin}.`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Erreur mise à jour du rôle');
     }
   };
 
@@ -512,6 +529,52 @@ export default function Dashboard() {
                           />
                         </div>
                         <Button type="submit" className="w-full">Créer l’utilisateur</Button>
+                      </form>
+
+                      <form onSubmit={handleChangeRole} className="space-y-4 rounded-xl border p-4">
+                        <div>
+                          <h3 className="font-semibold">Changer le rôle</h3>
+                          <p className="text-xs text-muted-foreground">
+                            Seuls les administrateurs peuvent modifier les rôles.
+                          </p>
+                        </div>
+                        <div>
+                          <Label>Utilisateur</Label>
+                          <Select
+                            value={targetRoleLogin}
+                            onValueChange={(value) => {
+                              setTargetRoleLogin(value);
+                              const selected = users.find((u) => u.login === value);
+                              if (selected) setTargetRole(selected.role);
+                            }}
+                          >
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Choisir un utilisateur" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {users.map((u) => (
+                                <SelectItem key={u.login} value={u.login}>
+                                  {u.login} ({u.role})
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label>Nouveau rôle</Label>
+                          <Select value={targetRole} onValueChange={(value) => setTargetRole(value as UserRole)}>
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Choisir un rôle" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="pdg">PDG (lecture seule)</SelectItem>
+                              <SelectItem value="admin">Administrateur</SelectItem>
+                              <SelectItem value="gestion_manager">Gestion manager</SelectItem>
+                              <SelectItem value="comptable">Comptable</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <Button type="submit" className="w-full">Enregistrer le rôle</Button>
                       </form>
 
                       <form onSubmit={handleChangePassword} className="space-y-4 rounded-xl border p-4">

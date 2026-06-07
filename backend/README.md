@@ -1,6 +1,6 @@
-﻿# SIA-TLR – API NestJS
+﻿# DIDDI S.A-TLR – API NestJS
 
-Backend REST pour l’application SIA-TLR (gestion de flotte, trajets, chauffeurs, dépenses, factures, banque).
+Backend REST pour l’application DIDDI S.A-TLR (gestion de flotte, trajets, chauffeurs, dépenses, factures, banque).
 
 ## Prérequis
 

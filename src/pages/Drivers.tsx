@@ -692,7 +692,7 @@ export default function Drivers() {
           ${driversContent}
           
           <div class="footer">
-            Document généré automatiquement par SIA-TLR • ${currentDate}
+            Document généré automatiquement par DIDDI S.A-TLR • ${currentDate}
           </div>
         </body>
       </html>
