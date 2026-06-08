@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   ForbiddenException,
   Get,
   Param,
@@ -83,5 +84,16 @@ export class UsersController {
   ) {
     assertAdmin(req);
     return this.usersService.changeRole(login, dto.role);
+  }
+
+  @Delete(':login')
+  async remove(@Param('login') login: string, @Req() req: Request) {
+    assertAdmin(req);
+    const actorLogin = getActorLogin(req);
+    if (!actorLogin) {
+      throw new ForbiddenException('Utilisateur non identifié.');
+    }
+    await this.usersService.remove(login, actorLogin);
+    return { message: 'Utilisateur supprimé.' };
   }
 }

@@ -367,6 +367,10 @@ export const usersApi = {
       method: 'PATCH',
       body: JSON.stringify({ role }),
     }),
+  delete: (login: string) =>
+    request<{ message: string }>(`/users/${encodeURIComponent(login)}`, {
+      method: 'DELETE',
+    }),
   changeOwnPassword: (currentPassword: string, newPassword: string) =>
     request<{ message: string }>('/users/me/password', {
       method: 'PATCH',

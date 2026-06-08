@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useCa
 import { setApiActor, usersApi } from '@/lib/api';
 
 const AUTH_STORAGE_KEY = 'goofe_auth';
+const FALLBACK_PASSWORDS_STORAGE_KEY = 'tlr_fallback_password_hashes';
 const GLAUNET_AUTH_STORAGE_KEY = 'glaunet_auth';
 const LEGACY_STORAGE_PREFIX = ['truck', 'track'].join('_');
 const LEGACY_AUTH_STORAGE_KEY = `${LEGACY_STORAGE_PREFIX}_auth`;
@@ -61,6 +62,27 @@ const FALLBACK_PASSWORD_HASHES: Record<string, string> = {
   hammanwabi: '0892b4377c41d5c3d7d85f2161212e1bd1c57c19b9b446ce8dfea7b7bee8c9c5',
 };
 
+function readFallbackPasswordHashes(): Record<string, string> {
+  try {
+    const raw = localStorage.getItem(FALLBACK_PASSWORDS_STORAGE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return typeof parsed === 'object' && parsed !== null ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function getFallbackPasswordHash(login: string): string | undefined {
+  return readFallbackPasswordHashes()[login] || FALLBACK_PASSWORD_HASHES[login];
+}
+
+function saveFallbackPasswordHash(login: string, passwordHash: string): void {
+  const hashes = readFallbackPasswordHashes();
+  hashes[login] = passwordHash;
+  localStorage.setItem(FALLBACK_PASSWORDS_STORAGE_KEY, JSON.stringify(hashes));
+}
+
 async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(password);
@@ -80,6 +102,7 @@ interface AuthContextType {
   createUser: (login: string, role: UserRole, password: string) => Promise<void>;
   changeUserPassword: (targetLogin: string, newPassword: string) => Promise<void>;
   changeUserRole: (targetLogin: string, role: UserRole) => Promise<void>;
+  deleteUser: (targetLogin: string) => Promise<void>;
   changeOwnPassword: (currentPassword: string, newPassword: string) => Promise<void>;
   canManageFleet: boolean;
   canManageAccounting: boolean;
@@ -147,7 +170,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const fallback = FALLBACK_USERS.find((u) => u.login === normalizedLogin);
       if (!fallback) return false;
       const passwordHash = await hashPassword(password);
-      if (passwordHash !== FALLBACK_PASSWORD_HASHES[normalizedLogin]) return false;
+      if (passwordHash !== getFallbackPasswordHash(normalizedLogin)) return false;
 
       const u: User = { login: fallback.login, role: fallback.role };
       setUser(u);
@@ -184,8 +207,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     validateLogin(normalizedLogin);
     validateNewPassword(newPassword);
 
-    await usersApi.changePassword(normalizedLogin, newPassword);
-    await refreshUsers();
+    try {
+      await usersApi.changePassword(normalizedLogin, newPassword);
+      await refreshUsers();
+    } catch (err) {
+      const fallback = FALLBACK_USERS.find((u) => u.login === normalizedLogin);
+      if (!fallback) throw err;
+      saveFallbackPasswordHash(normalizedLogin, await hashPassword(newPassword));
+    }
   };
 
   const changeUserRole = async (targetLogin: string, role: UserRole): Promise<void> => {
@@ -203,11 +232,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const deleteUser = async (targetLogin: string): Promise<void> => {
+    if (!user || user.role !== 'admin') {
+      throw new Error('Action réservée à l’administrateur.');
+    }
+    const normalizedLogin = normalizeLogin(targetLogin);
+    validateLogin(normalizedLogin);
+    if (normalizedLogin === user.login.toLowerCase()) {
+      throw new Error('Impossible de supprimer le compte actuellement connecté.');
+    }
+
+    await usersApi.delete(normalizedLogin);
+    await refreshUsers();
+  };
+
   const changeOwnPassword = async (currentPassword: string, newPassword: string): Promise<void> => {
     if (!user) throw new Error('Utilisateur non connecté.');
     validateNewPassword(newPassword);
-    await usersApi.changeOwnPassword(currentPassword, newPassword);
-    await refreshUsers();
+    try {
+      await usersApi.changeOwnPassword(currentPassword, newPassword);
+      await refreshUsers();
+    } catch (err) {
+      const normalizedLogin = normalizeLogin(user.login);
+      const fallback = FALLBACK_USERS.find((u) => u.login === normalizedLogin);
+      if (!fallback) throw err;
+
+      const currentHash = await hashPassword(currentPassword);
+      if (currentHash !== getFallbackPasswordHash(normalizedLogin)) {
+        throw new Error('Mot de passe actuel incorrect.');
+      }
+      saveFallbackPasswordHash(normalizedLogin, await hashPassword(newPassword));
+    }
   };
 
   const isAdmin = user?.role === 'admin';
@@ -232,6 +287,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         createUser,
         changeUserPassword,
         changeUserRole,
+        deleteUser,
         changeOwnPassword,
         canManageFleet,
         canManageAccounting,

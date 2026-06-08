@@ -156,4 +156,24 @@ export class UsersService implements OnModuleInit {
     const saved = await this.userRepository.save(user);
     return this.toSummary(saved);
   }
+
+  async remove(loginInput: string, actorLogin: string): Promise<void> {
+    const login = this.normalizeLogin(loginInput);
+    const normalizedActor = this.normalizeLogin(actorLogin);
+    if (login === normalizedActor) {
+      throw new BadRequestException('Impossible de supprimer le compte actuellement connecté.');
+    }
+
+    const user = await this.userRepository.findOne({ where: { login } });
+    if (!user) throw new NotFoundException('Utilisateur introuvable.');
+
+    if (this.normalizeRole(user.role) === 'admin') {
+      const adminCount = await this.userRepository.count({ where: { role: 'admin' } });
+      if (adminCount <= 1) {
+        throw new BadRequestException('Impossible de supprimer le dernier administrateur.');
+      }
+    }
+
+    await this.userRepository.delete({ login });
+  }
 }

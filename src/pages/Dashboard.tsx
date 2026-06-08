@@ -1,11 +1,11 @@
-import { lazy, Suspense, useRef, useState, useMemo } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState, useMemo } from 'react';
 import { useApp } from '@/contexts/AppContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Truck, Route, DollarSign, TrendingUp, TrendingDown, FileText, Users, Package, AlertCircle, LayoutDashboard, Building2, CreditCard, Wallet, RefreshCw, HardDrive, Upload, Receipt, Layers, ShoppingCart } from 'lucide-react';
+import { Truck, Route, DollarSign, TrendingUp, TrendingDown, FileText, Users, Package, AlertCircle, LayoutDashboard, Building2, CreditCard, Wallet, RefreshCw, HardDrive, Upload, Receipt, Layers, ShoppingCart, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -27,24 +27,35 @@ const DashboardCharts = lazy(() => import('@/components/DashboardCharts'));
 export default function Dashboard() {
   const navigate = useNavigate();
   const { trucks, trips, parcelExpeditions, expenses, invoices, drivers, refreshTrucks, refreshDrivers, refreshTrips, refreshParcelExpeditions, refreshExpenses, refreshInvoices, refreshThirdParties, refreshPersonnel } = useApp();
-  const { user, users, createUser, changeUserPassword, changeUserRole, changeOwnPassword, refreshUsers } = useAuth();
+  const { user, users, createUser, changeUserPassword, changeUserRole, deleteUser, changeOwnPassword, refreshUsers } = useAuth();
   const [isBackingUp, setIsBackingUp] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [isPwdDialogOpen, setIsPwdDialogOpen] = useState(false);
   const [isOwnPwdDialogOpen, setIsOwnPwdDialogOpen] = useState(false);
-  const [targetLogin, setTargetLogin] = useState('admin');
+  const [targetLogin, setTargetLogin] = useState('sara');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [createLogin, setCreateLogin] = useState('');
   const [createRole, setCreateRole] = useState<UserRole>('comptable');
   const [createPassword, setCreatePassword] = useState('');
   const [createConfirmPassword, setCreateConfirmPassword] = useState('');
-  const [targetRoleLogin, setTargetRoleLogin] = useState('admin');
+  const [targetRoleLogin, setTargetRoleLogin] = useState('sara');
   const [targetRole, setTargetRole] = useState<UserRole>('admin');
   const [currentPassword, setCurrentPassword] = useState('');
   const [ownNewPassword, setOwnNewPassword] = useState('');
   const [ownConfirmPassword, setOwnConfirmPassword] = useState('');
   const restoreFileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (users.length === 0) return;
+    if (!users.some((u) => u.login === targetLogin)) {
+      setTargetLogin(users[0].login);
+    }
+    if (!users.some((u) => u.login === targetRoleLogin)) {
+      setTargetRoleLogin(users[0].login);
+      setTargetRole(users[0].role);
+    }
+  }, [targetLogin, targetRoleLogin, users]);
 
   const handleBackup = async () => {
     setIsBackingUp(true);
@@ -161,6 +172,23 @@ export default function Dashboard() {
       toast.success(`Rôle mis à jour pour ${targetRoleLogin}.`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Erreur mise à jour du rôle');
+    }
+  };
+
+  const handleDeleteUser = async (login: string) => {
+    if (!confirm(`Supprimer l'utilisateur ${login} ?`)) return;
+
+    try {
+      await deleteUser(login);
+      toast.success(`Utilisateur ${login} supprimé.`);
+      if (targetLogin === login) setTargetLogin(users.find((u) => u.login !== login)?.login || '');
+      if (targetRoleLogin === login) {
+        const next = users.find((u) => u.login !== login);
+        setTargetRoleLogin(next?.login || '');
+        if (next) setTargetRole(next.role);
+      }
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Erreur suppression utilisateur');
     }
   };
 
@@ -624,6 +652,39 @@ export default function Dashboard() {
                         </div>
                         <Button type="submit" className="w-full">Enregistrer le mot de passe</Button>
                       </form>
+
+                      <div className="space-y-4 rounded-xl border p-4 md:col-span-2">
+                        <div>
+                          <h3 className="font-semibold">Comptes existants</h3>
+                          <p className="text-xs text-muted-foreground">
+                            Supprimez un compte qui ne doit plus accéder à l’application.
+                          </p>
+                        </div>
+                        <div className="space-y-2">
+                          {users.map((u) => (
+                            <div
+                              key={u.login}
+                              className="flex items-center justify-between gap-3 rounded-lg border bg-muted/30 px-3 py-2"
+                            >
+                              <div className="min-w-0">
+                                <p className="text-sm font-medium truncate">{u.login}</p>
+                                <p className="text-xs text-muted-foreground">{u.role}</p>
+                              </div>
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                className="gap-1.5"
+                                disabled={u.login === user?.login}
+                                onClick={() => handleDeleteUser(u.login)}
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                                Supprimer
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </DialogContent>
                 </Dialog>
