@@ -38,6 +38,7 @@ export class AppController {
       bankAccounts,
       bankTransactions,
       parcelExpeditions,
+      appUsers,
     ] = await Promise.all([
       this.dataSource.query('SELECT * FROM third_parties'),
       this.dataSource.query('SELECT * FROM personnel'),
@@ -50,6 +51,7 @@ export class AppController {
       this.dataSource.query('SELECT * FROM bank_accounts'),
       this.dataSource.query('SELECT * FROM bank_transactions ORDER BY date ASC'),
       this.dataSource.query('SELECT * FROM parcel_expeditions ORDER BY "dateDepart" DESC'),
+      this.dataSource.query('SELECT * FROM app_users ORDER BY login ASC'),
     ]);
 
     const backup = {
@@ -67,6 +69,7 @@ export class AppController {
         bankAccounts,
         bankTransactions,
         parcelExpeditions,
+        appUsers,
       },
     };
 
@@ -92,7 +95,7 @@ export class AppController {
         TRUNCATE TABLE
           invoices, expenses, trips, parcel_expeditions,
           driver_transactions, bank_transactions, bank_accounts,
-          trucks, personnel, drivers, third_parties
+          trucks, personnel, drivers, third_parties, app_users
         RESTART IDENTITY CASCADE
       `);
 
@@ -120,6 +123,15 @@ export class AppController {
       await insert('invoices', data.invoices);
       await insert('bank_accounts', data.bankAccounts);
       await insert('bank_transactions', data.bankTransactions);
+      if (data.appUsers?.length) {
+        for (const row of data.appUsers) {
+          if (!row?.login) continue;
+          await queryRunner.query(
+            `INSERT INTO app_users (login, "passwordHash", role) VALUES ($1, $2, $3) ON CONFLICT (login) DO NOTHING`,
+            [row.login, row.passwordHash, row.role],
+          );
+        }
+      }
 
       await queryRunner.commitTransaction();
 
@@ -136,6 +148,7 @@ export class AppController {
           bankAccounts: data.bankAccounts?.length ?? 0,
           bankTransactions: data.bankTransactions?.length ?? 0,
           parcelExpeditions: data.parcelExpeditions?.length ?? 0,
+          appUsers: data.appUsers?.length ?? 0,
         },
       };
     } catch (err) {

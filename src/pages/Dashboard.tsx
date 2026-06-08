@@ -27,7 +27,7 @@ const DashboardCharts = lazy(() => import('@/components/DashboardCharts'));
 export default function Dashboard() {
   const navigate = useNavigate();
   const { trucks, trips, parcelExpeditions, expenses, invoices, drivers, refreshTrucks, refreshDrivers, refreshTrips, refreshParcelExpeditions, refreshExpenses, refreshInvoices, refreshThirdParties, refreshPersonnel } = useApp();
-  const { user, users, createUser, changeUserPassword, changeUserRole, changeOwnPassword } = useAuth();
+  const { user, users, createUser, changeUserPassword, changeUserRole, changeOwnPassword, refreshUsers } = useAuth();
   const [isBackingUp, setIsBackingUp] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [isPwdDialogOpen, setIsPwdDialogOpen] = useState(false);
@@ -87,7 +87,7 @@ export default function Dashboard() {
       const parsed = JSON.parse(text);
       if (!parsed.data || !parsed.version) throw new Error('Fichier de backup invalide ou corrompu');
       const result = await adminApi.restore(parsed.data);
-      await Promise.all([refreshTrucks(), refreshDrivers(), refreshTrips(), refreshParcelExpeditions(), refreshExpenses(), refreshInvoices(), refreshThirdParties(), refreshPersonnel()]);
+      await Promise.all([refreshTrucks(), refreshDrivers(), refreshTrips(), refreshParcelExpeditions(), refreshExpenses(), refreshInvoices(), refreshThirdParties(), refreshPersonnel(), refreshUsers()]);
       toast.success(`Restauration réussie — ${Object.values(result.counts).reduce((a, b) => a + b, 0)} enregistrements restaurés`);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Erreur lors de la restauration');

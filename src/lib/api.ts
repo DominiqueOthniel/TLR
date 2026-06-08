@@ -342,6 +342,38 @@ export const personnelApi = {
   delete: (id: string) => request<void>(`/personnel/${id}`, { method: 'DELETE' }),
 };
 
+// --- Users (comptes partagés en ligne) ---
+export interface UserSummaryRow {
+  login: string;
+  role: 'admin' | 'pdg' | 'gestion_manager' | 'comptable';
+}
+
+export const usersApi = {
+  getAll: () => request<UserSummaryRow[]>('/users'),
+  login: (login: string, password: string) =>
+    request<UserSummaryRow>('/users/login', {
+      method: 'POST',
+      body: JSON.stringify({ login, password }),
+    }),
+  create: (data: { login: string; role: UserSummaryRow['role']; password: string }) =>
+    request<UserSummaryRow>('/users', { method: 'POST', body: JSON.stringify(data) }),
+  changePassword: (login: string, password: string) =>
+    request<UserSummaryRow>(`/users/${encodeURIComponent(login)}/password`, {
+      method: 'PATCH',
+      body: JSON.stringify({ password }),
+    }),
+  changeRole: (login: string, role: UserSummaryRow['role']) =>
+    request<UserSummaryRow>(`/users/${encodeURIComponent(login)}/role`, {
+      method: 'PATCH',
+      body: JSON.stringify({ role }),
+    }),
+  changeOwnPassword: (currentPassword: string, newPassword: string) =>
+    request<{ message: string }>('/users/me/password', {
+      method: 'PATCH',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    }),
+};
+
 // --- Admin ---
 export const adminApi = {
   backup: () => fetch(`${API_URL}/admin/backup`),
