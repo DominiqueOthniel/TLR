@@ -11,11 +11,11 @@ import { useAuth, LOGIN_USER_OPTIONS } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 export default function Login() {
-  const [selectedUser, setSelectedUser] = useState<string>(LOGIN_USER_OPTIONS[0].login);
+  const [selectedUser, setSelectedUser] = useState<string>('pdg');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const { isSubmitting: loading, withGuard } = useSubmitGuard();
-  const { user, users, login: doLogin } = useAuth();
+  const { user, users, usersLoading, usersError, login: doLogin, refreshUsers } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -102,14 +102,31 @@ export default function Login() {
           {/* Formulaire */}
           <form onSubmit={handleSubmit} className="space-y-5">
 
+            {usersError && (
+              <div className="rounded-xl border border-amber-400/30 bg-amber-500/10 px-3 py-2.5 text-xs text-amber-100/90 leading-relaxed">
+                {usersError}
+                <button
+                  type="button"
+                  onClick={() => void refreshUsers()}
+                  className="mt-2 block text-amber-200 underline underline-offset-2 hover:text-white"
+                >
+                  Réessayer
+                </button>
+              </div>
+            )}
+
             {/* Sélecteur utilisateur */}
             <div className="space-y-2">
               <Label className="text-white/65 text-xs font-semibold uppercase tracking-wider">Utilisateur</Label>
-              <Select value={selectedUser} onValueChange={setSelectedUser} disabled={loading}>
+              <Select value={selectedUser} onValueChange={setSelectedUser} disabled={loading || usersLoading}>
                 <SelectTrigger className="bg-white/[0.04] border-white/10 text-white h-12 rounded-xl hover:bg-white/[0.07] focus:ring-blue-400/40 focus:border-blue-400/50 transition-all">
-                  <span className="flex items-center gap-2.5">
-                    <User className="h-4 w-4 text-blue-300/70" />
-                    <SelectValue placeholder="Choisir un utilisateur" />
+                  <span className="flex items-center gap-2.5 min-w-0">
+                    <User className="h-4 w-4 text-blue-300/70 shrink-0" />
+                    {usersLoading ? (
+                      <span className="text-white/50">Chargement des comptes…</span>
+                    ) : (
+                      <SelectValue placeholder="Choisir un utilisateur" />
+                    )}
                   </span>
                 </SelectTrigger>
                 <SelectContent className="bg-[#101a3a] border-white/10">

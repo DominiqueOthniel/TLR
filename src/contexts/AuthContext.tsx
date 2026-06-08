@@ -49,11 +49,20 @@ function validateRole(role: UserRole) {
   }
 }
 
+const FALLBACK_USERS: UserSummary[] = [
+  { login: 'admin', role: 'admin' },
+  { login: 'pdg', role: 'pdg' },
+  { login: 'gestionmanager', role: 'gestion_manager' },
+  { login: 'comptable', role: 'comptable' },
+];
+
 interface AuthContextType {
   user: User | null;
   login: (login: string, password: string) => Promise<boolean>;
   logout: () => void;
   users: UserSummary[];
+  usersLoading: boolean;
+  usersError: string | null;
   refreshUsers: () => Promise<void>;
   createUser: (login: string, role: UserRole, password: string) => Promise<void>;
   changeUserPassword: (targetLogin: string, newPassword: string) => Promise<void>;
@@ -79,14 +88,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return null;
     }
   });
-  const [users, setUsers] = useState<UserSummary[]>([]);
+  const [users, setUsers] = useState<UserSummary[]>(FALLBACK_USERS);
+  const [usersLoading, setUsersLoading] = useState(true);
+  const [usersError, setUsersError] = useState<string | null>(null);
 
   const refreshUsers = useCallback(async () => {
+    setUsersLoading(true);
+    setUsersError(null);
     try {
       const list = await usersApi.getAll();
-      setUsers(list.map((u) => ({ login: u.login, role: normalizeRole(u.role) })));
+      if (list.length > 0) {
+        setUsers(list.map((u) => ({ login: u.login, role: normalizeRole(u.role) })));
+      } else {
+        setUsers(FALLBACK_USERS);
+        setUsersError('Aucun compte trouvé en ligne. Vérifiez que le backend est bien déployé avec la table app_users.');
+      }
     } catch {
-      setUsers([]);
+      setUsers(FALLBACK_USERS);
+      setUsersError('Impossible de joindre le serveur des comptes. Vérifiez VITE_API_URL et le redéploiement du backend.');
+    } finally {
+      setUsersLoading(false);
     }
   }, []);
 
@@ -183,6 +204,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login,
         logout,
         users,
+        usersLoading,
+        usersError,
         refreshUsers,
         createUser,
         changeUserPassword,
