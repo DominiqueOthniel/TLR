@@ -7,7 +7,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { AppUser, AppUserRole } from '../entities/app-user.entity';
 import { hashPassword } from '../utils/password-hash';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -30,9 +30,11 @@ export class UsersService implements OnModuleInit {
   constructor(
     @InjectRepository(AppUser)
     private readonly userRepository: Repository<AppUser>,
+    private readonly dataSource: DataSource,
   ) {}
 
   async onModuleInit(): Promise<void> {
+    await this.ensureUsersTable();
     await this.seedDefaultUsers();
   }
 
@@ -50,6 +52,16 @@ export class UsersService implements OnModuleInit {
 
   private toSummary(user: AppUser): UserSummaryDto {
     return { login: user.login, role: this.normalizeRole(user.role) };
+  }
+
+  private async ensureUsersTable(): Promise<void> {
+    await this.dataSource.query(`
+      CREATE TABLE IF NOT EXISTS app_users (
+        login varchar(30) PRIMARY KEY,
+        "passwordHash" varchar(64) NOT NULL,
+        role varchar(32) NOT NULL
+      )
+    `);
   }
 
   private async seedDefaultUsers(): Promise<void> {
