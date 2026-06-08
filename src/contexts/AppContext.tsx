@@ -58,6 +58,8 @@ export interface Trip {
   dateDepart: string;
   dateArrivee: string;
   recette: number;
+  quantite?: number;
+  prixUnitaire?: number;
   prefinancement?: number;
   client?: string;
   marchandise?: string;
@@ -278,6 +280,8 @@ function normalizeTrip(r: Record<string, unknown>): Trip {
     dateDepart: String(r.dateDepart),
     dateArrivee: r.dateArrivee ? String(r.dateArrivee) : '',
     recette: parseNum(r.recette),
+    quantite: r.quantite != null ? parseNum(r.quantite) : undefined,
+    prixUnitaire: r.prixUnitaire != null ? parseNum(r.prixUnitaire) : undefined,
     prefinancement: r.prefinancement != null ? parseNum(r.prefinancement) : undefined,
     client: r.client ? String(r.client) : undefined,
     marchandise: r.marchandise ? String(r.marchandise) : undefined,

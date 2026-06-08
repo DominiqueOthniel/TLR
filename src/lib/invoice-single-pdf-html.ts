@@ -42,6 +42,9 @@ export function buildSingleInvoicePdfInnerHtml(opts: {
 
   let detailBlock = '';
   if (trip) {
+    const tripQuantite = trip.quantite != null && trip.quantite > 0 ? trip.quantite.toLocaleString('fr-FR') : '1';
+    const tripPrixUnitaire =
+      trip.prixUnitaire != null && trip.prixUnitaire > 0 ? trip.prixUnitaire : invoice.montantHT;
     detailBlock = `
                 <div class="mb-4">
                   <h3 class="font-bold mb-2 uppercase" style="letter-spacing:0.06em;font-size:11px;color:#475569;">Détails du transport</h3>
@@ -50,7 +53,9 @@ export function buildSingleInvoicePdfInnerHtml(opts: {
                       <thead style="background:#1e3a8a;color:#ffffff;">
                         <tr>
                           <th class="p-2 text-left font-bold text-xs">Prestation</th>
-                          <th class="p-2 text-right font-bold text-xs">Montant TTC</th>
+                          <th class="p-2 text-right font-bold text-xs">Quantité</th>
+                          <th class="p-2 text-right font-bold text-xs">Prix unitaire</th>
+                          <th class="p-2 text-right font-bold text-xs">Montant total</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -63,8 +68,14 @@ export function buildSingleInvoicePdfInnerHtml(opts: {
                               ${trip.description ? `<p class="text-xs text-gray-600">${escapeHtml(trip.description)}</p>` : ''}
                             </div>
                           </td>
+                          <td class="p-2 text-right font-semibold">
+                            ${tripQuantite}
+                          </td>
+                          <td class="p-2 text-right font-semibold">
+                            ${tripPrixUnitaire.toLocaleString('fr-FR')} FCFA
+                          </td>
                           <td class="p-2 text-right font-bold">
-                            ${invoice.montantTTC.toLocaleString('fr-FR')} FCFA
+                            ${invoice.montantHT.toLocaleString('fr-FR')} FCFA
                           </td>
                         </tr>
                       </tbody>

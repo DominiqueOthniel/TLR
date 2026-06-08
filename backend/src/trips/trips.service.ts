@@ -1,17 +1,30 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { Trip } from '../entities/trip.entity';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { UpdateTripDto } from './dto/update-trip.dto';
 
 @Injectable()
-export class TripsService {
+export class TripsService implements OnModuleInit {
   constructor(
     @InjectRepository(Trip)
     private readonly tripRepository: Repository<Trip>,
+    private readonly dataSource: DataSource,
   ) {}
+
+  async onModuleInit(): Promise<void> {
+    await this.ensureTripDetailColumns();
+  }
+
+  private async ensureTripDetailColumns(): Promise<void> {
+    await this.dataSource.query(`
+      ALTER TABLE trips
+        ADD COLUMN IF NOT EXISTS quantite decimal(12, 2),
+        ADD COLUMN IF NOT EXISTS "prixUnitaire" decimal(15, 2)
+    `);
+  }
 
   async create(dto: CreateTripDto): Promise<Trip> {
     const trip = this.tripRepository.create({

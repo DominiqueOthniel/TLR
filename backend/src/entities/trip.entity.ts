@@ -79,6 +79,12 @@ export class Trip {
   @Column({ type: 'decimal', precision: 15, scale: 2 })
   recette: number;
 
+  @Column({ type: 'decimal', precision: 12, scale: 2, nullable: true })
+  quantite?: number;
+
+  @Column({ type: 'decimal', precision: 15, scale: 2, nullable: true })
+  prixUnitaire?: number;
+
   @Column({ type: 'decimal', precision: 15, scale: 2, nullable: true })
   prefinancement?: number;
 

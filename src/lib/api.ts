@@ -128,6 +128,8 @@ export interface TripPayload {
   dateDepart: string;
   dateArrivee?: string;
   recette: number;
+  quantite?: number;
+  prixUnitaire?: number;
   prefinancement?: number;
   client?: string;
   marchandise?: string;

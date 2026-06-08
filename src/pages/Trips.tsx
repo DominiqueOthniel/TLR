@@ -142,6 +142,8 @@ export default function Trips() {
     chauffeurId: '',
     dateDepart: '',
     dateArrivee: '',
+    quantite: undefined as number | undefined,
+    prixUnitaire: undefined as number | undefined,
     recette: 0,
     prefinancement: 0,
     paiementStatut: 'avancee' as 'solde' | 'avancee',
@@ -225,6 +227,8 @@ export default function Trips() {
       chauffeurId: '',
       dateDepart: '',
       dateArrivee: '',
+      quantite: undefined,
+      prixUnitaire: undefined,
       recette: 0,
       prefinancement: 0,
       paiementStatut: 'avancee' as 'solde' | 'avancee',
@@ -266,6 +270,13 @@ export default function Trips() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const montantTotal =
+      formData.quantite !== undefined &&
+      formData.prixUnitaire !== undefined &&
+      formData.quantite > 0 &&
+      formData.prixUnitaire > 0
+        ? formData.quantite * formData.prixUnitaire
+        : formData.recette;
     
     if (!formData.tracteurId && !formData.remorqueuseId) {
       toast.error('Veuillez sélectionner au moins un tracteur ou une remorqueuse');
@@ -299,7 +310,9 @@ export default function Trips() {
           chauffeurId: formData.chauffeurId,
           dateDepart: formData.dateDepart,
           dateArrivee: formData.dateArrivee || undefined,
-          recette: formData.recette,
+          recette: montantTotal,
+          quantite: formData.quantite,
+          prixUnitaire: formData.prixUnitaire,
           prefinancement: formData.prefinancement > 0 ? formData.prefinancement : undefined,
           tracteurId: formData.tracteurId || undefined,
           remorqueuseId: formData.remorqueuseId || undefined,
@@ -327,18 +340,18 @@ export default function Trips() {
             );
           }
         }
-        if (formData.recette > 0) {
+        if (montantTotal > 0) {
           const isSolde = formData.paiementStatut === 'solde';
           const numero = genInvoiceNum(invoices);
           const createdInvoice = await createInvoice({
             numero,
             trajetId: createdTrip.id,
             statut: isSolde ? 'payee' : 'en_attente',
-            montantHT: formData.recette,
+            montantHT: montantTotal,
             tva: 0,
             tps: 0,
-            montantTTC: formData.recette,
-            montantPaye: isSolde ? formData.recette : 0,
+            montantTTC: montantTotal,
+            montantPaye: isSolde ? montantTotal : 0,
             dateCreation: new Date().toISOString().split('T')[0],
             datePaiement: isSolde ? formData.dateDepart : undefined,
             modePaiement: isSolde ? 'Espèces' : undefined,
@@ -348,7 +361,7 @@ export default function Trips() {
           });
           if (isSolde) {
             await appendEntreeFromInvoicePayment({
-              montant: formData.recette,
+              montant: montantTotal,
               date: formData.dateDepart,
               factureNumero: createdInvoice.numero,
               factureId: createdInvoice.id,
@@ -406,6 +419,19 @@ export default function Trips() {
       trip.remorqueuseId ? `Remorque: ${getTruckLabel(trip.remorqueuseId)}` : '',
     ].filter(Boolean);
     return labels.length > 0 ? labels.join(' / ') : '-';
+  };
+
+  const updateTripPricing = (patch: Partial<Pick<typeof formData, 'quantite' | 'prixUnitaire' | 'recette'>>) => {
+    const next = { ...formData, ...patch };
+    if (
+      next.quantite !== undefined &&
+      next.prixUnitaire !== undefined &&
+      next.quantite > 0 &&
+      next.prixUnitaire > 0
+    ) {
+      next.recette = next.quantite * next.prixUnitaire;
+    }
+    setFormData(next);
   };
 
   const openExpenseFromTrip = (expenseId: string) => {
@@ -839,7 +865,9 @@ export default function Trips() {
         { header: 'Statut', value: (t) => formatTripStatusFr(t.statut) },
         { header: 'Départ', value: (t) => t.dateDepart },
         { header: 'Arrivée', value: (t) => t.dateArrivee || '' },
-        { header: 'Recette (FCFA)', value: (t) => t.recette },
+        { header: 'Quantité', value: (t) => t.quantite ?? '' },
+        { header: 'Prix unitaire (FCFA)', value: (t) => t.prixUnitaire ?? '' },
+        { header: 'Montant total (FCFA)', value: (t) => t.recette },
       ],
       rows: sortedTrips,
     });
@@ -903,7 +931,15 @@ export default function Trips() {
           value: (t) => (t.dateArrivee ? new Date(t.dateArrivee).toLocaleDateString('fr-FR') : '-'),
         },
         { 
-          header: 'Recette (FCFA)', 
+          header: 'Quantité',
+          value: (t) => t.quantite != null && t.quantite > 0 ? t.quantite.toLocaleString('fr-FR') : '-',
+        },
+        {
+          header: 'Prix unitaire',
+          value: (t) => t.prixUnitaire != null && t.prixUnitaire > 0 ? `${t.prixUnitaire.toLocaleString('fr-FR')} FCFA` : '-',
+        },
+        {
+          header: 'Montant total (FCFA)',
           value: (t) => `+${t.recette.toLocaleString('fr-FR')}`,
           cellStyle: (t) => t.recette > 0 ? 'positive' : 'neutral'
         },
@@ -1262,18 +1298,42 @@ export default function Trips() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="recette">Recette (FCFA) *</Label>
+                  <Label htmlFor="quantite">Quantité</Label>
+                  <NumberInput
+                    id="quantite"
+                    min={0}
+                    value={formData.quantite}
+                    onChange={(value) => updateTripPricing({ quantite: value })}
+                    placeholder="Ex: 1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="prixUnitaire">Prix unitaire (FCFA)</Label>
+                  <NumberInput
+                    id="prixUnitaire"
+                    min={0}
+                    value={formData.prixUnitaire}
+                    onChange={(value) => updateTripPricing({ prixUnitaire: value })}
+                    placeholder="Prix unitaire"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="recette">Montant total (FCFA) *</Label>
                   <NumberInput
                     id="recette"
                     min={0}
                     value={formData.recette}
-                    onChange={(value) => setFormData({ ...formData, recette: value })}
+                    onChange={(value) => updateTripPricing({ recette: value || 0 })}
                     required
-                    placeholder="Montant de la recette"
+                    placeholder="Quantité × prix unitaire"
                   />
+                  <p className="text-xs text-muted-foreground mt-1">Calculé automatiquement si quantité et prix unitaire sont renseignés.</p>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="prefinancement">Préfinancement (FCFA) (optionnel)</Label>
                   <NumberInput
@@ -1462,7 +1522,7 @@ export default function Trips() {
             </CardHeader>
             <CardContent className="p-0">
           <div className="overflow-x-auto">
-          <Table className="min-w-[1180px]">
+          <Table className="min-w-[1380px]">
             <TableHeader>
               <TableRow>
                   <TableHead className="min-w-[110px]">ID trajet</TableHead>
@@ -1474,7 +1534,9 @@ export default function Trips() {
                 <TableHead className="min-w-[90px]">Départ</TableHead>
                 <TableHead className="min-w-[90px]">Arrivée</TableHead>
                 <TableHead className="text-right min-w-[90px]">Distance</TableHead>
-                <TableHead className="text-right min-w-[110px]">Recette</TableHead>
+                <TableHead className="text-right min-w-[90px]">Quantité</TableHead>
+                <TableHead className="text-right min-w-[120px]">Prix unitaire</TableHead>
+                <TableHead className="text-right min-w-[120px]">Montant total</TableHead>
                 <TableHead className="text-right min-w-[120px]">Préfinancement</TableHead>
                 <TableHead className="text-right min-w-[110px]">Dépenses</TableHead>
                 <TableHead className="text-right min-w-[110px]">Solde</TableHead>
@@ -1484,7 +1546,7 @@ export default function Trips() {
             <TableBody>
               {sortedTrips.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={14} className="text-center text-muted-foreground">
+                  <TableCell colSpan={16} className="text-center text-muted-foreground">
                     {trips.length === 0 
                       ? 'Aucun trajet enregistré'
                       : hasActiveFilters
@@ -1537,6 +1599,12 @@ export default function Trips() {
                           <span className="text-muted-foreground text-xs">-</span>
                         );
                       })()}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {trip.quantite != null && trip.quantite > 0 ? trip.quantite.toLocaleString('fr-FR') : '-'}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {trip.prixUnitaire != null && trip.prixUnitaire > 0 ? `${trip.prixUnitaire.toLocaleString('fr-FR')} FCFA` : '-'}
                     </TableCell>
                     <TableCell className="text-right font-semibold text-accent">{trip.recette.toLocaleString('fr-FR')} FCFA</TableCell>
                     <TableCell className="text-right">

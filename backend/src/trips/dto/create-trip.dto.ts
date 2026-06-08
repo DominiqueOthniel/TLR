@@ -85,6 +85,16 @@ export class CreateTripDto {
   recette: number;
 
   @IsOptional()
+  @ValidateIf((_, v) => v !== undefined && v !== null && v !== '')
+  @IsNumber()
+  quantite?: number;
+
+  @IsOptional()
+  @ValidateIf((_, v) => v !== undefined && v !== null && v !== '')
+  @IsNumber()
+  prixUnitaire?: number;
+
+  @IsOptional()
   @IsNumber()
   prefinancement?: number;
 

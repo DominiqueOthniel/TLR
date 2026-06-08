@@ -1489,10 +1489,31 @@ export default function Invoices() {
 
                         {/* Recette */}
                         <div className="md:col-span-2 bg-green-50 dark:bg-green-950/20 rounded-lg p-3 border-2 border-green-200 dark:border-green-800">
-                          <span className="text-xs font-semibold text-green-700 dark:text-green-400">{EMOJI.argent} Recette</span>
-                          <p className="text-2xl font-bold text-green-700 dark:text-green-400 mt-1">
-                            {selectedTrip.recette.toLocaleString('fr-FR')} FCFA
-                          </p>
+                          <span className="text-xs font-semibold text-green-700 dark:text-green-400">{EMOJI.argent} Détails financiers</span>
+                          <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                              <p className="text-xs text-green-700/70 dark:text-green-300/70">Quantité</p>
+                              <p className="text-sm font-semibold text-green-700 dark:text-green-400">
+                                {selectedTrip.quantite != null && selectedTrip.quantite > 0
+                                  ? selectedTrip.quantite.toLocaleString('fr-FR')
+                                  : '-'}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-green-700/70 dark:text-green-300/70">Prix unitaire</p>
+                              <p className="text-sm font-semibold text-green-700 dark:text-green-400">
+                                {selectedTrip.prixUnitaire != null && selectedTrip.prixUnitaire > 0
+                                  ? `${selectedTrip.prixUnitaire.toLocaleString('fr-FR')} FCFA`
+                                  : '-'}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-green-700/70 dark:text-green-300/70">Montant total</p>
+                              <p className="text-sm font-semibold text-green-700 dark:text-green-400">
+                                {selectedTrip.recette.toLocaleString('fr-FR')} FCFA
+                              </p>
+                            </div>
+                          </div>
                         </div>
 
                         {/* Description */}
