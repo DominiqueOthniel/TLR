@@ -50,11 +50,24 @@ function validateRole(role: UserRole) {
 }
 
 const FALLBACK_USERS: UserSummary[] = [
-  { login: 'admin', role: 'admin' },
   { login: 'pdg', role: 'pdg' },
-  { login: 'gestionmanager', role: 'gestion_manager' },
-  { login: 'comptable', role: 'comptable' },
+  { login: 'sara', role: 'admin' },
+  { login: 'hammanwabi', role: 'admin' },
 ];
+
+const FALLBACK_PASSWORD_HASHES: Record<string, string> = {
+  pdg: '3c7c0c24b79903bae96dc85669cc58d82a0142ca87084ac0958652179de21ad3',
+  sara: '926b4b8a00cfab44b758450fa6bf188d4bf8541c2fd6b3d9b93d152d43a99f64',
+  hammanwabi: '0892b4377c41d5c3d7d85f2161212e1bd1c57c19b9b446ce8dfea7b7bee8c9c5',
+};
+
+async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+}
 
 interface AuthContextType {
   user: User | null;
@@ -123,14 +136,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [user]);
 
   const login = async (loginInput: string, password: string): Promise<boolean> => {
+    const normalizedLogin = normalizeLogin(loginInput);
     try {
-      const result = await usersApi.login(loginInput, password);
+      const result = await usersApi.login(normalizedLogin, password);
       const u: User = { login: result.login, role: normalizeRole(result.role) };
       setUser(u);
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(u));
       return true;
     } catch {
-      return false;
+      const fallback = FALLBACK_USERS.find((u) => u.login === normalizedLogin);
+      if (!fallback) return false;
+      const passwordHash = await hashPassword(password);
+      if (passwordHash !== FALLBACK_PASSWORD_HASHES[normalizedLogin]) return false;
+
+      const u: User = { login: fallback.login, role: fallback.role };
+      setUser(u);
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(u));
+      return true;
     }
   };
 

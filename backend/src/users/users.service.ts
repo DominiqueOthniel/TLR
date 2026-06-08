@@ -14,10 +14,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 
 const DEFAULT_USERS: Array<{ login: string; passwordHash: string; role: AppUserRole }> = [
-  { login: 'admin', passwordHash: '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', role: 'admin' },
   { login: 'pdg', passwordHash: '3c7c0c24b79903bae96dc85669cc58d82a0142ca87084ac0958652179de21ad3', role: 'pdg' },
-  { login: 'gestionmanager', passwordHash: 'af960ccfc27d3ef7981c7fd8887ae7baa30f21aff0b9b15b6253e7b659545f87', role: 'gestion_manager' },
-  { login: 'comptable', passwordHash: '9c831eae072d3a93e92ba9d940aa186447bcef2eb777b570e267fe78a000bcb6', role: 'comptable' },
+  { login: 'sara', passwordHash: '926b4b8a00cfab44b758450fa6bf188d4bf8541c2fd6b3d9b93d152d43a99f64', role: 'admin' },
+  { login: 'hammanwabi', passwordHash: '0892b4377c41d5c3d7d85f2161212e1bd1c57c19b9b446ce8dfea7b7bee8c9c5', role: 'admin' },
 ];
 
 export interface UserSummaryDto {
@@ -34,8 +33,13 @@ export class UsersService implements OnModuleInit {
   ) {}
 
   async onModuleInit(): Promise<void> {
-    await this.ensureUsersTable();
-    await this.seedDefaultUsers();
+    try {
+      await this.ensureUsersTable();
+      await this.seedDefaultUsers();
+    } catch (err) {
+      // Ne bloque pas le démarrage complet de l'API si la base refuse l'initialisation des comptes.
+      console.warn('Initialisation des comptes utilisateurs ignorée:', err);
+    }
   }
 
   private normalizeLogin(login: string): string {
