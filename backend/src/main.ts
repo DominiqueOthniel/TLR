@@ -1,7 +1,7 @@
 ﻿import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { json, urlencoded } from 'express';
-import compression from 'compression';
+import * as compression from 'compression';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
