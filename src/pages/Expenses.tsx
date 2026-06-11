@@ -27,6 +27,7 @@ import {
 } from '@/lib/caisse-local';
 import { frCollator, parseDateMs, stableSort } from '@/lib/list-sort';
 import { ListSortSelect } from '@/components/ListSortSelect';
+import { formatLocalDate } from '@/lib/date-utils';
 import { formatTripDisplayId } from '@/lib/trip-id';
 
 const categories = ['Carburant', 'Maintenance', 'Péage', 'Assurance', 'Salaire', 'Don', 'Autre'];
@@ -813,7 +814,7 @@ export default function Expenses() {
                     <SelectItem value="none">Aucun trajet</SelectItem>
                     {trips.map(trip => (
                       <SelectItem key={trip.id} value={trip.id}>
-                        {formatTripDisplayId(trip.id)} - {trip.origine} → {trip.destination} {trip.client && `(${trip.client})`} - {new Date(trip.dateDepart).toLocaleDateString('fr-FR')}
+                        {formatTripDisplayId(trip.id)} - {trip.origine} → {trip.destination} {trip.client && `(${trip.client})`} - {formatLocalDate(trip.dateDepart)}
                       </SelectItem>
                     ))}
                   </SelectContent>

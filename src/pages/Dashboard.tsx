@@ -21,6 +21,7 @@ import { useAuth, UserRole } from '@/contexts/AuthContext';
 import { adminApi } from '@/lib/api';
 import { toast } from 'sonner';
 import { getCaisseSoldeActuel, getTotalBanqueDisponible } from '@/lib/bank-local';
+import { formatLocalDate, parseLocalDate } from '@/lib/date-utils';
 
 const DashboardCharts = lazy(() => import('@/components/DashboardCharts'));
 
@@ -261,7 +262,7 @@ export default function Dashboard() {
   const recentTripsSorted = useMemo(
     () =>
       [...trips].sort(
-        (a, b) => new Date(b.dateDepart).getTime() - new Date(a.dateDepart).getTime(),
+        (a, b) => (parseLocalDate(b.dateDepart)?.getTime() ?? 0) - (parseLocalDate(a.dateDepart)?.getTime() ?? 0),
       ),
     [trips],
   );
@@ -322,7 +323,8 @@ export default function Dashboard() {
       
       // Chiffre d’affaires et dépenses pour ce mois
       const monthTrips = trips.filter(trip => {
-        const tripDate = new Date(trip.dateDepart);
+      const tripDate = parseLocalDate(trip.dateDepart);
+      if (!tripDate) return false;
         return tripDate.getMonth() === date.getMonth() && 
                tripDate.getFullYear() === date.getFullYear();
       });
@@ -1004,7 +1006,7 @@ export default function Dashboard() {
                         </Badge>
                       </div>
                       <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-muted-foreground">
-                        <span>{EMOJI.date} {new Date(trip.dateDepart).toLocaleDateString('fr-FR')}</span>
+                        <span>{EMOJI.date} {formatLocalDate(trip.dateDepart)}</span>
                         {trip.client && <span className="hidden sm:inline">{EMOJI.personne} {trip.client}</span>}
                       </div>
                     </div>

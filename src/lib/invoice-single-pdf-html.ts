@@ -1,6 +1,7 @@
 import type { Expense, Invoice, ParcelExpedition, Trip } from '@/contexts/AppContext';
 import { COMPANY_CONTACT, COMPANY_LOGO_SRC, COMPANY_NAME, COMPANY_TAGLINE } from '@/lib/invoice-branding';
 import { formatTripStatusFr } from '@/lib/sync-utils';
+import { formatLocalDate, parseLocalDateMs } from '@/lib/date-utils';
 
 function escapeHtml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -91,8 +92,8 @@ export function buildSingleInvoicePdfInnerHtml(opts: {
                       ${trip.tracteurId ? `<p class="text-gray-600">Tracteur : <span class="text-black">${getTruckLabel(trip.tracteurId)}</span></p>` : ''}
                       ${trip.remorqueuseId ? `<p class="text-gray-600">Remorque : <span class="text-black">${getTruckLabel(trip.remorqueuseId)}</span></p>` : ''}
                       <p class="text-gray-600">Statut trajet : <span class="text-black" style="${trip.statut === 'annule' ? 'color:#b91c1c;font-weight:600;' : ''}">${formatTripStatusFr(trip.statut)}</span></p>
-                      <p class="text-gray-600">Départ : <span class="text-black">${new Date(trip.dateDepart).toLocaleDateString('fr-FR')}</span></p>
-                      ${trip.dateArrivee ? `<p class="text-gray-600">Arrivée : <span class="text-black">${new Date(trip.dateArrivee).toLocaleDateString('fr-FR')}</span></p>` : ''}
+                      <p class="text-gray-600">Départ : <span class="text-black">${formatLocalDate(trip.dateDepart)}</span></p>
+                      ${trip.dateArrivee ? `<p class="text-gray-600">Arrivée : <span class="text-black">${formatLocalDate(trip.dateArrivee)}</span></p>` : ''}
                     </div>
                   </div>
                   <div>
@@ -129,7 +130,7 @@ export function buildSingleInvoicePdfInnerHtml(opts: {
                 </div>`;
   } else if (parcelExpedition) {
     const pe = parcelExpedition;
-    const dateArriveeMs = pe.dateArrivee?.trim() ? new Date(pe.dateArrivee).getTime() : NaN;
+    const dateArriveeMs = pe.dateArrivee?.trim() ? parseLocalDateMs(pe.dateArrivee) : NaN;
     const hasArriveeValide = !Number.isNaN(dateArriveeMs);
     const lotsRows = pe.lots
       .map(
@@ -175,8 +176,8 @@ export function buildSingleInvoicePdfInnerHtml(opts: {
                       ${pe.tracteurId ? `<p class="text-gray-600">Tracteur : <span class="text-black">${getTruckLabel(pe.tracteurId)}</span></p>` : ''}
                       ${pe.remorqueuseId ? `<p class="text-gray-600">Remorque : <span class="text-black">${getTruckLabel(pe.remorqueuseId)}</span></p>` : ''}
                       <p class="text-gray-600">Statut expédition : <span class="text-black" style="${pe.statut === 'annule' ? 'color:#b91c1c;font-weight:600;' : ''}">${formatTripStatusFr(pe.statut)}</span></p>
-                      <p class="text-gray-600">Départ : <span class="text-black">${new Date(pe.dateDepart).toLocaleDateString('fr-FR')}</span></p>
-                      ${hasArriveeValide ? `<p class="text-gray-600">Arrivée : <span class="text-black">${new Date(pe.dateArrivee!).toLocaleDateString('fr-FR')}</span></p>` : ''}
+                      <p class="text-gray-600">Départ : <span class="text-black">${formatLocalDate(pe.dateDepart)}</span></p>
+                      ${hasArriveeValide ? `<p class="text-gray-600">Arrivée : <span class="text-black">${formatLocalDate(pe.dateArrivee!)}</span></p>` : ''}
                       ${pe.description ? `<p class="text-gray-600 mt-2">${escapeHtml(pe.description)}</p>` : ''}
                     </div>
                   </div>

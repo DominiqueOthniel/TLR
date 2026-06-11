@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSubmitGuard } from '@/hooks/useSubmitGuard';
 import { useApp, Trip, TripStatus } from '@/contexts/AppContext';
@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Trash2, MapPin, Route, CheckCircle, Clock, XCircle, FileText, Filter, X, Search, Download, Eye, DollarSign, Loader2, UserRoundPlus } from 'lucide-react';
+import { Plus, Trash2, MapPin, Route, CheckCircle, Clock, XCircle, FileText, Filter, X, Search, Download, Eye, DollarSign, Loader2, UserRoundPlus, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { canDeleteTrip, generateInvoiceNumber as genInvoiceNum, calculateTripStats, formatTripStatusFr } from '@/lib/sync-utils';
 import CityPicker, { CAMEROON_CITIES } from '@/components/CityPicker';
@@ -24,6 +24,7 @@ import { frCollator, parseDateMs, stableSort } from '@/lib/list-sort';
 import { ListSortSelect } from '@/components/ListSortSelect';
 import { appendEntreeFromInvoicePayment } from '@/lib/caisse-local';
 import { formatTripDisplayId } from '@/lib/trip-id';
+import { formatLocalDate } from '@/lib/date-utils';
 
 const TRIP_STATUT_ORDER: Record<TripStatus, number> = {
   planifie: 0,
@@ -127,6 +128,7 @@ export default function Trips() {
   const [filterStatus, setFilterStatus] = useState<TripStatus | 'all'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [listSort, setListSort] = useState<string>('date_depart_desc');
+  const [expandedTripIds, setExpandedTripIds] = useState<Set<string>>(() => new Set());
   const [roadDistances, setRoadDistances] = useState<Record<string, number>>({});
   const [formRoadDistance, setFormRoadDistance] = useState<number | null>(null);
 
@@ -925,10 +927,10 @@ export default function Trips() {
           };
           return statuts[t.statut] || t.statut;
         }},
-        { header: 'Départ', value: (t) => new Date(t.dateDepart).toLocaleDateString('fr-FR') },
+        { header: 'Départ', value: (t) => formatLocalDate(t.dateDepart) },
         {
           header: 'Arrivée',
-          value: (t) => (t.dateArrivee ? new Date(t.dateArrivee).toLocaleDateString('fr-FR') : '-'),
+          value: (t) => (t.dateArrivee ? formatLocalDate(t.dateArrivee) : '-'),
         },
         { 
           header: 'Quantité',
@@ -955,6 +957,18 @@ export default function Trips() {
     setFilterStatus('all');
     setSearchTerm('');
     setListSort('date_depart_desc');
+  };
+
+  const toggleTripDetails = (tripId: string) => {
+    setExpandedTripIds((current) => {
+      const next = new Set(current);
+      if (next.has(tripId)) {
+        next.delete(tripId);
+      } else {
+        next.add(tripId);
+      }
+      return next;
+    });
   };
   
   // Vérifier si des filtres sont actifs
@@ -1514,232 +1528,235 @@ export default function Trips() {
         </CardContent>
       </Card>
 
-      <Card className="shadow-md">
-        <CardHeader className="bg-gradient-to-br from-background to-muted/20">
-              <CardTitle className="flex items-center gap-2">
-            🚚 Liste des Trajets
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
+      <Card className="border-border/60 shadow-sm">
+        <CardHeader className="border-b bg-muted/20 py-4">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              🚚 Liste des trajets
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Vue allégée : ouvrez un trajet pour voir les détails.
+            </p>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
           <div className="overflow-x-auto">
-          <Table className="min-w-[1380px]">
-            <TableHeader>
-              <TableRow>
-                  <TableHead className="min-w-[110px]">ID trajet</TableHead>
-                <TableHead className="min-w-[160px]">Itinéraire</TableHead>
-                <TableHead className="min-w-[120px]">Client</TableHead>
-                <TableHead className="min-w-[180px]">Chauffeur(s)</TableHead>
-                <TableHead className="min-w-[180px]">Camion(s)</TableHead>
-                <TableHead className="min-w-[120px]">Statut</TableHead>
-                <TableHead className="min-w-[90px]">Départ</TableHead>
-                <TableHead className="min-w-[90px]">Arrivée</TableHead>
-                <TableHead className="text-right min-w-[90px]">Distance</TableHead>
-                <TableHead className="text-right min-w-[90px]">Quantité</TableHead>
-                <TableHead className="text-right min-w-[120px]">Prix unitaire</TableHead>
-                <TableHead className="text-right min-w-[120px]">Montant total</TableHead>
-                <TableHead className="text-right min-w-[120px]">Préfinancement</TableHead>
-                <TableHead className="text-right min-w-[110px]">Dépenses</TableHead>
-                <TableHead className="text-right min-w-[110px]">Solde</TableHead>
-                <TableHead className="text-right min-w-[160px]">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sortedTrips.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={16} className="text-center text-muted-foreground">
-                    {trips.length === 0 
-                      ? 'Aucun trajet enregistré'
-                      : hasActiveFilters
-                        ? 'Aucun trajet ne correspond aux filtres sélectionnés'
-                        : 'Aucun trajet enregistré'
-                    }
-                  </TableCell>
+            <Table className="min-w-[980px]">
+              <TableHeader>
+                <TableRow className="bg-muted/30 hover:bg-muted/30">
+                  <TableHead className="w-[120px]">ID</TableHead>
+                  <TableHead className="min-w-[250px]">Trajet</TableHead>
+                  <TableHead className="w-[120px]">Départ</TableHead>
+                  <TableHead className="min-w-[210px]">Équipe</TableHead>
+                  <TableHead className="w-[120px]">Statut</TableHead>
+                  <TableHead className="text-right w-[140px]">Montant</TableHead>
+                  <TableHead className="text-right w-[140px]">Solde</TableHead>
+                  <TableHead className="text-right w-[250px]">Actions</TableHead>
                 </TableRow>
-              ) : (
-                sortedTrips.map((trip) => (
-                  <TableRow key={trip.id} className="hover:bg-muted/50 transition-colors duration-200">
-                    <TableCell>
-                      <code className="text-xs font-mono">{formatTripDisplayId(trip.id)}</code>
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      <div>{trip.origine} → {trip.destination}</div>
-                      {trip.description && <div className="text-xs text-muted-foreground mt-1">{trip.description}</div>}
-                    </TableCell>
-                    <TableCell>{trip.client || '-'}</TableCell>
-                    <TableCell>
-                      <div>{getDriverLabel(trip.chauffeurId)}</div>
-                      {trip.chauffeurRemplacantId && (
-                        <div className="text-xs text-muted-foreground">
-                          Remplacé par {getDriverLabel(trip.chauffeurRemplacantId)}
-                          {trip.remplacementDate && ` le ${new Date(trip.remplacementDate).toLocaleDateString('fr-FR')}`}
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-xs space-y-1">
-                        {trip.tracteurId && <div>{getTruckLabel(trip.tracteurId)}</div>}
-                        {trip.remorqueuseId && <div className="text-muted-foreground">{getTruckLabel(trip.remorqueuseId)}</div>}
-                        {!trip.tracteurId && !trip.remorqueuseId && <span className="text-muted-foreground">-</span>}
-                      </div>
-                    </TableCell>
-                    <TableCell>{getStatusBadge(trip.statut)}</TableCell>
-                    <TableCell>{new Date(trip.dateDepart).toLocaleDateString('fr-FR')}</TableCell>
-                    <TableCell>
-                      {trip.dateArrivee 
-                        ? new Date(trip.dateArrivee).toLocaleDateString('fr-FR') 
-                        : <span className="text-muted-foreground text-xs">À définir</span>
+              </TableHeader>
+              <TableBody>
+                {sortedTrips.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
+                      {trips.length === 0
+                        ? 'Aucun trajet enregistré'
+                        : hasActiveFilters
+                          ? 'Aucun trajet ne correspond aux filtres sélectionnés'
+                          : 'Aucun trajet enregistré'
                       }
                     </TableCell>
-                    <TableCell className="text-right">
-                      {(() => {
-                        const km = getTripDistanceKm(trip);
-                        return km != null ? (
-                          <span className="font-medium">{km.toLocaleString('fr-FR')} km</span>
-                        ) : (
-                          <span className="text-muted-foreground text-xs">-</span>
-                        );
-                      })()}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {trip.quantite != null && trip.quantite > 0 ? trip.quantite.toLocaleString('fr-FR') : '-'}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {trip.prixUnitaire != null && trip.prixUnitaire > 0 ? `${trip.prixUnitaire.toLocaleString('fr-FR')} FCFA` : '-'}
-                    </TableCell>
-                    <TableCell className="text-right font-semibold text-accent">{trip.recette.toLocaleString('fr-FR')} FCFA</TableCell>
-                    <TableCell className="text-right">
-                      {(() => {
-                        const stats = calculateTripStats(trip.id, expenses, trip, invoices);
-                        return stats.prefinancement > 0 ? (
-                          <span className="text-blue-600 dark:text-blue-400 font-medium">
-                            {stats.prefinancement.toLocaleString('fr-FR')} FCFA
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground text-xs">-</span>
-                        );
-                      })()}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {(() => {
-                        const stats = calculateTripStats(trip.id, expenses, trip, invoices);
-                        return stats.expenses > 0 ? (
-                          <div className="flex flex-col items-end">
-                            <span className="text-red-600 dark:text-red-400 font-medium">
-                              {stats.expenses.toLocaleString('fr-FR')} FCFA
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              ({stats.expensesCount} dépense{stats.expensesCount > 1 ? 's' : ''})
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground text-xs">-</span>
-                        );
-                      })()}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {(() => {
-                        const stats = calculateTripStats(trip.id, expenses, trip, invoices);
-                        const soldeColor = stats.solde >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
-                        return (
-                          <span className={`font-bold ${soldeColor}`}>
-                            {stats.solde.toLocaleString('fr-FR')} FCFA
-                          </span>
-                        );
-                      })()}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Select 
-                          value={trip.statut} 
-                          onValueChange={(value) => handleUpdateStatus(trip.id, value as TripStatus, trip.statut)}
-                          disabled={trip.statut === 'termine' || trip.statut === 'annule'}
-                        >
-                          <SelectTrigger className="w-[130px] h-8">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="planifie" disabled={trip.statut !== 'planifie'}>Planifié</SelectItem>
-                            <SelectItem value="en_cours" disabled={trip.statut === 'termine' || trip.statut === 'annule'}>En cours</SelectItem>
-                            <SelectItem value="termine" disabled={trip.statut === 'planifie' || trip.statut === 'termine' || trip.statut === 'annule'}>Terminé</SelectItem>
-                            <SelectItem value="annule" disabled={trip.statut === 'termine' || trip.statut === 'annule'}>Annulé</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        {canManageAccounting && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => createExpenseFromTrip(trip)}
-                            className="h-8 w-8 p-0"
-                            title="Ajouter une dépense pour ce trajet"
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        )}
-                        {(() => {
-                          const stats = calculateTripStats(trip.id, expenses, trip, invoices);
-                          return stats.linkedExpensesCount > 0 && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => {
-                                setSelectedTripForExpenses(trip);
-                                setIsExpensesDialogOpen(true);
-                              }}
-                              className="h-8 w-8 p-0"
-                              title="Voir les dépenses de ce trajet"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          );
-                        })()}
-                        {canManageAccounting && !hasInvoice(trip.id) && trip.recette > 0 && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleCreateInvoice(trip.id)}
-                            className="h-8 w-8 p-0"
-                            title="Créer une facture pour ce trajet"
-                            disabled={isInvoiceSubmitting}
-                          >
-                            {isInvoiceSubmitting ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <FileText className="h-4 w-4" />
-                            )}
-                          </Button>
-                        )}
-                        {canManageFleet && trip.statut === 'en_cours' && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => openReplacementDialog(trip)}
-                            className="h-8 w-8 p-0"
-                            title="Remplacer le chauffeur"
-                          >
-                            <UserRoundPlus className="h-4 w-4" />
-                          </Button>
-                        )}
-                        {canManageFleet && (
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleDeleteTrip(trip.id)}
-                          className="h-8 w-8 p-0"
-                          title="Supprimer le trajet"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                        )}
-                </div>
-                    </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  sortedTrips.map((trip) => {
+                    const stats = calculateTripStats(trip.id, expenses, trip, invoices);
+                    const tripDistanceKm = getTripDistanceKm(trip);
+                    const isExpanded = expandedTripIds.has(trip.id);
+                    const soldeColor = stats.solde >= 0
+                      ? 'text-emerald-700 dark:text-emerald-300'
+                      : 'text-red-700 dark:text-red-300';
+
+                    return (
+                      <Fragment key={trip.id}>
+                        <TableRow className="group border-b border-border/50 hover:bg-muted/30">
+                          <TableCell className="align-top">
+                            <code className="rounded bg-muted px-2 py-1 text-xs font-mono text-muted-foreground">
+                              {formatTripDisplayId(trip.id)}
+                            </code>
+                          </TableCell>
+                          <TableCell className="align-top">
+                            <div className="space-y-1">
+                              <div className="font-semibold leading-tight">
+                                {trip.origine} → {trip.destination}
+                              </div>
+                              <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                                {trip.client && <span>{trip.client}</span>}
+                                {trip.marchandise && <span>{trip.marchandise}</span>}
+                                {tripDistanceKm != null && <span>{tripDistanceKm.toLocaleString('fr-FR')} km</span>}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="align-top whitespace-nowrap text-sm">
+                            {formatLocalDate(trip.dateDepart)}
+                          </TableCell>
+                          <TableCell className="align-top">
+                            <div className="space-y-1 text-sm">
+                              <div className="font-medium">{getDriverLabel(trip.chauffeurId)}</div>
+                              <div className="line-clamp-1 text-xs text-muted-foreground">
+                                {getTripTrucksLabel(trip) || 'Camion non renseigné'}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="align-top">{getStatusBadge(trip.statut)}</TableCell>
+                          <TableCell className="align-top text-right font-semibold text-slate-900 dark:text-slate-100">
+                            {trip.recette.toLocaleString('fr-FR')} FCFA
+                          </TableCell>
+                          <TableCell className={`align-top text-right font-semibold ${soldeColor}`}>
+                            {stats.solde.toLocaleString('fr-FR')} FCFA
+                          </TableCell>
+                          <TableCell className="align-top">
+                            <div className="flex flex-wrap justify-end gap-1.5">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => toggleTripDetails(trip.id)}
+                                className="h-8 px-2 text-xs"
+                                title={isExpanded ? 'Masquer les détails' : 'Voir les détails'}
+                              >
+                                <ChevronDown className={`mr-1 h-4 w-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                                Détails
+                              </Button>
+                              <Select
+                                value={trip.statut}
+                                onValueChange={(value) => handleUpdateStatus(trip.id, value as TripStatus, trip.statut)}
+                                disabled={trip.statut === 'termine' || trip.statut === 'annule'}
+                              >
+                                <SelectTrigger className="h-8 w-[118px] text-xs">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="planifie" disabled={trip.statut !== 'planifie'}>Planifié</SelectItem>
+                                  <SelectItem value="en_cours" disabled={trip.statut === 'termine' || trip.statut === 'annule'}>En cours</SelectItem>
+                                  <SelectItem value="termine" disabled={trip.statut === 'planifie' || trip.statut === 'termine' || trip.statut === 'annule'}>Terminé</SelectItem>
+                                  <SelectItem value="annule" disabled={trip.statut === 'termine' || trip.statut === 'annule'}>Annulé</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              {canManageAccounting && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => createExpenseFromTrip(trip)}
+                                  className="h-8 w-8 p-0"
+                                  title="Ajouter une dépense pour ce trajet"
+                                >
+                                  <Plus className="h-4 w-4" />
+                                </Button>
+                              )}
+                              {stats.linkedExpensesCount > 0 && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    setSelectedTripForExpenses(trip);
+                                    setIsExpensesDialogOpen(true);
+                                  }}
+                                  className="h-8 w-8 p-0"
+                                  title="Voir les dépenses de ce trajet"
+                                >
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              )}
+                              {canManageAccounting && !hasInvoice(trip.id) && trip.recette > 0 && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleCreateInvoice(trip.id)}
+                                  className="h-8 w-8 p-0"
+                                  title="Créer une facture pour ce trajet"
+                                  disabled={isInvoiceSubmitting}
+                                >
+                                  {isInvoiceSubmitting ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <FileText className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              )}
+                              {canManageFleet && trip.statut === 'en_cours' && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => openReplacementDialog(trip)}
+                                  className="h-8 w-8 p-0"
+                                  title="Remplacer le chauffeur"
+                                >
+                                  <UserRoundPlus className="h-4 w-4" />
+                                </Button>
+                              )}
+                              {canManageFleet && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => handleDeleteTrip(trip.id)}
+                                  className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+                                  title="Supprimer le trajet"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                        {isExpanded && (
+                          <TableRow className="bg-muted/15 hover:bg-muted/15">
+                            <TableCell colSpan={8} className="px-6 py-4">
+                              <div className="grid gap-4 text-sm md:grid-cols-4">
+                                <div className="space-y-1">
+                                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Planning</p>
+                                  <p>Arrivée : {trip.dateArrivee ? formatLocalDate(trip.dateArrivee) : 'À définir'}</p>
+                                  <p>Distance : {tripDistanceKm != null ? `${tripDistanceKm.toLocaleString('fr-FR')} km` : '-'}</p>
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Camion</p>
+                                  <p>{trip.tracteurId ? getTruckLabel(trip.tracteurId) : 'Tracteur non renseigné'}</p>
+                                  <p className="text-muted-foreground">{trip.remorqueuseId ? getTruckLabel(trip.remorqueuseId) : 'Remorque non renseignée'}</p>
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Facturation</p>
+                                  <p>Quantité : {trip.quantite != null && trip.quantite > 0 ? trip.quantite.toLocaleString('fr-FR') : '-'}</p>
+                                  <p>Prix unitaire : {trip.prixUnitaire != null && trip.prixUnitaire > 0 ? `${trip.prixUnitaire.toLocaleString('fr-FR')} FCFA` : '-'}</p>
+                                  <p>Préfinancement : {stats.prefinancement > 0 ? `${stats.prefinancement.toLocaleString('fr-FR')} FCFA` : '-'}</p>
+                                </div>
+                                <div className="space-y-1">
+                                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Dépenses</p>
+                                  <p>{stats.expenses > 0 ? `${stats.expenses.toLocaleString('fr-FR')} FCFA` : '-'}</p>
+                                  <p className="text-muted-foreground">
+                                    {stats.expensesCount} dépense{stats.expensesCount > 1 ? 's' : ''}
+                                  </p>
+                                </div>
+                              </div>
+                              {(trip.description || trip.chauffeurRemplacantId) && (
+                                <div className="mt-4 rounded-lg border bg-background/70 p-3 text-sm">
+                                  {trip.description && <p className="text-muted-foreground">{trip.description}</p>}
+                                  {trip.chauffeurRemplacantId && (
+                                    <p className="mt-1 text-muted-foreground">
+                                      Remplacé par {getDriverLabel(trip.chauffeurRemplacantId)}
+                                      {trip.remplacementDate && ` le ${formatLocalDate(trip.remplacementDate)}`}
+                                    </p>
+                                  )}
+                                </div>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </Fragment>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
           </div>
-            </CardContent>
-          </Card>
+        </CardContent>
+      </Card>
 
       {/* Sélecteur de ville pour l'origine (nom + coordonnées pour localisation précise) */}
       <CityPicker

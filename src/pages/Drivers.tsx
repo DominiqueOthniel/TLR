@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useSubmitGuard } from '@/hooks/useSubmitGuard';
 import { useApp, Driver } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,7 @@ import { exportToExcel, exportToPrintablePDF } from '@/lib/export-utils';
 import { EMOJI } from '@/lib/emoji-palette';
 import { frCollator, stableSort } from '@/lib/list-sort';
 import { ListSortSelect } from '@/components/ListSortSelect';
+import { formatLocalDate, parseLocalDateMs } from '@/lib/date-utils';
 
 const DRIVER_SORT_OPTIONS = [
   { value: 'nom_asc', label: 'Nom A → Z' },
@@ -376,7 +377,7 @@ export default function Drivers() {
       const driverTripsList = trips
         .filter((t) => t.chauffeurId === driver.id)
         .slice()
-        .sort((a, b) => new Date(b.dateDepart).getTime() - new Date(a.dateDepart).getTime());
+        .sort((a, b) => parseLocalDateMs(b.dateDepart) - parseLocalDateMs(a.dateDepart));
 
       const transactionsRows = allTransactions.length > 0 
         ? allTransactions.map((t, idx) => `
@@ -401,7 +402,7 @@ export default function Drivers() {
               .map(
                 (trip, idx) => `
             <tr style="background-color: ${idx % 2 === 0 ? '#f8fafc' : '#ffffff'};">
-              <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${new Date(trip.dateDepart).toLocaleDateString('fr-FR')}</td>
+              <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${formatLocalDate(trip.dateDepart)}</td>
               <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${escHtml(trip.origine)} → ${escHtml(trip.destination)}</td>
               <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${escHtml(trip.client || '—')}</td>
               <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">

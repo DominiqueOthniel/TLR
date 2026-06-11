@@ -1,10 +1,10 @@
 /** Collateur français pour libellés (A–Z cohérent avec l’UI). */
+import { parseLocalDateMs } from '@/lib/date-utils';
+
 export const frCollator = new Intl.Collator('fr', { sensitivity: 'base', numeric: true });
 
 export function parseDateMs(s: string | undefined | null): number {
-  if (!s) return 0;
-  const t = Date.parse(s);
-  return Number.isNaN(t) ? 0 : t;
+  return parseLocalDateMs(s);
 }
 
 /**

@@ -26,10 +26,25 @@ export class TripsService implements OnModuleInit {
     `);
   }
 
+  private normalizeDateOnly(value: string): string;
+  private normalizeDateOnly(value: string | undefined | null): string | undefined;
+  private normalizeDateOnly(value: string | undefined | null): string | undefined {
+    if (!value) return undefined;
+    return value.includes('T') ? value.split('T')[0] : value;
+  }
+
+  private normalizeNullableDateOnly(value: string | null | undefined): string | null | undefined {
+    if (value === null) return null;
+    return this.normalizeDateOnly(value);
+  }
+
   async create(dto: CreateTripDto): Promise<Trip> {
     const trip = this.tripRepository.create({
       id: uuidv4(),
       ...dto,
+      dateDepart: this.normalizeDateOnly(dto.dateDepart),
+      dateArrivee: this.normalizeDateOnly(dto.dateArrivee),
+      remplacementDate: this.normalizeDateOnly(dto.remplacementDate),
     });
     return this.tripRepository.save(trip);
   }
@@ -51,7 +66,13 @@ export class TripsService implements OnModuleInit {
 
   async update(id: string, dto: UpdateTripDto): Promise<Trip> {
     await this.findOne(id);
-    await this.tripRepository.update(id, dto as Partial<Trip>);
+    const patch = {
+      ...dto,
+      ...(dto.dateDepart !== undefined ? { dateDepart: this.normalizeDateOnly(dto.dateDepart) } : {}),
+      ...(dto.dateArrivee !== undefined ? { dateArrivee: this.normalizeNullableDateOnly(dto.dateArrivee) } : {}),
+      ...(dto.remplacementDate !== undefined ? { remplacementDate: this.normalizeNullableDateOnly(dto.remplacementDate) } : {}),
+    };
+    await this.tripRepository.update(id, patch as Partial<Trip>);
     return this.findOne(id);
   }
 

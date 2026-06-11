@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useSubmitGuard } from '@/hooks/useSubmitGuard';
 import { useApp, Invoice, InvoiceStatus, Trip } from '@/contexts/AppContext';
@@ -48,6 +48,7 @@ import { frCollator, parseDateMs, stableSort } from '@/lib/list-sort';
 import { ListSortSelect } from '@/components/ListSortSelect';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { formatTripDisplayId } from '@/lib/trip-id';
+import { formatLocalDate } from '@/lib/date-utils';
 
 const INVOICE_SORT_OPTIONS = [
   { value: 'date_desc', label: 'Date création (récent → ancien)' },
@@ -1286,7 +1287,7 @@ export default function Invoices() {
                           };
                           const tripDetails = getTrip(trip.id);
                           const driver = tripDetails ? drivers.find(d => d.id === tripDetails.chauffeurId) : null;
-                          const dateDepart = tripDetails ? new Date(tripDetails.dateDepart).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+                          const dateDepart = tripDetails ? formatLocalDate(tripDetails.dateDepart, { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
                           
                           return (
                             <SelectItem key={trip.id} value={trip.id} className="py-2">
@@ -1413,12 +1414,12 @@ export default function Invoices() {
                         <div className="space-y-2">
                           <div>
                             <span className="text-xs font-semibold text-muted-foreground">{EMOJI.date} Date de départ</span>
-                            <p className="text-sm font-medium mt-1">{new Date(selectedTrip.dateDepart).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                            <p className="text-sm font-medium mt-1">{formatLocalDate(selectedTrip.dateDepart, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
                           </div>
                           {selectedTrip.dateArrivee && (
                             <div>
                               <span className="text-xs font-semibold text-muted-foreground">{EMOJI.date} Date d'arrivée</span>
-                              <p className="text-sm font-medium mt-1">{new Date(selectedTrip.dateArrivee).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                              <p className="text-sm font-medium mt-1">{formatLocalDate(selectedTrip.dateArrivee, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
                             </div>
                           )}
                           {!selectedTrip.dateArrivee && (
@@ -2880,12 +2881,12 @@ export default function Invoices() {
                         )}
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Date de départ:</span>
-                          <span className="font-medium">{new Date(trip.dateDepart).toLocaleDateString('fr-FR')}</span>
+                          <span className="font-medium">{formatLocalDate(trip.dateDepart)}</span>
                         </div>
                         {trip.dateArrivee && (
                           <div className="flex justify-between">
                             <span className="text-muted-foreground">Date d'arrivée:</span>
-                            <span className="font-medium">{new Date(trip.dateArrivee).toLocaleDateString('fr-FR')}</span>
+                            <span className="font-medium">{formatLocalDate(trip.dateArrivee)}</span>
                           </div>
                         )}
                       </div>
