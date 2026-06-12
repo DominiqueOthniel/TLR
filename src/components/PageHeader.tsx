@@ -25,25 +25,25 @@ export default function PageHeader({
   title,
   description,
   icon: Icon,
-  gradient = 'from-blue-600/15 via-blue-500/8 to-transparent',
-  iconColor = 'from-blue-700 via-blue-600 to-rose-800',
+  gradient = 'from-blue-500/10 via-slate-400/[0.08] to-transparent',
+  iconColor = 'from-blue-700 via-slate-700 to-rose-800',
   stats,
   actions,
   className,
 }: PageHeaderProps) {
   return (
     <div className={cn(
-      'relative overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm mb-6',
+      'relative overflow-hidden rounded-3xl border border-border/60 bg-card/95 shadow-sm shadow-slate-900/[0.03] mb-6',
       className
     )}>
       {/* Gradient de fond */}
-      <div className={cn('absolute inset-0 bg-gradient-to-br opacity-70', gradient)} />
+      <div className={cn('absolute inset-0 bg-gradient-to-br opacity-60', gradient)} />
 
       {/* Motif de points discret */}
       <div className="absolute inset-0 opacity-[0.025] dark:opacity-[0.04] bg-dot-pattern" />
 
       {/* Ligne décorative haute */}
-      <div className={cn('absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent')} />
+      <div className={cn('absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent')} />
 
       {/* Contenu */}
       <div className="relative p-4 sm:p-5 md:p-7">
@@ -52,8 +52,8 @@ export default function PageHeader({
           <div className="flex items-center gap-3 sm:gap-4">
             {Icon && (
               <div className="relative flex-shrink-0">
-                <div className={cn('absolute inset-0 bg-gradient-to-br rounded-xl blur-lg opacity-50', iconColor)} />
-                <div className={cn('relative bg-gradient-to-br p-2.5 sm:p-3 rounded-xl shadow-lg', iconColor)}>
+                <div className={cn('absolute inset-0 bg-gradient-to-br rounded-2xl blur-lg opacity-20', iconColor)} />
+                <div className={cn('relative bg-gradient-to-br p-2.5 sm:p-3 rounded-2xl shadow-sm', iconColor)}>
                   <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
               </div>
@@ -88,14 +88,14 @@ export default function PageHeader({
             {stats.map((stat, i) => (
               <div
                 key={i}
-                className="group relative min-w-0 bg-background/70 dark:bg-background/40 backdrop-blur-sm border border-border/50 rounded-xl p-2.5 sm:p-4 hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+                  className="group relative min-w-0 bg-background/[0.65] dark:bg-background/40 backdrop-blur-sm border border-border/50 rounded-2xl p-2.5 sm:p-4 hover:border-primary/25 hover:bg-background/80 transition-colors duration-200"
               >
                 <div className="flex items-start justify-between gap-2 mb-1 sm:mb-2">
                   <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest text-muted-foreground min-w-0 flex-1 break-words leading-snug">
                     {stat.label}
                   </p>
                   {stat.icon && (
-                    <div className={cn('p-1 sm:p-1.5 rounded-lg bg-primary/10 flex-shrink-0', stat.color)}>
+                    <div className={cn('p-1 sm:p-1.5 rounded-xl bg-primary/[0.08] flex-shrink-0', stat.color)}>
                       {stat.icon}
                     </div>
                   )}
@@ -115,7 +115,7 @@ export default function PageHeader({
       </div>
 
       {/* Ligne décorative basse */}
-      <div className="h-[2px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+      <div className="h-px bg-gradient-to-r from-transparent via-primary/[0.15] to-transparent" />
     </div>
   );
 }

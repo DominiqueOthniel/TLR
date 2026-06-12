@@ -4,114 +4,114 @@
 
 @layer base {
   :root {
-    --background: 220 25% 97%;
-    --foreground: 222 30% 12%;
+    --background: 220 28% 98%;
+    --foreground: 222 24% 16%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 30% 12%;
+    --card-foreground: 222 24% 16%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 30% 12%;
+    --popover-foreground: 222 24% 16%;
 
-    --primary: 222 76% 36%;
+    --primary: 221 48% 40%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 14% 94%;
-    --secondary-foreground: 222 30% 20%;
+    --secondary: 220 20% 95%;
+    --secondary-foreground: 222 22% 24%;
 
-    --muted: 220 18% 94%;
-    --muted-foreground: 220 12% 50%;
+    --muted: 220 22% 95%;
+    --muted-foreground: 220 10% 46%;
 
-    --accent: 222 76% 36%;
+    --accent: 221 42% 44%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 68% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 142 71% 45%;
+    --success: 150 48% 40%;
     --success-foreground: 0 0% 100%;
 
     /* Couleurs de marque TLR */
-    --brand-navy: 222 76% 36%;
-    --brand-burgundy: 351 60% 33%;
-    --brand-gold: 38 92% 50%;
+    --brand-navy: 221 48% 40%;
+    --brand-burgundy: 351 42% 38%;
+    --brand-gold: 40 74% 52%;
     --ios-ease: cubic-bezier(0.22, 1, 0.36, 1);
     --ios-spring: cubic-bezier(0.16, 1, 0.3, 1);
-    --border: 220 18% 90%;
-    --input: 220 18% 92%;
-    --ring: 222 76% 36%;
+    --border: 220 18% 89%;
+    --input: 220 18% 91%;
+    --ring: 221 48% 40%;
 
-    --radius: 0.875rem;
+    --radius: 1rem;
 
     /* Sidebar */
-    --sidebar-background: 222 47% 12%;
-    --sidebar-foreground: 220 20% 92%;
-    --sidebar-primary: 222 76% 55%;
+    --sidebar-background: 222 32% 17%;
+    --sidebar-foreground: 220 22% 90%;
+    --sidebar-primary: 218 58% 64%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 40% 18%;
-    --sidebar-accent-foreground: 220 20% 92%;
-    --sidebar-border: 222 35% 20%;
-    --sidebar-ring: 222 76% 55%;
+    --sidebar-accent: 222 26% 23%;
+    --sidebar-accent-foreground: 220 22% 92%;
+    --sidebar-border: 222 22% 24%;
+    --sidebar-ring: 218 58% 64%;
 
     /* Charts (marine, bordeaux, or, ciel, sarcelle) */
-    --chart-1: 222 76% 45%;
-    --chart-2: 351 60% 42%;
-    --chart-3: 38 92% 50%;
-    --chart-4: 199 89% 48%;
-    --chart-5: 160 68% 38%;
+    --chart-1: 221 48% 45%;
+    --chart-2: 351 42% 46%;
+    --chart-3: 40 74% 52%;
+    --chart-4: 199 56% 50%;
+    --chart-5: 160 42% 42%;
   }
 
   .dark {
-    --background: 222 42% 9%;
-    --foreground: 220 20% 94%;
+    --background: 222 32% 10%;
+    --foreground: 220 18% 93%;
 
-    --card: 222 36% 12%;
+    --card: 222 28% 13%;
     --card-foreground: 220 20% 94%;
 
-    --popover: 222 36% 12%;
+    --popover: 222 28% 13%;
     --popover-foreground: 220 20% 94%;
 
-    --primary: 217 84% 62%;
+    --primary: 217 58% 64%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 222 28% 18%;
+    --secondary: 222 22% 19%;
     --secondary-foreground: 220 20% 80%;
 
-    --muted: 222 28% 18%;
+    --muted: 222 22% 19%;
     --muted-foreground: 220 15% 60%;
 
-    --accent: 217 84% 62%;
+    --accent: 217 58% 64%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 75% 55%;
+    --destructive: 0 62% 56%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 142 65% 50%;
+    --success: 150 44% 48%;
     --success-foreground: 0 0% 100%;
 
     /* Couleurs de marque TLR (variantes sombre) */
-    --brand-navy: 217 84% 62%;
-    --brand-burgundy: 351 65% 55%;
-    --brand-gold: 38 95% 58%;
+    --brand-navy: 217 58% 64%;
+    --brand-burgundy: 351 48% 58%;
+    --brand-gold: 40 82% 62%;
 
-    --border: 222 28% 22%;
-    --input: 222 28% 20%;
-    --ring: 217 84% 62%;
+    --border: 222 20% 23%;
+    --input: 222 20% 21%;
+    --ring: 217 58% 64%;
 
-    --sidebar-background: 222 47% 8%;
+    --sidebar-background: 222 30% 12%;
     --sidebar-foreground: 220 20% 92%;
-    --sidebar-primary: 217 84% 62%;
+    --sidebar-primary: 217 58% 64%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 40% 15%;
+    --sidebar-accent: 222 24% 18%;
     --sidebar-accent-foreground: 220 20% 92%;
-    --sidebar-border: 222 32% 18%;
-    --sidebar-ring: 217 84% 62%;
+    --sidebar-border: 222 22% 19%;
+    --sidebar-ring: 217 58% 64%;
 
-    --chart-1: 217 84% 62%;
-    --chart-2: 351 65% 58%;
-    --chart-3: 38 95% 58%;
-    --chart-4: 199 89% 58%;
-    --chart-5: 160 65% 48%;
+    --chart-1: 217 58% 64%;
+    --chart-2: 351 48% 58%;
+    --chart-3: 40 82% 62%;
+    --chart-4: 199 58% 58%;
+    --chart-5: 160 44% 48%;
   }
 }
 
@@ -121,9 +121,18 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
+    background:
+      radial-gradient(circle at top left, hsl(var(--primary) / 0.08), transparent 32rem),
+      linear-gradient(180deg, hsl(var(--background)), hsl(220 24% 96%));
     font-feature-settings: "rlig" 1, "calt" 1;
     text-rendering: optimizeLegibility;
     overscroll-behavior: none;
+  }
+
+  .dark body {
+    background:
+      radial-gradient(circle at top left, hsl(var(--primary) / 0.08), transparent 32rem),
+      linear-gradient(180deg, hsl(var(--background)), hsl(222 28% 9%));
   }
   h1, h2, h3, h4, h5, h6 {
     @apply tracking-tight;
@@ -137,34 +146,34 @@
 
   /* Gradient de texte principal (marine → bordeaux) */
   .gradient-text {
-    @apply bg-gradient-to-r from-blue-700 via-blue-600 to-rose-800 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-blue-800 via-slate-700 to-rose-800 bg-clip-text text-transparent;
   }
 
   /* Glassmorphism cards */
   .glass-card {
-    @apply bg-white/70 dark:bg-white/5 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-xl;
+    @apply bg-white/75 dark:bg-white/5 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-sm;
   }
 
   /* Hover card léger */
   .card-lift {
-    @apply transition-shadow duration-200 hover:shadow-xl hover:shadow-primary/10;
+    @apply transition-shadow duration-200 hover:shadow-md hover:shadow-slate-900/5;
     transition-timing-function: var(--ios-spring);
   }
 
   /* Badge glow */
   .badge-glow {
-    @apply shadow-lg shadow-primary/30;
+    @apply shadow-sm shadow-primary/10;
   }
 
   /* Stat card moderne */
   .stat-card {
-    @apply relative overflow-hidden rounded-2xl border bg-card p-5 transition-shadow duration-200 hover:shadow-lg hover:shadow-primary/10;
+    @apply relative overflow-hidden rounded-2xl border border-border/60 bg-card/95 p-5 transition-shadow duration-200 hover:shadow-md hover:shadow-slate-900/5;
     transition-timing-function: var(--ios-spring);
   }
 
   /* Bouton premium (marine → bordeaux) */
   .btn-premium {
-    @apply relative overflow-hidden bg-gradient-to-r from-blue-800 via-blue-700 to-rose-800 text-white font-semibold rounded-xl px-5 py-2.5 shadow-lg shadow-blue-900/30 transition-shadow duration-200 hover:shadow-rose-900/40;
+    @apply relative overflow-hidden bg-gradient-to-r from-blue-800 via-slate-700 to-rose-800 text-white font-semibold rounded-xl px-5 py-2.5 shadow-sm shadow-slate-900/[0.15] transition-shadow duration-200 hover:shadow-md;
     transition-timing-function: var(--ios-spring);
   }
 
@@ -175,7 +184,7 @@
   }
 
   .nav-item-active {
-    @apply bg-primary/15 text-primary font-semibold;
+    @apply bg-white/10 text-white font-semibold;
   }
 
   .nav-item-inactive {
@@ -234,11 +243,11 @@
 ::-webkit-scrollbar       { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--primary) / 0.35);
+  background: hsl(var(--primary) / 0.24);
   border-radius: 99px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary) / 0.6);
+  background: hsl(var(--primary) / 0.38);
 }
 
 /* =====================================================

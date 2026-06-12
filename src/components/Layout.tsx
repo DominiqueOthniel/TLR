@@ -72,23 +72,23 @@ function NavItem({
       to={item.href}
       onClick={onClick}
       className={cn(
-        'group relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 select-none',
+        'group relative flex items-center gap-3 px-3 py-2.5 rounded-2xl transition-colors duration-200 select-none',
         isActive
-          ? 'bg-white/10 text-white font-semibold shadow-sm'
-          : 'text-sidebar-foreground/60 hover:bg-white/5 hover:text-sidebar-foreground/90'
+          ? 'bg-white/10 text-white font-semibold'
+          : 'text-sidebar-foreground/[0.62] hover:bg-white/[0.06] hover:text-sidebar-foreground/90'
       )}
     >
       {/* Indicateur actif */}
       {isActive && (
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-gradient-to-b from-blue-400 via-blue-500 to-amber-400 rounded-r-full" />
+        <div className="absolute left-0 top-1/2 h-6 w-0.5 -translate-y-1/2 rounded-r-full bg-white/[0.55]" />
       )}
 
       {/* Icône */}
       <div className={cn(
-        'p-2 rounded-lg flex-shrink-0 transition-all duration-200',
+        'p-2 rounded-xl flex-shrink-0 transition-colors duration-200',
         isActive
-          ? `bg-gradient-to-br ${item.color} shadow-md`
-          : 'bg-white/5 group-hover:bg-white/10'
+          ? 'bg-white/[0.14]'
+          : 'bg-white/[0.045] group-hover:bg-white/[0.08]'
       )}>
         <Icon className={cn('h-4 w-4', isActive ? 'text-white' : 'text-sidebar-foreground/70')} />
       </div>
@@ -162,13 +162,13 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           </AlertDescription>
         </Alert>
       )}
-      {/* Grille de fond subtile */}
-      <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.025] dark:opacity-[0.03] bg-[linear-gradient(to_right,hsl(222,76%,40%)_1px,transparent_1px),linear-gradient(to_bottom,hsl(222,76%,40%)_1px,transparent_1px)] bg-[size:32px_32px]" />
+      {/* Fond doux */}
+      <div className="fixed inset-0 pointer-events-none z-0 bg-[radial-gradient(circle_at_top_right,hsl(var(--primary)/0.08),transparent_28rem)]" />
 
       {/* ===== OVERLAY MOBILE ===== */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 lg:hidden bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-40 lg:hidden bg-slate-950/[0.45] backdrop-blur-sm"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -193,7 +193,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       {/* ===== SIDEBAR DESKTOP ===== */}
       <div
         className={cn(
-          'hidden lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-64 lg:flex-col lg:z-30 transition-transform duration-500 ease-out',
+          'hidden lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-64 lg:flex-col lg:z-30 transition-transform duration-300 ease-out',
           desktopSidebarHidden && '-translate-x-full pointer-events-none',
         )}
         aria-hidden={desktopSidebarHidden}
@@ -210,13 +210,13 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       </div>
 
       {/* ===== MAIN CONTENT ===== */}
-      <div className={cn('relative z-10 transition-[padding] duration-500 ease-out', desktopSidebarHidden ? 'lg:pl-0' : 'lg:pl-64')}>
+      <div className={cn('relative z-10 transition-[padding] duration-300 ease-out', desktopSidebarHidden ? 'lg:pl-0' : 'lg:pl-64')}>
         {/* Topbar */}
-        <header className="sticky top-0 z-40 flex h-14 items-center gap-2 sm:gap-3 border-b border-border/60 bg-card/85 backdrop-blur-xl px-4 sm:px-6 shadow-sm transition-all duration-300">
+        <header className="sticky top-0 z-40 flex h-14 items-center gap-2 sm:gap-3 border-b border-border/50 bg-card/80 backdrop-blur-xl px-4 sm:px-6 shadow-sm shadow-slate-900/[0.03] transition-colors duration-200">
           {/* Bouton menu mobile */}
           <button
             type="button"
-            className="lg:hidden flex items-center justify-center h-9 w-9 rounded-xl bg-muted/60 hover:bg-muted text-foreground transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+            className="lg:hidden flex items-center justify-center h-9 w-9 rounded-2xl bg-muted/60 hover:bg-muted text-foreground transition-colors duration-200 active:scale-95"
             onClick={() => setSidebarOpen(true)}
             aria-label="Ouvrir le menu"
           >
@@ -226,7 +226,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           {/* Masquer / afficher la sidebar (desktop) */}
           <button
             type="button"
-            className="hidden lg:flex items-center justify-center h-9 w-9 rounded-xl bg-muted/60 hover:bg-muted text-foreground transition-all duration-300 hover:-translate-y-0.5 active:scale-95 shrink-0"
+            className="hidden lg:flex items-center justify-center h-9 w-9 rounded-2xl bg-muted/60 hover:bg-muted text-foreground transition-colors duration-200 active:scale-95 shrink-0"
             onClick={toggleDesktopSidebar}
             aria-label={desktopSidebarHidden ? 'Afficher le menu latéral' : 'Masquer le menu latéral'}
             title={desktopSidebarHidden ? 'Afficher le menu' : 'Masquer le menu'}
@@ -239,8 +239,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className="hidden sm:flex items-center gap-2 shrink-0">
               <AppLogo variant="compact" />
               <div className="leading-tight">
-                <p className="text-sm font-black tracking-tight text-blue-900 dark:text-blue-200">DIDDI S.A-TLR</p>
-                <p className="text-[9px] uppercase tracking-[0.18em] text-rose-800/70 dark:text-rose-300/70">Transport</p>
+                <p className="text-sm font-bold tracking-tight text-slate-800 dark:text-slate-100">DIDDI S.A-TLR</p>
+                <p className="text-[9px] uppercase tracking-[0.18em] text-muted-foreground">Transport</p>
               </div>
             </div>
             <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/50 hidden sm:inline" />
@@ -264,7 +264,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         </header>
 
         {/* Contenu principal */}
-        <main className="py-5 px-4 sm:px-6 lg:px-7 min-h-[calc(100vh-3.5rem)]">
+        <main className="min-h-[calc(100vh-3.5rem)] px-4 py-5 sm:px-6 lg:px-7">
           {children}
         </main>
       </div>
@@ -302,15 +302,15 @@ function SidebarContent({
   onRequestHideDesktop?: () => void;
 }) {
   return (
-    <div className="flex flex-col h-full bg-sidebar border-r border-sidebar-border shadow-xl lg:shadow-none">
+    <div className="flex flex-col h-full bg-sidebar/[0.98] border-r border-sidebar-border/70 shadow-xl shadow-slate-950/20 lg:shadow-none">
 
       {/* Logo */}
-      <div className="flex items-center justify-between h-20 px-4 border-b border-sidebar-border/50 flex-shrink-0 gap-2">
+      <div className="flex items-center justify-between h-20 px-4 border-b border-sidebar-border/[0.45] flex-shrink-0 gap-2">
         <div className="flex items-center gap-3 min-w-0">
           <AppLogo variant="compact" />
           <div className="min-w-0">
-            <p className="text-lg font-black leading-none tracking-tight text-white">DIDDI S.A-TLR</p>
-            <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-amber-300/80">
+            <p className="text-lg font-bold leading-none tracking-tight text-white">DIDDI S.A-TLR</p>
+            <p className="mt-1 text-[9px] font-medium uppercase tracking-[0.18em] text-sidebar-foreground/[0.55]">
               Transport · Logistique
             </p>
           </div>
@@ -322,7 +322,7 @@ function SidebarContent({
               onClick={onRequestHideDesktop}
               aria-label="Masquer le menu latéral"
               title="Masquer le menu"
-              className="hidden lg:flex text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-white/5 p-1.5 rounded-lg transition-colors"
+              className="hidden lg:flex text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-white/[0.06] p-1.5 rounded-xl transition-colors"
             >
               <ChevronsLeft className="h-4 w-4" />
             </button>
@@ -332,7 +332,7 @@ function SidebarContent({
               onClick={closeSidebar}
               aria-label="Fermer le menu"
               title="Fermer"
-              className="lg:hidden text-sidebar-foreground/40 hover:text-sidebar-foreground hover:bg-white/5 p-1.5 rounded-lg transition-colors"
+              className="lg:hidden text-sidebar-foreground/40 hover:text-sidebar-foreground hover:bg-white/[0.06] p-1.5 rounded-xl transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
@@ -341,9 +341,9 @@ function SidebarContent({
       </div>
 
       {/* Utilisateur */}
-      <div className="px-4 py-3 border-b border-sidebar-border/30 flex-shrink-0">
-        <div className={cn('flex items-center gap-2.5 px-3 py-2.5 rounded-xl border', roleColor)}>
-          <div className="w-7 h-7 rounded-lg bg-current/10 flex items-center justify-center flex-shrink-0">
+      <div className="px-4 py-3 border-b border-sidebar-border/25 flex-shrink-0">
+        <div className={cn('flex items-center gap-2.5 px-3 py-2.5 rounded-2xl border', roleColor)}>
+          <div className="w-7 h-7 rounded-xl bg-current/10 flex items-center justify-center flex-shrink-0">
             <span className="text-xs font-bold uppercase">{user?.login?.[0]}</span>
           </div>
           <div className="min-w-0">
@@ -354,8 +354,8 @@ function SidebarContent({
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-sidebar-foreground/30 px-3 mb-2">Navigation</p>
+      <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
+        <p className="text-[10px] font-medium uppercase tracking-widest text-sidebar-foreground/[0.28] px-3 mb-2">Navigation</p>
         {navigation.map((item) => (
           <NavItem
             key={item.href}
@@ -367,12 +367,12 @@ function SidebarContent({
       </nav>
 
       {/* Footer */}
-      <div className="px-3 py-3 border-t border-sidebar-border/30 flex-shrink-0 space-y-1">
+      <div className="px-3 py-3 border-t border-sidebar-border/25 flex-shrink-0 space-y-1">
         <button
           onClick={logout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sidebar-foreground/50 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200 text-sm group"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sidebar-foreground/50 hover:bg-red-500/10 hover:text-red-300 transition-colors duration-200 text-sm group"
         >
-          <div className="p-2 rounded-lg bg-white/5 group-hover:bg-red-500/15 transition-colors">
+          <div className="p-2 rounded-xl bg-white/[0.045] group-hover:bg-red-500/[0.12] transition-colors">
             <LogOut className="h-4 w-4" />
           </div>
           Déconnexion
