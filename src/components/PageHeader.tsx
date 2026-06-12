@@ -25,25 +25,29 @@ export default function PageHeader({
   title,
   description,
   icon: Icon,
-  gradient = 'from-blue-500/10 via-slate-400/[0.08] to-transparent',
-  iconColor = 'from-blue-700 via-slate-700 to-rose-800',
+  gradient = 'from-blue-500/[0.16] via-cyan-400/[0.12] to-rose-400/10',
+  iconColor = 'from-blue-700 via-cyan-600 to-rose-600',
   stats,
   actions,
   className,
 }: PageHeaderProps) {
   return (
     <div className={cn(
-      'relative overflow-hidden rounded-3xl border border-border/60 bg-card/95 shadow-sm shadow-slate-900/[0.03] mb-6',
+      'relative overflow-hidden rounded-3xl border border-border/60 bg-card/95 shadow-md shadow-primary/5 mb-6',
       className
     )}>
       {/* Gradient de fond */}
-      <div className={cn('absolute inset-0 bg-gradient-to-br opacity-60', gradient)} />
+      <div className={cn('dopamine-gradient absolute inset-0 bg-gradient-to-br opacity-80', gradient)} />
 
       {/* Motif de points discret */}
       <div className="absolute inset-0 opacity-[0.025] dark:opacity-[0.04] bg-dot-pattern" />
 
       {/* Ligne décorative haute */}
-      <div className={cn('absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent')} />
+      <div className="absolute -right-10 -top-12 h-32 w-32 rounded-full bg-cyan-400/20 blur-2xl dopamine-orb" />
+      <div className="absolute -bottom-16 left-1/3 h-36 w-36 rounded-full bg-rose-400/15 blur-2xl dopamine-orb [animation-delay:1.4s]" />
+
+      {/* Ligne décorative haute */}
+      <div className={cn('absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-400/[0.55] to-transparent')} />
 
       {/* Contenu */}
       <div className="relative p-4 sm:p-5 md:p-7">
@@ -52,8 +56,8 @@ export default function PageHeader({
           <div className="flex items-center gap-3 sm:gap-4">
             {Icon && (
               <div className="relative flex-shrink-0">
-                <div className={cn('absolute inset-0 bg-gradient-to-br rounded-2xl blur-lg opacity-20', iconColor)} />
-                <div className={cn('relative bg-gradient-to-br p-2.5 sm:p-3 rounded-2xl shadow-sm', iconColor)}>
+                <div className={cn('absolute inset-0 bg-gradient-to-br rounded-2xl blur-xl opacity-35 dopamine-glow', iconColor)} />
+                <div className={cn('dopamine-gradient relative bg-gradient-to-br p-2.5 sm:p-3 rounded-2xl shadow-md shadow-cyan-500/20', iconColor)}>
                   <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
               </div>
@@ -88,14 +92,14 @@ export default function PageHeader({
             {stats.map((stat, i) => (
               <div
                 key={i}
-                  className="group relative min-w-0 bg-background/[0.65] dark:bg-background/40 backdrop-blur-sm border border-border/50 rounded-2xl p-2.5 sm:p-4 hover:border-primary/25 hover:bg-background/80 transition-colors duration-200"
+                  className="group relative min-w-0 bg-background/[0.68] dark:bg-background/40 backdrop-blur-sm border border-border/50 rounded-2xl p-2.5 sm:p-4 hover:-translate-y-0.5 hover:border-cyan-400/35 hover:bg-background/85 hover:shadow-md hover:shadow-cyan-500/10 transition-all duration-300"
               >
                 <div className="flex items-start justify-between gap-2 mb-1 sm:mb-2">
                   <p className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-widest text-muted-foreground min-w-0 flex-1 break-words leading-snug">
                     {stat.label}
                   </p>
                   {stat.icon && (
-                    <div className={cn('p-1 sm:p-1.5 rounded-xl bg-primary/[0.08] flex-shrink-0', stat.color)}>
+                    <div className={cn('p-1 sm:p-1.5 rounded-xl bg-primary/[0.08] flex-shrink-0 group-hover:scale-110 transition-transform duration-300', stat.color)}>
                       {stat.icon}
                     </div>
                   )}
@@ -115,7 +119,7 @@ export default function PageHeader({
       </div>
 
       {/* Ligne décorative basse */}
-      <div className="h-px bg-gradient-to-r from-transparent via-primary/[0.15] to-transparent" />
+      <div className="h-px bg-gradient-to-r from-transparent via-cyan-400/[0.45] to-transparent" />
     </div>
   );
 }

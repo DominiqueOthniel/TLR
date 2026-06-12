@@ -72,23 +72,23 @@ function NavItem({
       to={item.href}
       onClick={onClick}
       className={cn(
-        'group relative flex items-center gap-3 px-3 py-2.5 rounded-2xl transition-colors duration-200 select-none',
+        'group relative flex items-center gap-3 px-3 py-2.5 rounded-2xl transition-all duration-300 select-none overflow-hidden',
         isActive
-          ? 'bg-white/10 text-white font-semibold'
-          : 'text-sidebar-foreground/[0.62] hover:bg-white/[0.06] hover:text-sidebar-foreground/90'
+          ? 'dopamine-gradient bg-gradient-to-r from-cyan-400/20 via-blue-400/[0.15] to-rose-400/[0.15] text-white font-semibold shadow-sm shadow-cyan-500/[0.15]'
+          : 'text-sidebar-foreground/[0.62] hover:-translate-y-0.5 hover:bg-white/[0.06] hover:text-sidebar-foreground/90'
       )}
     >
       {/* Indicateur actif */}
       {isActive && (
-        <div className="absolute left-0 top-1/2 h-6 w-0.5 -translate-y-1/2 rounded-r-full bg-white/[0.55]" />
+        <div className="absolute left-0 top-1/2 h-7 w-1 -translate-y-1/2 rounded-r-full bg-gradient-to-b from-cyan-300 via-blue-300 to-amber-300" />
       )}
 
       {/* Icône */}
       <div className={cn(
-        'p-2 rounded-xl flex-shrink-0 transition-colors duration-200',
+        'p-2 rounded-xl flex-shrink-0 transition-all duration-300',
         isActive
-          ? 'bg-white/[0.14]'
-          : 'bg-white/[0.045] group-hover:bg-white/[0.08]'
+          ? `bg-gradient-to-br ${item.color} shadow-md shadow-cyan-500/20 group-hover:scale-105`
+          : 'bg-white/[0.045] group-hover:scale-105 group-hover:bg-white/[0.08]'
       )}>
         <Icon className={cn('h-4 w-4', isActive ? 'text-white' : 'text-sidebar-foreground/70')} />
       </div>
@@ -162,8 +162,11 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           </AlertDescription>
         </Alert>
       )}
-      {/* Fond doux */}
+      {/* Fond vivant et subtil */}
       <div className="fixed inset-0 pointer-events-none z-0 bg-[radial-gradient(circle_at_top_right,hsl(var(--primary)/0.08),transparent_28rem)]" />
+      <div className="dopamine-orb fixed left-[6%] top-24 z-0 h-48 w-48 rounded-full bg-cyan-400/[0.12] pointer-events-none" />
+      <div className="dopamine-orb fixed right-[8%] top-44 z-0 h-56 w-56 rounded-full bg-amber-300/[0.12] pointer-events-none [animation-delay:1.7s]" />
+      <div className="dopamine-orb fixed bottom-10 left-[45%] z-0 h-52 w-52 rounded-full bg-rose-400/10 pointer-events-none [animation-delay:3s]" />
 
       {/* ===== OVERLAY MOBILE ===== */}
       {sidebarOpen && (
@@ -212,11 +215,11 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       {/* ===== MAIN CONTENT ===== */}
       <div className={cn('relative z-10 transition-[padding] duration-300 ease-out', desktopSidebarHidden ? 'lg:pl-0' : 'lg:pl-64')}>
         {/* Topbar */}
-        <header className="sticky top-0 z-40 flex h-14 items-center gap-2 sm:gap-3 border-b border-border/50 bg-card/80 backdrop-blur-xl px-4 sm:px-6 shadow-sm shadow-slate-900/[0.03] transition-colors duration-200">
+        <header className="sticky top-0 z-40 flex h-14 items-center gap-2 sm:gap-3 border-b border-border/50 bg-card/[0.82] backdrop-blur-xl px-4 sm:px-6 shadow-sm shadow-cyan-500/[0.05] transition-colors duration-200">
           {/* Bouton menu mobile */}
           <button
             type="button"
-            className="lg:hidden flex items-center justify-center h-9 w-9 rounded-2xl bg-muted/60 hover:bg-muted text-foreground transition-colors duration-200 active:scale-95"
+            className="lg:hidden flex items-center justify-center h-9 w-9 rounded-2xl bg-muted/60 hover:bg-primary/10 hover:text-primary text-foreground transition-all duration-300 active:scale-95"
             onClick={() => setSidebarOpen(true)}
             aria-label="Ouvrir le menu"
           >
@@ -226,7 +229,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           {/* Masquer / afficher la sidebar (desktop) */}
           <button
             type="button"
-            className="hidden lg:flex items-center justify-center h-9 w-9 rounded-2xl bg-muted/60 hover:bg-muted text-foreground transition-colors duration-200 active:scale-95 shrink-0"
+            className="hidden lg:flex items-center justify-center h-9 w-9 rounded-2xl bg-muted/60 hover:bg-primary/10 hover:text-primary text-foreground transition-all duration-300 active:scale-95 shrink-0"
             onClick={toggleDesktopSidebar}
             aria-label={desktopSidebarHidden ? 'Afficher le menu latéral' : 'Masquer le menu latéral'}
             title={desktopSidebarHidden ? 'Afficher le menu' : 'Masquer le menu'}

@@ -13,7 +13,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 24% 16%;
 
-    --primary: 221 48% 40%;
+    --primary: 224 68% 48%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 220 20% 95%;
@@ -22,31 +22,34 @@
     --muted: 220 22% 95%;
     --muted-foreground: 220 10% 46%;
 
-    --accent: 221 42% 44%;
+    --accent: 190 76% 42%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 68% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 150 48% 40%;
+    --success: 155 62% 39%;
     --success-foreground: 0 0% 100%;
 
     /* Couleurs de marque TLR */
-    --brand-navy: 221 48% 40%;
-    --brand-burgundy: 351 42% 38%;
-    --brand-gold: 40 74% 52%;
+    --brand-navy: 224 68% 48%;
+    --brand-burgundy: 345 64% 48%;
+    --brand-gold: 39 92% 55%;
+    --joy-cyan: 190 88% 48%;
+    --joy-violet: 262 72% 58%;
+    --joy-coral: 12 88% 62%;
     --ios-ease: cubic-bezier(0.22, 1, 0.36, 1);
     --ios-spring: cubic-bezier(0.16, 1, 0.3, 1);
     --border: 220 18% 89%;
     --input: 220 18% 91%;
-    --ring: 221 48% 40%;
+    --ring: 224 68% 48%;
 
     --radius: 1rem;
 
     /* Sidebar */
     --sidebar-background: 222 32% 17%;
     --sidebar-foreground: 220 22% 90%;
-    --sidebar-primary: 218 58% 64%;
+    --sidebar-primary: 190 88% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 222 26% 23%;
     --sidebar-accent-foreground: 220 22% 92%;
@@ -54,11 +57,11 @@
     --sidebar-ring: 218 58% 64%;
 
     /* Charts (marine, bordeaux, or, ciel, sarcelle) */
-    --chart-1: 221 48% 45%;
-    --chart-2: 351 42% 46%;
-    --chart-3: 40 74% 52%;
-    --chart-4: 199 56% 50%;
-    --chart-5: 160 42% 42%;
+    --chart-1: 224 68% 52%;
+    --chart-2: 345 64% 54%;
+    --chart-3: 39 92% 55%;
+    --chart-4: 190 88% 48%;
+    --chart-5: 155 62% 42%;
   }
 
   .dark {
@@ -71,7 +74,7 @@
     --popover: 222 28% 13%;
     --popover-foreground: 220 20% 94%;
 
-    --primary: 217 58% 64%;
+    --primary: 217 72% 66%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 222 22% 19%;
@@ -80,23 +83,26 @@
     --muted: 222 22% 19%;
     --muted-foreground: 220 15% 60%;
 
-    --accent: 217 58% 64%;
+    --accent: 190 78% 56%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62% 56%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 150 44% 48%;
+    --success: 155 58% 50%;
     --success-foreground: 0 0% 100%;
 
     /* Couleurs de marque TLR (variantes sombre) */
-    --brand-navy: 217 58% 64%;
-    --brand-burgundy: 351 48% 58%;
-    --brand-gold: 40 82% 62%;
+    --brand-navy: 217 72% 66%;
+    --brand-burgundy: 345 68% 62%;
+    --brand-gold: 40 92% 64%;
+    --joy-cyan: 190 88% 58%;
+    --joy-violet: 262 78% 68%;
+    --joy-coral: 12 88% 68%;
 
     --border: 222 20% 23%;
     --input: 222 20% 21%;
-    --ring: 217 58% 64%;
+    --ring: 217 72% 66%;
 
     --sidebar-background: 222 30% 12%;
     --sidebar-foreground: 220 20% 92%;
@@ -107,11 +113,11 @@
     --sidebar-border: 222 22% 19%;
     --sidebar-ring: 217 58% 64%;
 
-    --chart-1: 217 58% 64%;
-    --chart-2: 351 48% 58%;
-    --chart-3: 40 82% 62%;
-    --chart-4: 199 58% 58%;
-    --chart-5: 160 44% 48%;
+    --chart-1: 217 72% 66%;
+    --chart-2: 345 68% 62%;
+    --chart-3: 40 92% 64%;
+    --chart-4: 190 88% 58%;
+    --chart-5: 155 58% 50%;
   }
 }
 
@@ -122,7 +128,9 @@
   body {
     @apply bg-background text-foreground antialiased;
     background:
-      radial-gradient(circle at top left, hsl(var(--primary) / 0.08), transparent 32rem),
+      radial-gradient(circle at top left, hsl(var(--joy-cyan) / 0.12), transparent 32rem),
+      radial-gradient(circle at 78% 12%, hsl(var(--brand-gold) / 0.10), transparent 25rem),
+      radial-gradient(circle at 90% 75%, hsl(var(--joy-violet) / 0.08), transparent 28rem),
       linear-gradient(180deg, hsl(var(--background)), hsl(220 24% 96%));
     font-feature-settings: "rlig" 1, "calt" 1;
     text-rendering: optimizeLegibility;
@@ -131,7 +139,9 @@
 
   .dark body {
     background:
-      radial-gradient(circle at top left, hsl(var(--primary) / 0.08), transparent 32rem),
+      radial-gradient(circle at top left, hsl(var(--joy-cyan) / 0.11), transparent 32rem),
+      radial-gradient(circle at 78% 12%, hsl(var(--brand-gold) / 0.08), transparent 25rem),
+      radial-gradient(circle at 90% 75%, hsl(var(--joy-violet) / 0.12), transparent 28rem),
       linear-gradient(180deg, hsl(var(--background)), hsl(222 28% 9%));
   }
   h1, h2, h3, h4, h5, h6 {
@@ -146,7 +156,7 @@
 
   /* Gradient de texte principal (marine → bordeaux) */
   .gradient-text {
-    @apply bg-gradient-to-r from-blue-800 via-slate-700 to-rose-800 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-blue-700 via-cyan-600 to-rose-600 bg-clip-text text-transparent;
   }
 
   /* Glassmorphism cards */
@@ -156,24 +166,24 @@
 
   /* Hover card léger */
   .card-lift {
-    @apply transition-shadow duration-200 hover:shadow-md hover:shadow-slate-900/5;
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/10;
     transition-timing-function: var(--ios-spring);
   }
 
   /* Badge glow */
   .badge-glow {
-    @apply shadow-sm shadow-primary/10;
+    @apply shadow-md shadow-primary/20;
   }
 
   /* Stat card moderne */
   .stat-card {
-    @apply relative overflow-hidden rounded-2xl border border-border/60 bg-card/95 p-5 transition-shadow duration-200 hover:shadow-md hover:shadow-slate-900/5;
+    @apply relative overflow-hidden rounded-2xl border border-border/60 bg-card/95 p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/10;
     transition-timing-function: var(--ios-spring);
   }
 
   /* Bouton premium (marine → bordeaux) */
   .btn-premium {
-    @apply relative overflow-hidden bg-gradient-to-r from-blue-800 via-slate-700 to-rose-800 text-white font-semibold rounded-xl px-5 py-2.5 shadow-sm shadow-slate-900/[0.15] transition-shadow duration-200 hover:shadow-md;
+    @apply relative overflow-hidden bg-gradient-to-r from-blue-700 via-cyan-600 to-rose-600 text-white font-semibold rounded-xl px-5 py-2.5 shadow-md shadow-primary/20 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/20;
     transition-timing-function: var(--ios-spring);
   }
 
@@ -184,7 +194,7 @@
   }
 
   .nav-item-active {
-    @apply bg-white/10 text-white font-semibold;
+    @apply bg-white/[0.12] text-white font-semibold shadow-sm shadow-cyan-500/10;
   }
 
   .nav-item-inactive {
@@ -193,7 +203,7 @@
 }
 
 /* =====================================================
-   ANIMATIONS MODÉRÉES
+   ANIMATIONS ENGAGEANTES
    ===================================================== */
 @keyframes iosPageEnter {
   from {
@@ -204,6 +214,51 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes dopamineGradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes dopamineOrbDrift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.55; }
+  33% { transform: translate3d(18px, -14px, 0) scale(1.04); opacity: 0.72; }
+  66% { transform: translate3d(-12px, 12px, 0) scale(0.98); opacity: 0.62; }
+}
+
+@keyframes dopamineGlowPulse {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--joy-cyan) / 0.16); }
+  50% { box-shadow: 0 0 34px 0 hsl(var(--joy-cyan) / 0.24); }
+}
+
+@keyframes dopamineSheen {
+  0% { transform: translateX(-120%) skewX(-18deg); }
+  100% { transform: translateX(220%) skewX(-18deg); }
+}
+
+.dopamine-gradient {
+  background-size: 220% 220%;
+  animation: dopamineGradientShift 12s ease-in-out infinite;
+}
+
+.dopamine-orb {
+  animation: dopamineOrbDrift 14s ease-in-out infinite;
+  filter: blur(18px);
+}
+
+.dopamine-glow {
+  animation: dopamineGlowPulse 3.8s ease-in-out infinite;
+}
+
+.dopamine-sheen::after {
+  content: "";
+  position: absolute;
+  inset: -40% auto -40% 0;
+  width: 42%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.32), transparent);
+  animation: dopamineSheen 3.4s ease-in-out infinite;
+  pointer-events: none;
 }
 
 @keyframes iosSurfaceIn {
@@ -220,13 +275,11 @@
 .animate-ios-page-enter { animation: iosPageEnter 0.18s var(--ios-spring) both; }
 .animate-ios-surface    { animation: iosSurfaceIn 0.16s var(--ios-spring) both; }
 
-/* Pas d'animations infinies décoratives. */
+/* Les anciennes animations bruyantes restent coupées. */
 .animate-fade-in-up,
 .animate-fade-in-scale,
-.animate-float,
 .animate-spin-slow,
-.animate-pulse-glow,
-.shimmer {
+.animate-pulse-glow {
   animation: none !important;
 }
 
@@ -290,6 +343,13 @@
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.001ms !important;
+  }
+
+  .dopamine-gradient,
+  .dopamine-orb,
+  .dopamine-glow,
+  .dopamine-sheen::after {
+    animation: none !important;
   }
 }
 
