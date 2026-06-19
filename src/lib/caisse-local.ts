@@ -290,7 +290,7 @@ export async function upsertSortieFromExpense(expense: {
     type: 'sortie',
     montant: expense.montant,
     date: dateStr,
-    description: `Dépense — ${expense.description}`,
+    description: `Dépense : ${expense.description}`,
     reference: ref,
     categorie: expense.categorie || 'Dépenses',
   };

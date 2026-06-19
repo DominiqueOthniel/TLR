@@ -432,9 +432,9 @@ export default function Expenses() {
 
   // Fonctions utilitaires pour les labels (définies avant leur utilisation)
   const getTruckLabel = (id?: string) => {
-    if (!id) return '—';
+    if (!id) return '';
     const truck = trucks.find(t => t.id === id);
-    return truck ? truck.immatriculation : '—';
+    return truck ? truck.immatriculation : '';
   };
 
   const getDriverLabel = (id?: string) => {

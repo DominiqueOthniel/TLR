@@ -100,7 +100,7 @@ export default function Dashboard() {
       if (!parsed.data || !parsed.version) throw new Error('Fichier de backup invalide ou corrompu');
       const result = await adminApi.restore(parsed.data);
       await Promise.all([refreshTrucks(), refreshDrivers(), refreshTrips(), refreshParcelExpeditions(), refreshExpenses(), refreshInvoices(), refreshThirdParties(), refreshPersonnel(), refreshUsers()]);
-      toast.success(`Restauration réussie — ${Object.values(result.counts).reduce((a, b) => a + b, 0)} enregistrements restaurés`);
+      toast.success(`Restauration réussie : ${Object.values(result.counts).reduce((a, b) => a + b, 0)} enregistrements restaurés`);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Erreur lors de la restauration');
     } finally {
@@ -364,7 +364,7 @@ export default function Dashboard() {
       {/* En-tête professionnel */}
       <PageHeader
         title="Tableau de Bord"
-        description="Encaissements et bénéfice : factures (montants payés sur trajets et expéditions) et dépenses enregistrées — les dons saisis uniquement en Caisse n’y sont pas inclus."
+        description="Encaissements et bénéfice : factures (montants payés sur trajets et expéditions) et dépenses enregistrées. Les dons saisis uniquement en Caisse n’y sont pas inclus."
         icon={LayoutDashboard}
         gradient="from-blue-600/20 via-rose-500/10 to-transparent"
         stats={[

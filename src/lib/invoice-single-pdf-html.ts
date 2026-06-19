@@ -10,7 +10,7 @@ function escapeHtml(s: string): string {
 function parcelClientsSummary(pe: ParcelExpedition): string {
   const raw = pe.lots.map((l) => l.clients?.trim()).filter(Boolean) as string[];
   const uniq = [...new Set(raw)];
-  return uniq.length ? uniq.join(', ') : '—';
+  return uniq.length ? uniq.join(', ') : '';
 }
 
 export function buildSingleInvoicePdfInnerHtml(opts: {
@@ -34,12 +34,12 @@ export function buildSingleInvoicePdfInnerHtml(opts: {
 
   const partyLabel = expense ? 'Fournisseur' : 'Client';
   const partyName = expense
-    ? fournisseurNom || '—'
+    ? fournisseurNom || ''
     : trip
-      ? trip.client || '—'
+      ? trip.client || ''
       : parcelExpedition
         ? parcelClientsSummary(parcelExpedition)
-        : '—';
+        : '';
 
   let detailBlock = '';
   if (trip) {
@@ -141,7 +141,7 @@ export function buildSingleInvoicePdfInnerHtml(opts: {
                           <td class="p-2 text-sm text-right">${l.quantite.toLocaleString('fr-FR')}</td>
                           <td class="p-2 text-sm text-right">${l.prixUnitaire.toLocaleString('fr-FR')}</td>
                           <td class="p-2 text-sm text-right font-semibold">${l.montant.toLocaleString('fr-FR')}</td>
-                          <td class="p-2 text-xs text-gray-600">${l.observations ? escapeHtml(l.observations) : '—'}</td>
+                          <td class="p-2 text-xs text-gray-600">${l.observations ? escapeHtml(l.observations) : ''}</td>
                         </tr>`,
       )
       .join('');

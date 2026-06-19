@@ -236,7 +236,7 @@ export async function addRetraitPourCaisse(params: {
         type: 'retrait',
         montant: params.montant,
         date: dateStr,
-        description: `Alimentation caisse — ${params.descriptionCaisse}`,
+        description: `Alimentation caisse : ${params.descriptionCaisse}`,
         reference: `caisse:${params.caisseTransactionId}`,
         categorie: 'Caisse',
       });
@@ -271,7 +271,7 @@ export async function addRetraitPourCaisse(params: {
     type: 'retrait',
     montant: params.montant,
     date: dateStr,
-    description: `Alimentation caisse — ${params.descriptionCaisse}`,
+    description: `Alimentation caisse : ${params.descriptionCaisse}`,
     reference: `caisse:${params.caisseTransactionId}`,
     categorie: 'Caisse',
   };
@@ -384,7 +384,7 @@ export function assertBankDebitAllowed(
     return {
       ok: false,
       disponible,
-      message: `Solde bancaire insuffisant pour payer cette dépense. Disponible : ${disponible.toLocaleString('fr-FR')} FCFA — montant à régler : ${montant.toLocaleString('fr-FR')} FCFA.`,
+      message: `Solde bancaire insuffisant pour payer cette dépense. Disponible : ${disponible.toLocaleString('fr-FR')} FCFA, montant à régler : ${montant.toLocaleString('fr-FR')} FCFA.`,
     };
   }
   return { ok: true, disponible };

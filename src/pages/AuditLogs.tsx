@@ -238,13 +238,13 @@ export default function AuditLogs() {
                         <Badge variant={actionBadgeVariant(r.action)}>{r.action}</Badge>
                       </TableCell>
                       <TableCell className="text-sm">
-                        {r.actorLogin ?? '—'}
+                        {r.actorLogin ?? ''}
                         {r.actorRole ? (
                           <span className="text-muted-foreground text-xs block">({r.actorRole})</span>
                         ) : null}
                       </TableCell>
                       <TableCell className="max-w-[280px] text-sm">
-                        <span className="line-clamp-2">{r.summary ?? '—'}</span>
+                        <span className="line-clamp-2">{r.summary ?? ''}</span>
                         {r.entityId ? (
                           <span className="text-[10px] text-muted-foreground font-mono block truncate">
                             {r.entityId}

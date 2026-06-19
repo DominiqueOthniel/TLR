@@ -66,7 +66,6 @@ export default function Login() {
         {/* Grille subtile */}
         <div className="absolute inset-0 text-white opacity-[0.035] bg-dot-pattern" />
         {/* Filet doré séparateur haut */}
-        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-amber-300/40 to-transparent" />
       </div>
 
       {/* Carte de connexion */}
@@ -93,10 +92,10 @@ export default function Login() {
 
             <h1 className="text-3xl font-bold tracking-tight mb-1.5">
               <span className="bg-gradient-to-r from-blue-300 via-white to-rose-300 bg-clip-text text-transparent">
-                Transport · Logistique · Révolution
+                Transport et logistique
               </span>
             </h1>
-            <p className="text-white/45 text-sm">Plateforme de gestion de flotte · Cameroun</p>
+            <p className="text-white/45 text-sm">Plateforme de gestion de flotte, Cameroun</p>
           </div>
 
           {/* Formulaire */}
@@ -206,7 +205,7 @@ export default function Login() {
           {/* Footer */}
           <div className="mt-7 flex items-center justify-center gap-2 text-white/30 text-xs">
             <Lock className="h-3 w-3" />
-            <span>Connexion sécurisée · DIDDI S.A-TLR © {new Date().getFullYear()}</span>
+            <span>Connexion sécurisée, DIDDI S.A-TLR © {new Date().getFullYear()}</span>
           </div>
         </div>
       </div>

@@ -401,7 +401,7 @@ export default function Credits() {
     <div className="space-y-6 p-1">
       <PageHeader
         title="Suivi créances"
-        description="Suivi isolé des emprunts et prêts — ne modifie pas la caisse, la banque ni le tableau de bord"
+        description="Suivi isolé des emprunts et prêts. Ne modifie pas la caisse, la banque ni le tableau de bord"
         icon={CreditCard}
         gradient="from-rose-500/15 via-pink-500/8 to-transparent"
         iconColor="from-rose-500 via-pink-500 to-red-600"
@@ -639,7 +639,7 @@ export default function Credits() {
                               <Calendar className="h-3 w-3" />
                               {new Date(c.dateEcheance).toLocaleDateString('fr-FR')}
                             </div>
-                          ) : <span className="text-muted-foreground text-xs">—</span>}
+                          ) : <span className="text-muted-foreground text-xs"></span>}
                         </TableCell>
                         <TableCell>{statutBadge(c.statut)}</TableCell>
                         <TableCell className="text-right">

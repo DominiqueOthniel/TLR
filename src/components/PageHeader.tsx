@@ -46,9 +46,6 @@ export default function PageHeader({
       <div className="absolute -right-10 -top-12 h-32 w-32 rounded-full bg-cyan-400/20 blur-2xl dopamine-orb" />
       <div className="absolute -bottom-16 left-1/3 h-36 w-36 rounded-full bg-rose-400/15 blur-2xl dopamine-orb [animation-delay:1.4s]" />
 
-      {/* Ligne décorative haute */}
-      <div className={cn('absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-400/[0.55] to-transparent')} />
-
       {/* Contenu */}
       <div className="relative p-4 sm:p-5 md:p-7">
         {/* Titre + actions */}
@@ -117,9 +114,6 @@ export default function PageHeader({
           </div>
         )}
       </div>
-
-      {/* Ligne décorative basse */}
-      <div className="h-px bg-gradient-to-r from-transparent via-cyan-400/[0.45] to-transparent" />
     </div>
   );
 }

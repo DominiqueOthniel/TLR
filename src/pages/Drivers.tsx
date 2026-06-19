@@ -404,7 +404,7 @@ export default function Drivers() {
             <tr style="background-color: ${idx % 2 === 0 ? '#f8fafc' : '#ffffff'};">
               <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${formatLocalDate(trip.dateDepart)}</td>
               <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${escHtml(trip.origine)} → ${escHtml(trip.destination)}</td>
-              <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${escHtml(trip.client || '—')}</td>
+              <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${escHtml(trip.client || '')}</td>
               <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">
                 <span style="padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; ${
                   trip.statut === 'annule'

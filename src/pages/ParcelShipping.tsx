@@ -102,9 +102,9 @@ function formatFcfa(n: number): string {
 }
 
 function dateLocaleOrDash(iso?: string): string {
-  if (!iso?.trim()) return '—';
+  if (!iso?.trim()) return '';
   const t = new Date(iso).getTime();
-  return Number.isNaN(t) ? '—' : new Date(iso).toLocaleDateString('fr-FR');
+  return Number.isNaN(t) ? '' : new Date(iso).toLocaleDateString('fr-FR');
 }
 
 function sumExpeditionMontant(lots: ParcelExpeditionLot[]): number {
@@ -447,13 +447,13 @@ export default function ParcelShipping() {
 
   const driverLabel = (id: string) => {
     const d = drivers.find((x) => x.id === id);
-    return d ? `${d.prenom} ${d.nom}` : '—';
+    return d ? `${d.prenom} ${d.nom}` : '';
   };
 
   const driverPhone = (id: string) => {
     const d = drivers.find((x) => x.id === id);
     const tel = d?.telephone?.trim();
-    return tel || '—';
+    return tel || '';
   };
 
   const truckBits = (tracteurId?: string, remorqueuseId?: string) => {
@@ -466,7 +466,7 @@ export default function ParcelShipping() {
       const t = trucks.find((x) => x.id === remorqueuseId);
       if (t) bits.push(t.immatriculation);
     }
-    return bits.length ? bits.join(' + ') : '—';
+    return bits.length ? bits.join(' + ') : '';
   };
 
   const allDestinations = useMemo(() => {
@@ -585,7 +585,7 @@ export default function ParcelShipping() {
 
   const recipientsSummary = (ex: ParcelExpedition) => {
     const uniq = [...new Set(ex.lots.map((l) => l.clients?.trim()).filter(Boolean) as string[])];
-    return uniq.length ? uniq.join(', ') : '—';
+    return uniq.length ? uniq.join(', ') : '';
   };
 
   const commissionAmount = (ex: ParcelExpedition) =>
@@ -596,7 +596,7 @@ export default function ParcelShipping() {
     const label = EXPEDITION_SORT_OPTIONS.find((o) => o.value === listSort)?.label;
     if (label) parts.push(`Tri : ${label}`);
     if (hasActiveFilters) parts.push('Filtres actifs');
-    return parts.length ? parts.join(' — ') : undefined;
+    return parts.length ? parts.join(', ') : undefined;
   }, [listSort, hasActiveFilters]);
 
   const handleExportExcel = () => {
@@ -622,7 +622,7 @@ export default function ParcelShipping() {
         },
         {
           header: 'Notes expédition',
-          value: (ex) => (ex.description?.trim() ? ex.description : '—'),
+          value: (ex) => (ex.description?.trim() ? ex.description : ''),
         },
         {
           header: 'Détail lignes (client · unité · qté · PU · montant · obs.)',
@@ -682,7 +682,7 @@ export default function ParcelShipping() {
           header: 'Notes',
           value: (ex) => {
             const d = ex.description?.trim();
-            if (!d) return '—';
+            if (!d) return '';
             return d.length > 100 ? `${d.slice(0, 97)}…` : d;
           },
         },
@@ -695,7 +695,7 @@ export default function ParcelShipping() {
     <div className="space-y-6 p-1">
       <PageHeader
         title="Expéditions"
-        description="Expéditions groupées depuis Douala : pour chaque ligne, clients, unité, quantité, prix unitaire et montant (FCFA), avec observations — idéal pour le suivi commercial du colis."
+        description="Expéditions groupées depuis Douala : pour chaque ligne, clients, unité, quantité, prix unitaire et montant (FCFA), avec observations. Idéal pour le suivi commercial du colis."
         icon={Package}
         gradient="from-sky-500/20 via-cyan-500/10 to-transparent"
         actions={
@@ -799,7 +799,7 @@ export default function ParcelShipping() {
                             <SelectItem value="none">Aucun</SelectItem>
                             {tracteurs.map((t) => (
                               <SelectItem key={t.id} value={t.id}>
-                                {t.immatriculation} — {t.modele}
+                                {t.immatriculation}, {t.modele}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -825,7 +825,7 @@ export default function ParcelShipping() {
                             <SelectItem value="none">Aucune</SelectItem>
                             {remorqueuses.map((t) => (
                               <SelectItem key={t.id} value={t.id}>
-                                {t.immatriculation} — {t.modele}
+                                {t.immatriculation}, {t.modele}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -1212,7 +1212,7 @@ export default function ParcelShipping() {
                     .filter((t) => t.type === 'tracteur')
                     .map((t) => (
                       <SelectItem key={t.id} value={t.id}>
-                        {t.immatriculation} — {t.modele}
+                        {t.immatriculation}, {t.modele}
                       </SelectItem>
                     ))}
                 </SelectContent>
@@ -1230,7 +1230,7 @@ export default function ParcelShipping() {
                     .filter((t) => t.type === 'remorqueuse')
                     .map((t) => (
                       <SelectItem key={t.id} value={t.id}>
-                        {t.immatriculation} — {t.modele}
+                        {t.immatriculation}, {t.modele}
                       </SelectItem>
                     ))}
                 </SelectContent>
@@ -1346,7 +1346,7 @@ export default function ParcelShipping() {
                         <span className="text-muted-foreground"> → </span>
                         <span>{ex.destination}</span>
                         <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                          {ex.lots.map((l) => l.clients).filter(Boolean).join(' · ') || '—'}
+                          {ex.lots.map((l) => l.clients).filter(Boolean).join(' · ') || ''}
                         </p>
                       </TableCell>
                       <TableCell className="whitespace-nowrap text-sm">
@@ -1411,7 +1411,7 @@ export default function ParcelShipping() {
             <>
               <DialogHeader>
                 <DialogTitle>
-                  Expédition {viewing.reference} — {viewing.origine} → {viewing.destination}
+                  Expédition {viewing.reference}, {viewing.origine} → {viewing.destination}
                 </DialogTitle>
               </DialogHeader>
 
@@ -1522,7 +1522,7 @@ export default function ParcelShipping() {
                           {viewing.lots.map((lot) => (
                             <TableRow key={lot.id}>
                               <TableCell className="font-medium">{lot.clients}</TableCell>
-                              <TableCell className="text-sm text-muted-foreground">{lot.observations || '—'}</TableCell>
+                              <TableCell className="text-sm text-muted-foreground">{lot.observations || ''}</TableCell>
                               <TableCell>{lot.unite}</TableCell>
                               <TableCell className="text-right">{lot.quantite.toLocaleString('fr-FR')}</TableCell>
                               <TableCell className="text-right">{formatFcfa(lot.prixUnitaire)}</TableCell>

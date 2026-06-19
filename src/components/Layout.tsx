@@ -253,7 +253,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           <div className="flex items-center gap-2 flex-shrink-0">
             <div className={cn('hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-medium', roleColor)}>
               <div className="w-1.5 h-1.5 rounded-full bg-current opacity-70" />
-              {user?.login} · {roleLabel}
+              {user?.login}, {roleLabel}
             </div>
             <button
           onClick={logout}
@@ -314,7 +314,7 @@ function SidebarContent({
           <div className="min-w-0">
             <p className="text-lg font-bold leading-none tracking-tight text-white">DIDDI S.A-TLR</p>
             <p className="mt-1 text-[9px] font-medium uppercase tracking-[0.18em] text-sidebar-foreground/[0.55]">
-              Transport · Logistique
+              Transport et logistique
             </p>
           </div>
         </div>

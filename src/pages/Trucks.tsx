@@ -1227,7 +1227,7 @@ export default function Trucks() {
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Type</p>
                 <p className="text-lg font-semibold">
-                  {viewingTruck ? labelTruckType(viewingTruck) : '—'}
+                  {viewingTruck ? labelTruckType(viewingTruck) : ''}
                 </p>
               </div>
               <div>

@@ -63,7 +63,7 @@ export default function DashboardCharts({
             <CardHeader className="bg-gradient-to-br from-background to-muted/20 border-b">
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle className="text-lg">{EMOJI.classement} Top 5 Camions — Encaissement</CardTitle>
+                  <CardTitle className="text-lg">{EMOJI.classement} Top 5 camions par encaissement</CardTitle>
                   <p className="text-sm text-muted-foreground mt-1">Classement par performance</p>
                 </div>
                 <Package className="h-8 w-8 text-primary opacity-50" />

@@ -398,8 +398,8 @@ export default function Invoices() {
               });
               toast.success(
                 factureSoldée
-                  ? `Facture fournisseur soldée — ${paymentAmount.toLocaleString('fr-FR')} FCFA prélevés sur « ${nomCompte} »`
-                  : `Prélèvement ${paymentAmount.toLocaleString('fr-FR')} FCFA sur « ${nomCompte} » — reste ${(selectedInvoice.montantTTC - nouveauTotalPaye).toLocaleString('fr-FR')} FCFA sur la facture`,
+                  ? `Facture fournisseur soldée : ${paymentAmount.toLocaleString('fr-FR')} FCFA prélevés sur « ${nomCompte} »`
+                  : `Prélèvement ${paymentAmount.toLocaleString('fr-FR')} FCFA sur « ${nomCompte} », reste ${(selectedInvoice.montantTTC - nouveauTotalPaye).toLocaleString('fr-FR')} FCFA sur la facture`,
               );
             } else {
               await appendVirementFromInvoicePayment({
@@ -411,7 +411,7 @@ export default function Invoices() {
               });
               toast.success(
                 factureSoldée
-                  ? `Facture soldée — ${paymentAmount.toLocaleString('fr-FR')} FCFA crédités sur « ${nomCompte} »`
+                  ? `Facture soldée : ${paymentAmount.toLocaleString('fr-FR')} FCFA crédités sur « ${nomCompte} »`
                   : `Virement ${paymentAmount.toLocaleString('fr-FR')} FCFA sur « ${nomCompte} » (reste ${(selectedInvoice.montantTTC - nouveauTotalPaye).toLocaleString('fr-FR')} FCFA)`,
               );
             }
@@ -443,11 +443,11 @@ export default function Invoices() {
             toast.success(
               isExpenseInvoice
                 ? factureSoldée
-                  ? `Facture fournisseur soldée — ${paymentAmount.toLocaleString('fr-FR')} FCFA sortis de caisse`
-                  : `Sortie caisse ${paymentAmount.toLocaleString('fr-FR')} FCFA — reste ${(selectedInvoice.montantTTC - nouveauTotalPaye).toLocaleString('fr-FR')} FCFA sur la facture fournisseur`
+                  ? `Facture fournisseur soldée : ${paymentAmount.toLocaleString('fr-FR')} FCFA sortis de caisse`
+                  : `Sortie caisse ${paymentAmount.toLocaleString('fr-FR')} FCFA, reste ${(selectedInvoice.montantTTC - nouveauTotalPaye).toLocaleString('fr-FR')} FCFA sur la facture fournisseur`
                 : factureSoldée
-                  ? `Facture soldée — ${paymentAmount.toLocaleString('fr-FR')} FCFA enregistrés en caisse`
-                  : `Encaissement caisse ${paymentAmount.toLocaleString('fr-FR')} FCFA — reste ${(selectedInvoice.montantTTC - nouveauTotalPaye).toLocaleString('fr-FR')} FCFA sur la facture`,
+                  ? `Facture soldée : ${paymentAmount.toLocaleString('fr-FR')} FCFA enregistrés en caisse`
+                  : `Encaissement caisse ${paymentAmount.toLocaleString('fr-FR')} FCFA, reste ${(selectedInvoice.montantTTC - nouveauTotalPaye).toLocaleString('fr-FR')} FCFA sur la facture`,
             );
           } catch {
             toast.error(
@@ -741,13 +741,13 @@ export default function Invoices() {
         {
           header: 'Statut mission',
           value: (inv) => {
-            if (inv.expenseId) return '—';
+            if (inv.expenseId) return '';
             if (inv.parcelExpeditionId) {
               const ex = getParcelExpedition(inv.parcelExpeditionId);
-              return ex ? formatTripStatusFr(ex.statut) : '—';
+              return ex ? formatTripStatusFr(ex.statut) : '';
             }
             const trip = getTrip(inv.trajetId);
-            return trip ? formatTripStatusFr(trip.statut) : '—';
+            return trip ? formatTripStatusFr(trip.statut) : '';
           },
         },
         {
@@ -847,7 +847,7 @@ export default function Invoices() {
       branding: {
         companyName: COMPANY_NAME,
         tagline: COMPANY_TAGLINE,
-        documentLabel: 'Synthèse comptable — export filtré',
+        documentLabel: 'Synthèse comptable, export filtré',
       },
       hideDefaultStatBox: true,
       headerColor: '#1e3a8a',
@@ -877,16 +877,16 @@ export default function Invoices() {
             if (inv.expenseId) {
               const expense = getExpense(inv.expenseId);
               const supplier = expense?.fournisseurId ? thirdParties.find(tp => tp.id === expense.fournisseurId) : null;
-              return supplier?.nom || '—';
+              return supplier?.nom || '';
             }
             if (inv.parcelExpeditionId) {
               const ex = getParcelExpedition(inv.parcelExpeditionId);
-              if (!ex) return '—';
+              if (!ex) return '';
               const clients = [...new Set(ex.lots.map((l) => l.clients?.trim()).filter(Boolean) as string[])];
-              return clients.join(', ') || '—';
+              return clients.join(', ') || '';
             }
             const trip = getTrip(inv.trajetId);
-            return trip?.client || '—';
+            return trip?.client || '';
           },
         },
         {
@@ -896,13 +896,13 @@ export default function Invoices() {
         {
           header: 'Statut mission',
           value: (inv) => {
-            if (inv.expenseId) return '—';
+            if (inv.expenseId) return '';
             if (inv.parcelExpeditionId) {
               const ex = getParcelExpedition(inv.parcelExpeditionId);
-              return ex ? formatTripStatusFr(ex.statut) : '—';
+              return ex ? formatTripStatusFr(ex.statut) : '';
             }
             const trip = getTrip(inv.trajetId);
-            return trip ? formatTripStatusFr(trip.statut) : '—';
+            return trip ? formatTripStatusFr(trip.statut) : '';
           },
         },
         {
@@ -928,10 +928,10 @@ export default function Invoices() {
             }
             if (inv.parcelExpeditionId) {
               const ex = getParcelExpedition(inv.parcelExpeditionId);
-              return ex ? `${ex.lots.length} ligne(s) colis` : '—';
+              return ex ? `${ex.lots.length} ligne(s) colis` : '';
             }
             const trip = getTrip(inv.trajetId);
-            return trip?.marchandise || '—';
+            return trip?.marchandise || '';
           },
         },
         {
@@ -2592,7 +2592,7 @@ export default function Invoices() {
                           <>
                             <p className="text-sm text-muted-foreground">Clients (lignes colis)</p>
                             <p className="font-semibold max-w-md ml-auto">
-                              {[...new Set(parcelEx.lots.map((l) => l.clients?.trim()).filter(Boolean) as string[])].join(', ') || '—'}
+                              {[...new Set(parcelEx.lots.map((l) => l.clients?.trim()).filter(Boolean) as string[])].join(', ') || ''}
                             </p>
                           </>
                         ) : (
@@ -2829,7 +2829,7 @@ export default function Invoices() {
                                   <TableCell className="text-sm text-right">{l.quantite.toLocaleString('fr-FR')}</TableCell>
                                   <TableCell className="text-sm text-right">{l.prixUnitaire.toLocaleString('fr-FR')}</TableCell>
                                   <TableCell className="text-sm text-right font-medium">{l.montant.toLocaleString('fr-FR')}</TableCell>
-                                  <TableCell className="text-xs text-muted-foreground">{l.observations || '—'}</TableCell>
+                                  <TableCell className="text-xs text-muted-foreground">{l.observations || ''}</TableCell>
                                 </TableRow>
                               ))}
                             </TableBody>
@@ -3155,7 +3155,7 @@ export default function Invoices() {
                           <SelectContent>
                             {getBankAccounts().map((a) => (
                               <SelectItem key={a.id} value={a.id}>
-                                {a.nom} — {a.banque}
+                                {a.nom} ({a.banque})
                               </SelectItem>
                             ))}
                           </SelectContent>

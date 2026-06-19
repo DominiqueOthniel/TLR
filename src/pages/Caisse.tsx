@@ -575,7 +575,7 @@ export default function Caisse() {
               ? 'Hors encaissement'
               : isCategorieFinancement(t)
                 ? 'Inclus dans encaissement'
-                : '—',
+                : '',
         },
       ],
       rows: sortedTransactions,
@@ -745,7 +745,7 @@ export default function Caisse() {
                                 <SelectContent>
                                   {bankAccounts.map((acc) => (
                                     <SelectItem key={acc.id} value={acc.id}>
-                                      {acc.nom} — {acc.banque}
+                                      {acc.nom} ({acc.banque})
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
@@ -920,7 +920,7 @@ export default function Caisse() {
               {statsBanque.totalDisponible.toLocaleString('fr-FR')} FCFA
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Somme des comptes — mis à jour via l’API et les prélèvements vers la caisse
+              Somme des comptes, mise à jour via l’API et les prélèvements vers la caisse
             </p>
             {statsBanque.parCompte.length > 1 && (
               <ul className="mt-2 text-xs text-muted-foreground space-y-0.5 max-h-20 overflow-y-auto">
@@ -1146,7 +1146,7 @@ export default function Caisse() {
                       </TableCell>
                       <TableCell>{t.description}</TableCell>
                       <TableCell>
-                        <span className="text-xs text-muted-foreground">{t.utilisateur || '—'}</span>
+                        <span className="text-xs text-muted-foreground">{t.utilisateur || ''}</span>
                       </TableCell>
                       <TableCell>
                         {t.bankTransactionId ? (
@@ -1155,7 +1155,7 @@ export default function Caisse() {
                             Prélevé
                           </Badge>
                         ) : (
-                          <span className="text-muted-foreground">—</span>
+                          <span className="text-muted-foreground"></span>
                         )}
                       </TableCell>
                       <TableCell className="font-mono text-xs">{t.reference || '-'}</TableCell>
