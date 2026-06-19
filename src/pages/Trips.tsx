@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Trash2, MapPin, Route, CheckCircle, Clock, XCircle, FileText, Filter, X, Search, Download, Eye, DollarSign, Loader2, UserRoundPlus, ChevronDown } from 'lucide-react';
+import { Plus, Trash2, MapPin, Route, CheckCircle, Clock, XCircle, FileText, Filter, X, Search, Download, Eye, DollarSign, Loader2, UserRoundPlus, ChevronDown, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { canDeleteTrip, generateInvoiceNumber as genInvoiceNum, calculateTripStats, formatTripStatusFr } from '@/lib/sync-utils';
 import CityPicker, { CAMEROON_CITIES } from '@/components/CityPicker';
@@ -113,6 +113,7 @@ export default function Trips() {
   } = useApp();
   const { canManageFleet, canManageAccounting } = useAuth();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingTrip, setEditingTrip] = useState<Trip | null>(null);
   const [isOriginPickerOpen, setIsOriginPickerOpen] = useState(false);
   const [isDestinationPickerOpen, setIsDestinationPickerOpen] = useState(false);
   const [isExpensesDialogOpen, setIsExpensesDialogOpen] = useState(false);
@@ -167,8 +168,10 @@ export default function Trips() {
   });
 
   // Obtenir les camions déjà en mission (trajets en cours ou planifiés)
-  const getTrucksInMission = () => {
-    const activeTrips = trips.filter(t => t.statut === 'en_cours' || t.statut === 'planifie');
+  const getTrucksInMission = (excludeTripId?: string) => {
+    const activeTrips = trips.filter(
+      (t) => (t.statut === 'en_cours' || t.statut === 'planifie') && t.id !== excludeTripId,
+    );
     const truckIdsInMission = new Set<string>();
     
     activeTrips.forEach(trip => {
@@ -179,7 +182,7 @@ export default function Trips() {
     return truckIdsInMission;
   };
 
-  const trucksInMission = getTrucksInMission();
+  const trucksInMission = getTrucksInMission(editingTrip?.id);
 
   // Filtrer les tracteurs disponibles (actifs ET pas en mission)
   const tracteurs = trucks.filter(t => 
@@ -196,8 +199,10 @@ export default function Trips() {
   );
 
   // Obtenir les chauffeurs déjà en mission (trajets en cours ou planifiés)
-  const getDriversInMission = () => {
-    const activeTrips = trips.filter(t => t.statut === 'en_cours' || t.statut === 'planifie');
+  const getDriversInMission = (excludeTripId?: string) => {
+    const activeTrips = trips.filter(
+      (t) => (t.statut === 'en_cours' || t.statut === 'planifie') && t.id !== excludeTripId,
+    );
     const driverIdsInMission = new Set<string>();
     
     activeTrips.forEach(trip => {
@@ -211,12 +216,13 @@ export default function Trips() {
     return driverIdsInMission;
   };
 
-  const driversInMission = getDriversInMission();
+  const driversInMission = getDriversInMission(editingTrip?.id);
 
   // Filtrer les chauffeurs disponibles (pas en mission)
   const availableDrivers = drivers.filter(d => !driversInMission.has(d.id));
 
   const resetForm = () => {
+    setEditingTrip(null);
     setFormData({
       tracteurId: '',
       remorqueuseId: '',
@@ -253,6 +259,40 @@ export default function Trips() {
       prefinancementChauffeurRemplacant: 0,
     });
     setSelectedTripForReplacement(null);
+  };
+
+  const canEditTrip = (trip: Trip) => trip.statut === 'planifie' || trip.statut === 'en_cours';
+
+  const handleEditTrip = (trip: Trip) => {
+    if (!canEditTrip(trip)) {
+      toast.error('Un trajet terminé ou annulé ne peut pas être modifié');
+      return;
+    }
+
+    setEditingTrip(trip);
+    setFormData({
+      tracteurId: trip.tracteurId || '',
+      remorqueuseId: trip.remorqueuseId || '',
+      origine: trip.origine,
+      destination: trip.destination,
+      origineLat: trip.origineLat,
+      origineLng: trip.origineLng,
+      destinationLat: trip.destinationLat,
+      destinationLng: trip.destinationLng,
+      chauffeurId: trip.chauffeurId,
+      dateDepart: trip.dateDepart.split('T')[0],
+      dateArrivee: trip.dateArrivee?.split('T')[0] || '',
+      quantite: trip.quantite,
+      prixUnitaire: trip.prixUnitaire,
+      recette: trip.recette,
+      prefinancement: trip.prefinancement || 0,
+      paiementStatut: 'avancee',
+      client: trip.client || '',
+      marchandise: trip.marchandise || '',
+      description: trip.description || '',
+      statut: trip.statut,
+    });
+    setIsDialogOpen(true);
   };
 
   const openReplacementDialog = (trip: Trip) => {
@@ -302,7 +342,7 @@ export default function Trips() {
 
     await withGuard(async () => {
       try {
-        const createdTrip = await createTrip({
+        const tripPayload = {
           origine: formData.origine,
           destination: formData.destination,
           origineLat: formData.origineLat,
@@ -321,6 +361,19 @@ export default function Trips() {
           client: formData.client || undefined,
           marchandise: formData.marchandise || undefined,
           description: formData.description || undefined,
+          statut: formData.statut,
+        };
+
+        if (editingTrip) {
+          await updateTrip(editingTrip.id, tripPayload);
+          toast.success('Trajet modifié avec succès');
+          setIsDialogOpen(false);
+          resetForm();
+          return;
+        }
+
+        const createdTrip = await createTrip({
+          ...tripPayload,
           statut: 'planifie',
         });
         if (formData.prefinancement > 0) {
@@ -379,7 +432,7 @@ export default function Trips() {
         setIsDialogOpen(false);
         resetForm();
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Erreur lors de l\'ajout');
+        toast.error(err instanceof Error ? err.message : editingTrip ? 'Erreur lors de la modification' : 'Erreur lors de l\'ajout');
       }
     });
   };
@@ -1038,7 +1091,10 @@ export default function Trips() {
           }}>
             {canManageFleet && (
             <DialogTrigger asChild>
-                <Button className="shadow-md hover:shadow-lg transition-all duration-300">
+                <Button
+                  className="shadow-md hover:shadow-lg transition-all duration-300"
+                  onClick={() => setEditingTrip(null)}
+                >
                 <Plus className="mr-2 h-4 w-4" />
                 Ajouter un trajet
               </Button>
@@ -1046,7 +1102,7 @@ export default function Trips() {
             )}
             <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Ajouter un trajet</DialogTitle>
+                <DialogTitle>{editingTrip ? `Modifier le trajet ${formatTripDisplayId(editingTrip.id)}` : 'Ajouter un trajet'}</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1274,6 +1330,18 @@ export default function Trips() {
                   />
                 </div>
 
+              {editingTrip && (
+                <div>
+                  <Label htmlFor="dateArrivee">Date d'arrivée (optionnel)</Label>
+                  <Input
+                    id="dateArrivee"
+                    type="date"
+                    value={formData.dateArrivee}
+                    onChange={(e) => setFormData({ ...formData, dateArrivee: e.target.value })}
+                  />
+                </div>
+              )}
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="client">Client (optionnel)</Label>
@@ -1372,6 +1440,7 @@ export default function Trips() {
                 />
               </div>
 
+              {!editingTrip && (
               <div>
                 <Label htmlFor="paiementStatutTrajet">Situation financière</Label>
                 <Select
@@ -1393,9 +1462,10 @@ export default function Trips() {
                   Soldé crée une facture payée et une entrée de caisse. Avancé crée une facture en attente.
                 </p>
               </div>
+              )}
 
                 <Button type="submit" className="w-full" disabled={isSubmitting}>
-                  {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Enregistrement...</> : 'Ajouter'}
+                  {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Enregistrement...</> : (editingTrip ? 'Enregistrer les modifications' : 'Ajouter')}
                 </Button>
               </form>
             </DialogContent>
@@ -1679,6 +1749,17 @@ export default function Trips() {
                                   ) : (
                                     <FileText className="h-4 w-4" />
                                   )}
+                                </Button>
+                              )}
+                              {canManageFleet && canEditTrip(trip) && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleEditTrip(trip)}
+                                  className="h-8 w-8 p-0"
+                                  title="Modifier le trajet"
+                                >
+                                  <Pencil className="h-4 w-4" />
                                 </Button>
                               )}
                               {canManageFleet && trip.statut === 'en_cours' && (
