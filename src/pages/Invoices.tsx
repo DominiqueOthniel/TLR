@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Input } from '@/components/ui/input';
 import { NumberInput } from '@/components/ui/number-input';
 import { Label } from '@/components/ui/label';
-import { Plus, CheckCircle2, Clock, Eye, FileText, Download, Mail, Trash2, DollarSign, AlertCircle, Filter, X, Landmark, Loader2, Package } from 'lucide-react';
+import { Plus, CheckCircle2, Clock, Eye, FileText, Download, Mail, Trash2, DollarSign, AlertCircle, Filter, X, Loader2, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -25,18 +25,9 @@ import PageHeader from '@/components/PageHeader';
 import { exportToExcel, exportToPrintablePDF } from '@/lib/export-utils';
 import { EMOJI } from '@/lib/emoji-palette';
 import {
-  appendPrelevementFromExpenseInvoicePayment,
-  appendVirementFromInvoicePayment,
-  assertBankDebitAllowed,
-  calculateAccountBalance,
-  getBankAccounts,
-  getBankTransactions,
-} from '@/lib/bank-local';
-import {
   appendEntreeFromInvoicePayment,
   appendSortieFromExpenseInvoicePayment,
   isRemoteCaisse,
-  isPaiementVersBanque,
   refreshCaisseFromApi,
   upsertSortieFromExpense,
   validateCaisseTransaction,
@@ -86,8 +77,6 @@ export default function Invoices() {
   const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [paymentAmount, setPaymentAmount] = useState<number>(0);
-  /** Compte qui reçoit le virement (dialog paiement) */
-  const [paymentCompteBanqueId, setPaymentCompteBanqueId] = useState<string>('');
   const [selectedTripId, setSelectedTripId] = useState('');
   /** Facture liée à une expédition (exclusif avec trajet). */
   const [invoiceMissionKind, setInvoiceMissionKind] = useState<'trip' | 'parcel'>('trip');
@@ -309,9 +298,7 @@ export default function Invoices() {
     if (!invoice) return;
     
     setSelectedInvoice(invoice);
-    setPaymentAmount(0); // Montant du nouveau paiement à ajouter (pré-rempli à 0)
-    const accs = getBankAccounts();
-    setPaymentCompteBanqueId(accs[0]?.id ?? '');
+    setPaymentAmount(0);
     setIsPaymentDialogOpen(true);
   };
 
@@ -332,23 +319,11 @@ export default function Invoices() {
     }
 
     const mode = selectedInvoice.modePaiement;
-    if (paymentAmount > 0 && isPaiementVersBanque(mode)) {
-      const accs = getBankAccounts();
-      if (accs.length === 0) {
-        toast.error('Créez au moins un compte bancaire pour enregistrer un virement.');
-        return;
-      }
-      if (!paymentCompteBanqueId) {
-        toast.error('Sélectionnez le compte bancaire qui reçoit le virement.');
-        return;
-      }
-    }
-
     const nouveauTotalPaye = dejaPaye + paymentAmount;
     const datePaiementJour = new Date().toISOString().split('T')[0];
     const isExpenseInvoice = Boolean(selectedInvoice.expenseId);
 
-    if (paymentAmount > 0 && isExpenseInvoice && !isPaiementVersBanque(mode)) {
+    if (paymentAmount > 0 && isExpenseInvoice) {
       if (isRemoteCaisse()) await refreshCaisseFromApi();
       const caisseCheck = validateCaisseTransaction({
         id: `caisse-facture-${selectedInvoice.id}-${Date.now()}`,
@@ -364,19 +339,6 @@ export default function Invoices() {
 
     await withPaymentGuard(async () => {
       try {
-        if (
-          paymentAmount > 0 &&
-          isPaiementVersBanque(mode) &&
-          paymentCompteBanqueId &&
-          isExpenseInvoice
-        ) {
-          const debitCheck = assertBankDebitAllowed(paymentCompteBanqueId, paymentAmount);
-          if (debitCheck.ok === false) {
-            toast.error(debitCheck.message, { duration: 8000 });
-            return;
-          }
-        }
-
         await updateInvoice(selectedInvoice.id, {
           montantPaye: nouveauTotalPaye,
           statut: nouveauTotalPaye >= selectedInvoice.montantTTC ? 'payee' : 'en_attente',
@@ -384,44 +346,7 @@ export default function Invoices() {
           modePaiement: selectedInvoice.modePaiement || undefined,
         });
 
-        if (paymentAmount > 0 && isPaiementVersBanque(mode) && paymentCompteBanqueId) {
-          try {
-            const nomCompte = getBankAccounts().find((a) => a.id === paymentCompteBanqueId)?.nom ?? 'Compte';
-            const factureSoldée = nouveauTotalPaye >= selectedInvoice.montantTTC;
-
-            if (isExpenseInvoice) {
-              await appendPrelevementFromExpenseInvoicePayment({
-                compteId: paymentCompteBanqueId,
-                montant: paymentAmount,
-                date: datePaiementJour,
-                factureNumero: selectedInvoice.numero,
-                factureId: selectedInvoice.id,
-              });
-              toast.success(
-                factureSoldée
-                  ? `Facture fournisseur soldée : ${paymentAmount.toLocaleString('fr-FR')} FCFA prélevés sur « ${nomCompte} »`
-                  : `Prélèvement ${paymentAmount.toLocaleString('fr-FR')} FCFA sur « ${nomCompte} », reste ${(selectedInvoice.montantTTC - nouveauTotalPaye).toLocaleString('fr-FR')} FCFA sur la facture`,
-              );
-            } else {
-              await appendVirementFromInvoicePayment({
-                compteId: paymentCompteBanqueId,
-                montant: paymentAmount,
-                date: datePaiementJour,
-                factureNumero: selectedInvoice.numero,
-                factureId: selectedInvoice.id,
-              });
-              toast.success(
-                factureSoldée
-                  ? `Facture soldée : ${paymentAmount.toLocaleString('fr-FR')} FCFA crédités sur « ${nomCompte} »`
-                  : `Virement ${paymentAmount.toLocaleString('fr-FR')} FCFA sur « ${nomCompte} » (reste ${(selectedInvoice.montantTTC - nouveauTotalPaye).toLocaleString('fr-FR')} FCFA)`,
-              );
-            }
-          } catch {
-            toast.error(
-              'Facture mise à jour, mais l’écriture banque a échoué. Vérifiez la caisse ou réessayez.',
-            );
-          }
-        } else if (paymentAmount > 0 && !isPaiementVersBanque(mode)) {
+        if (paymentAmount > 0) {
           try {
             if (isExpenseInvoice) {
               await appendSortieFromExpenseInvoicePayment({
@@ -464,7 +389,6 @@ export default function Invoices() {
         setIsPaymentDialogOpen(false);
         setSelectedInvoice(null);
         setPaymentAmount(0);
-        setPaymentCompteBanqueId('');
       } catch (err) {
         toast.error(err instanceof Error ? err.message : 'Erreur lors du paiement');
       }
@@ -482,27 +406,6 @@ export default function Invoices() {
       }
     }
   };
-
-  /** Solde banque avant le virement (dialog paiement). */
-  const soldeComptePourVirement =
-    paymentCompteBanqueId && isPaymentDialogOpen
-      ? calculateAccountBalance(
-          paymentCompteBanqueId,
-          getBankAccounts(),
-          getBankTransactions(),
-        )
-      : null;
-
-  /** Facture dépense + virement : le compte est débité — bloquer si solde insuffisant. */
-  const paiementBanqueDepenseInsuffisant =
-    Boolean(
-      isPaymentDialogOpen &&
-        selectedInvoice?.expenseId &&
-        paymentAmount > 0 &&
-        isPaiementVersBanque(selectedInvoice.modePaiement) &&
-        soldeComptePourVirement !== null &&
-        soldeComptePourVirement < paymentAmount,
-    );
 
   const getTripLabel = (tripId?: string) => {
     if (!tripId) return 'N/A';
@@ -1598,7 +1501,6 @@ export default function Invoices() {
                     <SelectContent>
                       <SelectItem value="none">Aucun</SelectItem>
                       <SelectItem value="Espèces">Espèces</SelectItem>
-                      <SelectItem value="Virement bancaire">Virement bancaire</SelectItem>
                       <SelectItem value="Chèque">Chèque</SelectItem>
                       <SelectItem value="Mobile Money">Mobile Money</SelectItem>
                     </SelectContent>
@@ -1892,7 +1794,6 @@ export default function Invoices() {
                     <SelectContent>
                       <SelectItem value="none">Aucun</SelectItem>
                       <SelectItem value="Espèces">Espèces</SelectItem>
-                      <SelectItem value="Virement bancaire">Virement bancaire</SelectItem>
                       <SelectItem value="Chèque">Chèque</SelectItem>
                       <SelectItem value="Mobile Money">Mobile Money</SelectItem>
                     </SelectContent>
@@ -3042,10 +2943,7 @@ export default function Invoices() {
       {/* Dialog de paiement partiel */}
       <Dialog
         open={isPaymentDialogOpen}
-        onOpenChange={(open) => {
-          setIsPaymentDialogOpen(open);
-          if (!open) setPaymentCompteBanqueId('');
-        }}
+        onOpenChange={setIsPaymentDialogOpen}
       >
         <DialogContent>
           <DialogHeader>
@@ -3120,13 +3018,7 @@ export default function Invoices() {
               <div>
                 <Label htmlFor="paymentMode">Mode de paiement (optionnel)</Label>
                 <Select 
-                  value={
-                    !selectedInvoice.modePaiement
-                      ? 'none'
-                      : selectedInvoice.modePaiement === 'Virement'
-                        ? 'Virement bancaire'
-                        : selectedInvoice.modePaiement
-                  }
+                  value={!selectedInvoice.modePaiement ? 'none' : selectedInvoice.modePaiement}
                   onValueChange={(value) => {
                     if (selectedInvoice) {
                       const mode = value === 'none' ? undefined : value;
@@ -3134,10 +3026,6 @@ export default function Invoices() {
                         ...selectedInvoice,
                         modePaiement: mode,
                       });
-                      if (mode && isPaiementVersBanque(mode)) {
-                        const accs = getBankAccounts();
-                        setPaymentCompteBanqueId((prev) => prev || accs[0]?.id || '');
-                      }
                     }
                   }}
                 >
@@ -3147,79 +3035,15 @@ export default function Invoices() {
                   <SelectContent>
                     <SelectItem value="none">Aucun</SelectItem>
                     <SelectItem value="Espèces">Espèces</SelectItem>
-                    <SelectItem value="Virement bancaire">Virement bancaire</SelectItem>
                     <SelectItem value="Chèque">Chèque</SelectItem>
                     <SelectItem value="Mobile Money">Mobile Money</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
-              {paymentAmount > 0 && isPaiementVersBanque(selectedInvoice.modePaiement) && (
-                <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 dark:bg-amber-950/20 p-4 space-y-3">
-                  <div className="flex items-center gap-2 text-sm font-medium">
-                    <Landmark className="h-4 w-4 shrink-0 text-amber-600" />
-                    {selectedInvoice.expenseId
-                      ? 'Compte débité (paiement fournisseur)'
-                      : 'Compte qui reçoit le virement'}
-                  </div>
-                  {getBankAccounts().length === 0 ? (
-                    <p className="text-sm text-destructive">
-                      Aucun compte bancaire enregistré. Ajoutez-en un (données / API) pour les virements.
-                    </p>
-                  ) : (
-                    <>
-                      <div>
-                        <Label htmlFor="paymentBankAccount">Compte bancaire *</Label>
-                        <Select
-                          value={paymentCompteBanqueId || undefined}
-                          onValueChange={setPaymentCompteBanqueId}
-                        >
-                          <SelectTrigger id="paymentBankAccount" className="mt-1">
-                            <SelectValue
-                              placeholder={
-                                selectedInvoice.expenseId
-                                  ? 'Choisir le compte à débiter'
-                                  : 'Choisir le compte crédité'
-                              }
-                            />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {getBankAccounts().map((a) => (
-                              <SelectItem key={a.id} value={a.id}>
-                                {a.nom} ({a.banque})
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      {paymentCompteBanqueId && soldeComptePourVirement !== null && (
-                        <div className="space-y-2">
-                          <p className="text-xs text-muted-foreground">
-                            Solde disponible sur ce compte avant ce paiement :{' '}
-                            <span className="font-medium tabular-nums text-foreground">
-                              {soldeComptePourVirement.toLocaleString('fr-FR')} FCFA
-                            </span>
-                          </p>
-                          {paiementBanqueDepenseInsuffisant && (
-                            <p className="text-sm text-destructive flex items-start gap-2">
-                              <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-                              <span>
-                                Solde insuffisant pour régler ce montant par la banque. Réduisez le paiement,
-                                choisissez un autre compte ou utilisez un autre mode (caisse).
-                              </span>
-                            </p>
-                          )}
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              )}
-
-              {paymentAmount > 0 && !isPaiementVersBanque(selectedInvoice.modePaiement) && (
+              {paymentAmount > 0 && (
                 <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 dark:bg-emerald-950/20 p-3 text-sm text-emerald-900 dark:text-emerald-200">
-                  Ce montant sera enregistré en <strong>caisse</strong> (espèces, chèque, mobile money, etc.). Seul le{' '}
-                  <strong>virement bancaire</strong> est crédité sur la banque.
+                  Ce montant sera enregistré en <strong>caisse</strong>.
                 </div>
               )}
 
@@ -3229,14 +3053,7 @@ export default function Invoices() {
                 </Button>
                 <Button
                   onClick={handleConfirmPayment}
-                  disabled={
-                    isConfirmingPayment ||
-                    paymentAmount <= 0 ||
-                    paiementBanqueDepenseInsuffisant ||
-                    (paymentAmount > 0 &&
-                      isPaiementVersBanque(selectedInvoice.modePaiement) &&
-                      (getBankAccounts().length === 0 || !paymentCompteBanqueId))
-                  }
+                  disabled={isConfirmingPayment || paymentAmount <= 0}
                 >
                   {isConfirmingPayment ? (
                     <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Enregistrement...</>

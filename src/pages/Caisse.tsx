@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Edit, Trash2, Wallet, TrendingUp, TrendingDown, Search, FileDown, FileText, HardDrive, Upload, Landmark, Receipt, Layers, Heart, Loader2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Wallet, TrendingUp, TrendingDown, Search, FileDown, FileText, HardDrive, Upload, Receipt, Layers, Heart, Loader2 } from 'lucide-react';
 import { useRef } from 'react';
 import { useSubmitGuard } from '@/hooks/useSubmitGuard';
 import { toast } from 'sonner';
@@ -17,16 +17,6 @@ import { EmptyState } from '@/components/EmptyState';
 import { exportToExcel, exportToPrintablePDF } from '@/lib/export-utils';
 import { EMOJI } from '@/lib/emoji-palette';
 import { Checkbox } from '@/components/ui/checkbox';
-import type { BankAccount, BankTransaction } from '@/lib/bank-types';
-import {
-  addRetraitPourCaisse,
-  calculateAccountBalance,
-  getBankAccounts,
-  getBankTransactions,
-  recreateBankTransaction,
-  refreshBankFromApi,
-  removeBankTransactionAsync,
-} from '@/lib/bank-local';
 import { useApp } from '@/contexts/AppContext';
 import { getTotalCreancesClients } from '@/lib/sync-utils';
 import {
@@ -71,7 +61,6 @@ export default function Caisse() {
   const [searchTerm, setSearchTerm] = useState('');
   const [listSort, setListSort] = useState<string>('date_desc');
 
-  const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
   const { isSubmitting, withGuard } = useSubmitGuard();
 
   const [formData, setFormData] = useState({
@@ -85,25 +74,12 @@ export default function Caisse() {
     exclutRevenu: false,
   });
 
-  /** Entrée : prélever le montant sur le compte bancaire (solde disponible) */
-  const [deduireSurBanque, setDeduireSurBanque] = useState(true);
-  const [compteBanqueId, setCompteBanqueId] = useState<string>(() => getBankAccounts()[0]?.id ?? '');
-
-  const refreshBankAccounts = () => {
-    setBankAccounts(getBankAccounts());
-  };
-
-  useEffect(() => {
-    refreshBankAccounts();
-  }, []);
-
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
         if (isRemoteCaisse()) {
           await refreshCaisseFromApi();
-          await refreshBankFromApi();
         }
         if (!cancelled) {
           setTransactions(getCaisseTransactions());
@@ -118,10 +94,6 @@ export default function Caisse() {
       cancelled = true;
     };
   }, []);
-
-  useEffect(() => {
-    if (isDialogOpen) refreshBankAccounts();
-  }, [isDialogOpen]);
 
   const expenseInvoiceRefs = useMemo(
     () => new Set(invoices.filter((inv) => inv.expenseId).map((inv) => `facture:${inv.id}`)),
@@ -167,32 +139,6 @@ export default function Caisse() {
     })();
   }, [expenseInvoiceRefs, transactions]);
 
-  /** Recharger les soldes banque depuis le localStorage quand la caisse change (ex. prélèvement lié). */
-  useEffect(() => {
-    refreshBankAccounts();
-  }, [transactions]);
-
-  /** Soldes bancaires recalculés (mouvements API) — dynamique avec dépôts, retraits, caisse liée. */
-  const statsBanque = useMemo(() => {
-    const accs = getBankAccounts();
-    const txs = getBankTransactions();
-    if (accs.length === 0) {
-      return { totalDisponible: 0, parCompte: [] as { id: string; nom: string; solde: number }[] };
-    }
-    const parCompte = accs.map((a) => ({
-      id: a.id,
-      nom: a.nom,
-      solde: calculateAccountBalance(a.id, accs, txs),
-    }));
-    const totalDisponible = parCompte.reduce((s, p) => s + p.solde, 0);
-    return { totalDisponible, parCompte };
-  }, [bankAccounts, transactions]);
-
-  const soldeDisponibleBanque = useMemo(() => {
-    if (!compteBanqueId || !deduireSurBanque || formData.type !== 'entree') return null;
-    return calculateAccountBalance(compteBanqueId, bankAccounts, getBankTransactions());
-  }, [compteBanqueId, deduireSurBanque, formData.type, bankAccounts]);
-
   const saveTransactions = (
     newTransactions: CaisseTransaction[],
     validationSoldeInitial = soldeInitial,
@@ -233,9 +179,9 @@ export default function Caisse() {
   }, 0);
 
   /** Après soldeActuel : évite ReferenceError (TDZ) si déclaré trop tôt. */
-  const tresorerieTotale = soldeActuel + statsBanque.totalDisponible;
+  const tresorerieTotale = soldeActuel;
 
-  /** Créances factures (hors caisse/banque) — même logique que le tableau de bord. */
+  /** Créances factures (hors caisse) — même logique que le tableau de bord. */
   const creancesClients = useMemo(() => getTotalCreancesClients(invoices), [invoices]);
   const positionEntreprise = tresorerieTotale + creancesClients;
 
@@ -260,9 +206,6 @@ export default function Caisse() {
       exclutRevenu: false,
     });
     setEditingTransaction(null);
-    const accs = getBankAccounts();
-    setDeduireSurBanque(accs.length > 0);
-    setCompteBanqueId(accs[0]?.id ?? '');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -275,27 +218,13 @@ export default function Caisse() {
     }
 
     await withGuard(async () => {
-    const shouldDeduireBanque =
-      formData.type === 'entree' &&
-      deduireSurBanque &&
-      Boolean(compteBanqueId) &&
-      getBankAccounts().length > 0;
-
     if (editingTransaction) {
-      const prevLinked = editingTransaction.bankTransactionId;
-
-      if (prevLinked && (formData.type !== 'entree' || !shouldDeduireBanque)) {
-        await removeBankTransactionAsync(prevLinked);
-      }
-
       const base: CaisseTransaction = {
         ...formData,
         id: editingTransaction.id,
         montant,
         utilisateur: editingTransaction.utilisateur || user?.login || 'system',
-        compteBanqueId: undefined,
-        bankTransactionId: undefined,
-        exclutRevenu: undefined,
+        exclutRevenu: formData.type === 'entree' && formData.exclutRevenu ? true : undefined,
       };
 
       const caisseCheck = validateCaisseTransaction(base, {
@@ -306,29 +235,6 @@ export default function Caisse() {
       if (caisseCheck.ok === false) {
         toast.error(caisseCheck.message);
         return;
-      }
-
-      if (formData.type === 'entree' && shouldDeduireBanque) {
-        const oldBankTx: BankTransaction | undefined = prevLinked
-          ? getBankTransactions().find((x) => x.id === prevLinked)
-          : undefined;
-        if (prevLinked) {
-          await removeBankTransactionAsync(prevLinked);
-        }
-        const result = await addRetraitPourCaisse({
-          compteId: compteBanqueId,
-          montant,
-          date: formData.date,
-          descriptionCaisse: formData.description,
-          caisseTransactionId: editingTransaction.id,
-        });
-        if (!result.ok) {
-          if (oldBankTx) await recreateBankTransaction(oldBankTx);
-          toast.error(result.message);
-          return;
-        }
-        base.compteBanqueId = compteBanqueId;
-        base.bankTransactionId = result.bankTransactionId;
       }
 
       try {
@@ -343,7 +249,6 @@ export default function Caisse() {
         toast.success('Transaction modifiée avec succès');
         setIsDialogOpen(false);
         resetForm();
-        refreshBankAccounts();
       } catch (err) {
         toast.error(err instanceof Error ? err.message : 'Erreur enregistrement caisse');
       }
@@ -365,22 +270,6 @@ export default function Caisse() {
       return;
     }
 
-    if (shouldDeduireBanque) {
-      const result = await addRetraitPourCaisse({
-        compteId: compteBanqueId,
-        montant,
-        date: formData.date,
-        descriptionCaisse: formData.description,
-        caisseTransactionId: newId,
-      });
-      if (!result.ok) {
-        toast.error(result.message);
-        return;
-      }
-      newTransaction.compteBanqueId = compteBanqueId;
-      newTransaction.bankTransactionId = result.bankTransactionId;
-    }
-
     try {
       if (isRemoteCaisse()) {
         await saveCaisseTransactionRemote(newTransaction, true);
@@ -392,7 +281,6 @@ export default function Caisse() {
       toast.success('Transaction ajoutée avec succès');
       setIsDialogOpen(false);
       resetForm();
-      refreshBankAccounts();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Erreur enregistrement caisse');
     }
@@ -401,7 +289,6 @@ export default function Caisse() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cette transaction ?')) return;
-    const t = transactions.find((x) => x.id === id);
     const caisseCheck = validateCaisseSoldeInitial(
       soldeInitial,
       transactions.filter((x) => x.id !== id),
@@ -409,9 +296,6 @@ export default function Caisse() {
     if (caisseCheck.ok === false) {
       toast.error(caisseCheck.message);
       return;
-    }
-    if (t?.bankTransactionId) {
-      await removeBankTransactionAsync(t.bankTransactionId);
     }
     try {
       if (isRemoteCaisse()) {
@@ -421,7 +305,6 @@ export default function Caisse() {
       } else {
         saveTransactions(transactions.filter((x) => x.id !== id));
       }
-      refreshBankAccounts();
       toast.success('Transaction supprimée');
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Erreur suppression');
@@ -439,9 +322,6 @@ export default function Caisse() {
       reference: t.reference || '',
       exclutRevenu: t.type === 'entree' && Boolean(t.exclutRevenu),
     });
-    const accs = getBankAccounts();
-    setDeduireSurBanque(Boolean(t.bankTransactionId) || accs.length > 0);
-    setCompteBanqueId(t.compteBanqueId || accs[0]?.id || '');
     setIsDialogOpen(true);
   };
 
@@ -690,8 +570,6 @@ export default function Caisse() {
                           value={formData.type}
                           onValueChange={(v: 'entree' | 'sortie') => {
                             setFormData({ ...formData, type: v, exclutRevenu: false });
-                            if (v === 'sortie') setDeduireSurBanque(false);
-                            else if (getBankAccounts().length > 0) setDeduireSurBanque(true);
                           }}
                         >
                           <SelectTrigger>
@@ -715,57 +593,6 @@ export default function Caisse() {
                         />
                       </div>
                     </div>
-
-                    {formData.type === 'entree' && bankAccounts.length > 0 && (
-                      <div className="space-y-3 rounded-lg border border-dashed border-emerald-200 dark:border-emerald-900/50 p-3 bg-emerald-50/50 dark:bg-emerald-950/20">
-                        <div className="flex items-start gap-2">
-                          <Checkbox
-                            id="deduire-banque"
-                            checked={deduireSurBanque}
-                            onCheckedChange={(c) => setDeduireSurBanque(c === true)}
-                            className="mt-1"
-                          />
-                          <div>
-                            <Label htmlFor="deduire-banque" className="font-medium cursor-pointer">
-                              Prélever sur un compte bancaire
-                            </Label>
-                            <p className="text-xs text-muted-foreground mt-0.5">
-                              Le montant est déduit du solde disponible du compte (mouvement bancaire synchronisé).
-                            </p>
-                          </div>
-                        </div>
-                        {deduireSurBanque && (
-                          <>
-                            <div>
-                              <Label>Compte bancaire</Label>
-                              <Select value={compteBanqueId} onValueChange={setCompteBanqueId}>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Choisir un compte" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {bankAccounts.map((acc) => (
-                                    <SelectItem key={acc.id} value={acc.id}>
-                                      {acc.nom} ({acc.banque})
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            {soldeDisponibleBanque !== null && (
-                              <div className="flex items-center gap-2 text-sm">
-                                <Landmark className="h-4 w-4 text-muted-foreground" />
-                                <span>
-                                  Solde disponible :{' '}
-                                  <strong className="tabular-nums">
-                                    {soldeDisponibleBanque.toLocaleString('fr-FR')} FCFA
-                                  </strong>
-                                </span>
-                              </div>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    )}
 
                     <div>
                       <Label htmlFor="date">Date *</Label>
@@ -895,8 +722,8 @@ export default function Caisse() {
         }
       />
 
-      {/* Statistiques : caisse + banque + trésorerie (tout recalculé à partir des mouvements) */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      {/* Statistiques caisse */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">Caisse (espèces)</CardTitle>
@@ -906,46 +733,6 @@ export default function Caisse() {
               {soldeActuel.toLocaleString('fr-FR')} FCFA
             </div>
             <p className="text-xs text-muted-foreground mt-1">Solde actuel caisse</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <Landmark className="h-4 w-4 text-amber-600" />
-              Solde banque (disponible)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${statsBanque.totalDisponible >= 0 ? 'text-amber-700 dark:text-amber-400' : 'text-red-600'}`}>
-              {statsBanque.totalDisponible.toLocaleString('fr-FR')} FCFA
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Somme des comptes, mise à jour via l’API et les prélèvements vers la caisse
-            </p>
-            {statsBanque.parCompte.length > 1 && (
-              <ul className="mt-2 text-xs text-muted-foreground space-y-0.5 max-h-20 overflow-y-auto">
-                {statsBanque.parCompte.map((c) => (
-                  <li key={c.id} className="flex justify-between gap-2">
-                    <span className="truncate">{c.nom}</span>
-                    <span className="tabular-nums shrink-0">{c.solde.toLocaleString('fr-FR')}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </CardContent>
-        </Card>
-        <Card className="border-primary/30 bg-primary/5 dark:bg-primary/10">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-              <Wallet className="h-4 w-4 text-primary" />
-              Trésorerie totale
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold ${tresorerieTotale >= 0 ? 'text-primary' : 'text-red-600'}`}>
-              {tresorerieTotale.toLocaleString('fr-FR')} FCFA
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">Caisse + tous les comptes banque</p>
           </CardContent>
         </Card>
         <Card>
@@ -1008,8 +795,8 @@ export default function Caisse() {
             Liquidités vs hors trésorerie
           </CardTitle>
           <p className="text-sm text-muted-foreground font-normal">
-            La caisse et la banque = <strong className="text-foreground">liquidités</strong>. Les factures non soldées ={' '}
-            <strong className="text-foreground">créances</strong> (pas encore en caisse/banque dans l’app).
+            La caisse = <strong className="text-foreground">liquidités</strong>. Les factures non soldées ={' '}
+            <strong className="text-foreground">créances</strong> (pas encore en caisse dans l’app).
           </p>
         </CardHeader>
         <CardContent>
@@ -1021,11 +808,11 @@ export default function Caisse() {
               <p className="text-xl font-bold tabular-nums text-emerald-700 dark:text-emerald-400">
                 {tresorerieTotale.toLocaleString('fr-FR')} FCFA
               </p>
-              <p className="text-[11px] text-muted-foreground mt-1">Caisse + banques (ci-dessus)</p>
+              <p className="text-[11px] text-muted-foreground mt-1">Solde caisse (ci-dessus)</p>
             </div>
             <div className="rounded-xl border border-sky-500/30 bg-sky-500/5 dark:bg-sky-950/20 p-4">
               <p className="text-xs font-medium text-sky-800 dark:text-sky-300 mb-2 flex items-center gap-1">
-                <Receipt className="h-3.5 w-3.5" /> Hors caisse &amp; banque
+                <Receipt className="h-3.5 w-3.5" /> Hors caisse
               </p>
               <p className="text-xl font-bold tabular-nums text-sky-700 dark:text-sky-400">
                 {creancesClients.toLocaleString('fr-FR')} FCFA
@@ -1106,7 +893,6 @@ export default function Caisse() {
                   <TableHead>Montant</TableHead>
                   <TableHead>Description</TableHead>
                   <TableHead>Utilisateur</TableHead>
-                  <TableHead className="whitespace-nowrap">Banque</TableHead>
                   <TableHead>Référence</TableHead>
                   {canManageTreasury && (
                     <TableHead className="text-right">Actions</TableHead>
@@ -1116,7 +902,7 @@ export default function Caisse() {
               <TableBody>
                 {sortedTransactions.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={canManageTreasury ? 9 : 8} className="py-4">
+                    <TableCell colSpan={canManageTreasury ? 7 : 6} className="py-4">
                       <EmptyState
                         icon={Wallet}
                         title="Aucune transaction enregistrée"
@@ -1147,16 +933,6 @@ export default function Caisse() {
                       <TableCell>{t.description}</TableCell>
                       <TableCell>
                         <span className="text-xs text-muted-foreground">{t.utilisateur || ''}</span>
-                      </TableCell>
-                      <TableCell>
-                        {t.bankTransactionId ? (
-                          <Badge variant="outline" className="gap-1 font-normal">
-                            <Landmark className="h-3 w-3" />
-                            Prélevé
-                          </Badge>
-                        ) : (
-                          <span className="text-muted-foreground"></span>
-                        )}
                       </TableCell>
                       <TableCell className="font-mono text-xs">{t.reference || '-'}</TableCell>
                       {canManageTreasury && (

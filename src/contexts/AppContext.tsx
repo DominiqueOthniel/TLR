@@ -11,7 +11,6 @@ import {
 } from '@/lib/api';
 import type { ParcelExpeditionPayload } from '@/lib/api';
 import { refreshCaisseFromApi, isRemoteCaisse } from '@/lib/caisse-local';
-import { refreshBankFromApi } from '@/lib/bank-local';
 
 // Types
 export type TruckType = 'tracteur' | 'remorqueuse';
@@ -641,7 +640,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
           refreshInvoices(),
           refreshThirdParties(),
           ...(isRemoteCaisse()
-            ? [refreshCaisseFromApi(), refreshBankFromApi()]
+            ? [refreshCaisseFromApi()]
             : []),
         ]);
         if (!cancelled) setApiError(null);

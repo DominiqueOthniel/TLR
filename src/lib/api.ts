@@ -1,5 +1,5 @@
 ﻿/**
- * Client API pour Transport Logistique et Revolution
+ * Client API pour TLR
  * Communique avec le backend NestJS (préfixe global `/api` sur le serveur).
  */
 

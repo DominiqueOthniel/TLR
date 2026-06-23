@@ -1,6 +1,6 @@
 {
-  "name": "Transport Logistique et Revolution - Gestion de Flotte",
-  "short_name": "Transport Logistique et Revolution",
+  "name": "TLR - Gestion de Flotte",
+  "short_name": "TLR",
   "description": "Application professionnelle de gestion de flotte de camions",
   "start_url": "/",
   "display": "standalone",

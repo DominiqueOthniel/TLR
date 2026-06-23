@@ -13,7 +13,7 @@ export class AppController {
   @Get()
   getHello(): { name: string; version: string; api: string } {
     return {
-      name: 'Transport Logistique et Revolution API',
+      name: 'TLR API',
       version: '1.0.0',
       api: '/api',
     };

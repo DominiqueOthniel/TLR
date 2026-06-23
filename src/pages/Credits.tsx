@@ -401,7 +401,7 @@ export default function Credits() {
     <div className="space-y-6 p-1">
       <PageHeader
         title="Suivi créances"
-        description="Suivi isolé des emprunts et prêts. Ne modifie pas la caisse, la banque ni le tableau de bord"
+        description="Suivi isolé des emprunts et prêts. Ne modifie pas la caisse ni le tableau de bord"
         icon={CreditCard}
         gradient="from-rose-500/15 via-pink-500/8 to-transparent"
         iconColor="from-rose-500 via-pink-500 to-red-600"

@@ -2,12 +2,12 @@
  * Identité visuelle commune à l’application et aux factures PDF.
  */
 
-export const COMPANY_BRAND_NAME = 'Transport Logistique et Revolution';
+export const COMPANY_BRAND_NAME = 'TLR';
 
 export const COMPANY_NAME = 'Transport Logistique et Revolution SARL';
 
 /** Affiché sous « Émetteur » et en pied de facture. */
-export const COMPANY_INVOICE_SHORT_NAME = COMPANY_BRAND_NAME;
+export const COMPANY_INVOICE_SHORT_NAME = 'TLR';
 
 export const COMPANY_TAGLINE =
   'Transport et Logistique gestion de vehicules tiers et prestation de service';
