@@ -2,13 +2,17 @@
  * Identité visuelle commune aux PDF factures (liste + facture unitaire).
  */
 
-export const COMPANY_NAME = 'DIDDI S.A-TLR';
+export const COMPANY_NAME = 'Transport Logique Revolution SARL';
 
-export const COMPANY_TAGLINE = 'Transport et logistique';
+/** Nom court affiché sous « Émetteur » et en pied de facture. */
+export const COMPANY_INVOICE_SHORT_NAME = 'TLR';
 
-export const COMPANY_ADDRESS = 'BP 4807 Douala - Cameroun';
+export const COMPANY_TAGLINE =
+  'Transport et Logistique gestion de vehicules tiers et prestation de service';
 
-export const COMPANY_PHONE = '+237 698 95 46 43 / 678 97 83 84';
+export const COMPANY_ADDRESS = 'Bonapriso Douala';
+
+export const COMPANY_PHONE = '+237 698 95 46 43 / 678 97 83 84 / 698 19 46 43';
 
 export const COMPANY_EMAIL = 'transportlogistiquerevolution@gmail.com';
 

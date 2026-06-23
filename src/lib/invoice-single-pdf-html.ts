@@ -1,6 +1,7 @@
 import type { Expense, Invoice, ParcelExpedition, Trip } from '@/contexts/AppContext';
-import { COMPANY_CONTACT, COMPANY_LOGO_SRC, COMPANY_NAME, COMPANY_TAGLINE } from '@/lib/invoice-branding';
+import { COMPANY_CONTACT, COMPANY_INVOICE_SHORT_NAME, COMPANY_LOGO_SRC, COMPANY_NAME, COMPANY_TAGLINE } from '@/lib/invoice-branding';
 import { formatTripStatusFr } from '@/lib/sync-utils';
+import type { InvoicePartyContact } from '@/lib/invoice-party';
 import { formatLocalDate, parseLocalDateMs } from '@/lib/date-utils';
 
 function escapeHtml(s: string): string {
@@ -22,9 +23,10 @@ export function buildSingleInvoicePdfInnerHtml(opts: {
   parcelExpedition?: ParcelExpedition | null;
   driver?: { prenom: string; nom: string; telephone?: string } | null;
   fournisseurNom?: string | null;
+  partyContact?: InvoicePartyContact;
   getTruckLabel: (id: string) => string;
 }): string {
-  const { invoice, dejaPaye, resteAPayer, trip, expense, parcelExpedition, driver, fournisseurNom, getTruckLabel } =
+  const { invoice, dejaPaye, resteAPayer, trip, expense, parcelExpedition, driver, fournisseurNom, partyContact, getTruckLabel } =
     opts;
 
   const statusLabel =
@@ -40,6 +42,15 @@ export function buildSingleInvoicePdfInnerHtml(opts: {
       : parcelExpedition
         ? parcelClientsSummary(parcelExpedition)
         : '';
+
+  const partyDetailsLines: string[] = [];
+  const partyTel = partyContact?.telephone?.trim();
+  const partyAddr = partyContact?.adresse?.trim();
+  if (partyTel) partyDetailsLines.push(`Tél. ${escapeHtml(partyTel)}`);
+  if (partyAddr) partyDetailsLines.push(escapeHtml(partyAddr));
+  const partyDetailsHtml = partyDetailsLines.length
+    ? `<p class="text-xs text-gray-600 mt-1" style="line-height:1.35;">${partyDetailsLines.join('<br/>')}</p>`
+    : '';
 
   let detailBlock = '';
   if (trip) {
@@ -64,7 +75,6 @@ export function buildSingleInvoicePdfInnerHtml(opts: {
                           <td class="p-2">
                             <div>
                               <p class="font-semibold">Transport ${trip.origine} → ${trip.destination}</p>
-                              ${driver ? `<p class="text-xs text-gray-600">Chauffeur : ${driver.prenom} ${driver.nom}</p>` : ''}
                               ${trip.marchandise ? `<p class="text-xs text-gray-600">Marchandise : ${trip.marchandise}</p>` : ''}
                               ${trip.description ? `<p class="text-xs text-gray-600">${escapeHtml(trip.description)}</p>` : ''}
                             </div>
@@ -223,12 +233,13 @@ export function buildSingleInvoicePdfInnerHtml(opts: {
           <div class="grid grid-cols-2 gap-4 mb-4 pb-3 border-b border-gray-200">
             <div>
               <h2 class="font-bold text-xs mb-1 uppercase" style="letter-spacing:0.1em;color:#64748b;">Émetteur</h2>
-              <p class="font-bold text-base" style="color:#0f172a;">${COMPANY_NAME}</p>
-              <p class="text-xs text-gray-600 mt-1" style="line-height:1.35;">Transport de marchandises<br/>${COMPANY_CONTACT}</p>
+              <p class="font-bold text-base" style="color:#0f172a;">${COMPANY_INVOICE_SHORT_NAME}</p>
+              <p class="text-xs text-gray-600 mt-1" style="line-height:1.35;">${COMPANY_TAGLINE}<br/>${COMPANY_CONTACT}</p>
             </div>
             <div class="text-right">
               <h2 class="font-bold text-xs mb-1 uppercase" style="letter-spacing:0.1em;color:#64748b;">${partyLabel}</h2>
               <p class="font-semibold text-base" style="color:#0f172a;">${escapeHtml(partyName)}</p>
+              ${partyDetailsHtml}
             </div>
           </div>
 
@@ -284,7 +295,7 @@ export function buildSingleInvoicePdfInnerHtml(opts: {
           ${notesBlock}
 
           <div class="mt-4 pt-3 border-t-2 border-gray-300 text-center">
-            <p class="font-bold text-sm">${COMPANY_NAME}</p>
+            <p class="font-bold text-sm">${COMPANY_INVOICE_SHORT_NAME}</p>
             <p class="text-sm text-gray-600 mt-1">Merci pour votre confiance.</p>
           </div>
         </div>

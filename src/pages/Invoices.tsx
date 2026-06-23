@@ -42,7 +42,8 @@ import {
   validateCaisseTransaction,
 } from '@/lib/caisse-local';
 import { AppLogo } from '@/components/AppLogo';
-import { COMPANY_CONTACT, COMPANY_NAME, COMPANY_TAGLINE } from '@/lib/invoice-branding';
+import { COMPANY_CONTACT, COMPANY_INVOICE_SHORT_NAME, COMPANY_NAME, COMPANY_TAGLINE } from '@/lib/invoice-branding';
+import { resolveInvoicePartyContact } from '@/lib/invoice-party';
 import { buildSingleInvoicePdfInnerHtml } from '@/lib/invoice-single-pdf-html';
 import { frCollator, parseDateMs, stableSort } from '@/lib/list-sort';
 import { ListSortSelect } from '@/components/ListSortSelect';
@@ -1016,6 +1017,11 @@ export default function Invoices() {
       const expenseSupplier = expense?.fournisseurId
         ? thirdParties.find((tp) => tp.id === expense.fournisseurId)
         : null;
+      const partyContact = resolveInvoicePartyContact(thirdParties, {
+        trip,
+        expenseSupplier,
+        parcelExpedition: parcelEx ?? null,
+      });
 
       const pdfContent = document.createElement('div');
       pdfContent.className = 'invoice-print bg-white text-black';
@@ -1028,6 +1034,7 @@ export default function Invoices() {
         parcelExpedition: parcelEx ?? null,
         driver: driver ?? null,
         fournisseurNom: expenseSupplier?.nom ?? null,
+        partyContact,
         getTruckLabel,
       });
 
@@ -2492,6 +2499,11 @@ export default function Invoices() {
             const expenseDriver = expense?.chauffeurId ? drivers.find(d => d.id === expense.chauffeurId) : null;
             const expenseTruck = expense?.camionId ? trucks.find(t => t.id === expense.camionId) : null;
             const expenseSupplier = expense?.fournisseurId ? thirdParties.find(tp => tp.id === expense.fournisseurId) : null;
+            const partyContact = resolveInvoicePartyContact(thirdParties, {
+              trip,
+              expenseSupplier,
+              parcelExpedition: parcelEx ?? null,
+            });
             
             return (
               <>
@@ -2575,8 +2587,9 @@ export default function Invoices() {
                   {/* En-tête de facture */}
                   <div className="border-b pb-4 print:pb-3 print:border-blue-200">
                     <div className="grid grid-cols-2 gap-6">
-                      <div className="print:hidden">
-                        <h3 className="font-bold text-lg mb-2 text-blue-900">{COMPANY_NAME}</h3>
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">Émetteur</p>
+                        <h3 className="font-bold text-lg mb-1 text-blue-900">{COMPANY_INVOICE_SHORT_NAME}</h3>
                         <p className="text-sm text-muted-foreground">
                           {COMPANY_TAGLINE}<br />
                           {COMPANY_CONTACT}
@@ -2585,20 +2598,38 @@ export default function Invoices() {
                       <div className="text-right">
                         {isExpenseInvoice ? (
                           <>
-                            <p className="text-sm text-muted-foreground">Fournisseur:</p>
+                            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">Fournisseur</p>
                             <p className="font-semibold">{expenseSupplier?.nom || 'N/A'}</p>
+                            {partyContact.telephone && (
+                              <p className="text-sm text-muted-foreground mt-1">Tél. {partyContact.telephone}</p>
+                            )}
+                            {partyContact.adresse && (
+                              <p className="text-sm text-muted-foreground">{partyContact.adresse}</p>
+                            )}
                           </>
                         ) : isParcelInvoice && parcelEx ? (
                           <>
-                            <p className="text-sm text-muted-foreground">Clients (lignes colis)</p>
+                            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">Clients</p>
                             <p className="font-semibold max-w-md ml-auto">
                               {[...new Set(parcelEx.lots.map((l) => l.clients?.trim()).filter(Boolean) as string[])].join(', ') || ''}
                             </p>
+                            {partyContact.telephone && (
+                              <p className="text-sm text-muted-foreground mt-1">Tél. {partyContact.telephone}</p>
+                            )}
+                            {partyContact.adresse && (
+                              <p className="text-sm text-muted-foreground">{partyContact.adresse}</p>
+                            )}
                           </>
                         ) : (
                           <>
-                            <p className="text-sm text-muted-foreground">Client:</p>
+                            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">Client</p>
                             <p className="font-semibold">{trip?.client || 'N/A'}</p>
+                            {partyContact.telephone && (
+                              <p className="text-sm text-muted-foreground mt-1">Tél. {partyContact.telephone}</p>
+                            )}
+                            {partyContact.adresse && (
+                              <p className="text-sm text-muted-foreground">{partyContact.adresse}</p>
+                            )}
                           </>
                         )}
                       </div>
