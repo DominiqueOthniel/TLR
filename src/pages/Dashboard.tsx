@@ -65,7 +65,7 @@ export default function Dashboard() {
       if (!response.ok) throw new Error('Erreur lors de la génération du backup');
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
-      const filename = `diddi-tlr-backup-${new Date().toISOString().split('T')[0]}.json`;
+      const filename = `transport-logistique-revolution-backup-${new Date().toISOString().split('T')[0]}.json`;
       const a = document.createElement('a');
       a.href = url;
       a.download = filename;

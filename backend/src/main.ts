@@ -63,7 +63,7 @@ async function bootstrap() {
   const httpAdapter = app.getHttpAdapter();
   httpAdapter.get('/', (req: any, res: any) => {
     res.json({
-      name: 'DIDDI S.A-TLR API',
+      name: 'Transport Logistique et Revolution API',
       version: '1.0.0',
       api: '/api',
       docs: 'GET /api pour l’API, GET /api/health pour le health check.',
@@ -84,7 +84,7 @@ async function bootstrap() {
   const host = process.env.HOST || '0.0.0.0';
   await app.listen(port, host);
 
-  console.log(`🚚 DIDDI S.A-TLR API: http://${host}:${port}/api`);
+  console.log(`🚚 Transport Logistique et Revolution API: http://${host}:${port}/api`);
 }
 
 bootstrap();

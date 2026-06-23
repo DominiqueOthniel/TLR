@@ -1,6 +1,6 @@
 {
-  "name": "DIDDI S.A-TLR - Gestion de Flotte",
-  "short_name": "DIDDI S.A-TLR",
+  "name": "Transport Logistique et Revolution - Gestion de Flotte",
+  "short_name": "Transport Logistique et Revolution",
   "description": "Application professionnelle de gestion de flotte de camions",
   "start_url": "/",
   "display": "standalone",

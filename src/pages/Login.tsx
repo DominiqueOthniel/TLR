@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Shield, Eye, EyeOff, Lock, User, ArrowRight } from 'lucide-react';
 import { AppLogo } from '@/components/AppLogo';
+import { COMPANY_BRAND_NAME } from '@/lib/invoice-branding';
 import { useAuth, LOGIN_USER_OPTIONS } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
@@ -205,7 +206,7 @@ export default function Login() {
           {/* Footer */}
           <div className="mt-7 flex items-center justify-center gap-2 text-white/30 text-xs">
             <Lock className="h-3 w-3" />
-            <span>Connexion sécurisée, DIDDI S.A-TLR © {new Date().getFullYear()}</span>
+            <span>Connexion sécurisée, {COMPANY_BRAND_NAME} © {new Date().getFullYear()}</span>
           </div>
         </div>
       </div>

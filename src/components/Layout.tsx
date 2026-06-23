@@ -27,6 +27,7 @@ import { useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AppLogo } from '@/components/AppLogo';
+import { COMPANY_BRAND_NAME } from '@/lib/invoice-branding';
 
 const SIDEBAR_HIDDEN_KEY = 'goofe_sidebar_desktop_hidden';
 const GLAUNET_SIDEBAR_HIDDEN_KEY = 'glaunet_sidebar_desktop_hidden';
@@ -242,7 +243,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className="hidden sm:flex items-center gap-2 shrink-0">
               <AppLogo variant="compact" />
               <div className="leading-tight">
-                <p className="text-sm font-bold tracking-tight text-slate-800 dark:text-slate-100">DIDDI S.A-TLR</p>
+                <p className="text-sm font-bold tracking-tight text-slate-800 dark:text-slate-100">{COMPANY_BRAND_NAME}</p>
                 <p className="text-[9px] uppercase tracking-[0.18em] text-muted-foreground">Transport</p>
               </div>
             </div>
@@ -312,7 +313,7 @@ function SidebarContent({
         <div className="flex items-center gap-3 min-w-0">
           <AppLogo variant="compact" />
           <div className="min-w-0">
-            <p className="text-lg font-bold leading-none tracking-tight text-white">DIDDI S.A-TLR</p>
+            <p className="text-lg font-bold leading-none tracking-tight text-white">{COMPANY_BRAND_NAME}</p>
             <p className="mt-1 text-[9px] font-medium uppercase tracking-[0.18em] text-sidebar-foreground/[0.55]">
               Transport et logistique
             </p>
@@ -381,7 +382,7 @@ function SidebarContent({
           Déconnexion
         </button>
         <p className="text-center text-[10px] text-sidebar-foreground/25 mt-3">
-          © {new Date().getFullYear()} DIDDI S.A-TLR
+          © {new Date().getFullYear()} {COMPANY_BRAND_NAME}
         </p>
       </div>
     </div>

@@ -2,6 +2,7 @@
 import {
   COMPANY_CONTACT,
   COMPANY_LOGO_SRC,
+  COMPANY_BRAND_NAME,
   COMPANY_NAME,
   COMPANY_TAGLINE,
 } from '@/lib/invoice-branding';
@@ -581,7 +582,7 @@ export function exportToPrintablePDF<T>(options: ExportOptions<T> | PDFExportOpt
         </div>
         ` : ''}
         <div class="footer">
-          Document généré automatiquement par DIDDI S.A-TLR • ${currentDate}
+          Document généré automatiquement par ${COMPANY_BRAND_NAME} • ${currentDate}
         </div>
       </body>
     </html>

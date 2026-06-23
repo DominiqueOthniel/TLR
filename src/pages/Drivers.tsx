@@ -17,7 +17,7 @@ import { exportToExcel, exportToPrintablePDF } from '@/lib/export-utils';
 import { EMOJI } from '@/lib/emoji-palette';
 import { frCollator, stableSort } from '@/lib/list-sort';
 import { ListSortSelect } from '@/components/ListSortSelect';
-import { formatLocalDate, parseLocalDateMs } from '@/lib/date-utils';
+import { COMPANY_BRAND_NAME } from '@/lib/invoice-branding';
 
 const DRIVER_SORT_OPTIONS = [
   { value: 'nom_asc', label: 'Nom A → Z' },
@@ -693,7 +693,7 @@ export default function Drivers() {
           ${driversContent}
           
           <div class="footer">
-            Document généré automatiquement par DIDDI S.A-TLR • ${currentDate}
+            Document généré automatiquement par ${COMPANY_BRAND_NAME} • ${currentDate}
           </div>
         </body>
       </html>

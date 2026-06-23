@@ -1,7 +1,7 @@
 {
   "name": "goofe-api",
   "version": "1.0.0",
-  "description": "API NestJS pour DIDDI S.A-TLR",
+  "description": "API NestJS pour Transport Logistique et Revolution",
   "scripts": {
     "build": "npx nest build",
     "start": "nest start",

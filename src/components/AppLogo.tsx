@@ -1,4 +1,5 @@
 ﻿import { cn } from '@/lib/utils';
+import { COMPANY_BRAND_NAME } from '@/lib/invoice-branding';
 
 /** Logo officiel servi depuis `public/tlr-logo.jpeg`. */
 export const APP_LOGO_SRC = `${import.meta.env.BASE_URL}tlr-logo.jpeg`;
@@ -63,7 +64,7 @@ const variantConfig: Record<
 export function AppLogo({
   variant = 'sidebar',
   className,
-  alt = 'DIDDI S.A-TLR, gestion de flotte',
+  alt = `${COMPANY_BRAND_NAME}, gestion de flotte`,
 }: {
   variant?: AppLogoVariant;
   className?: string;

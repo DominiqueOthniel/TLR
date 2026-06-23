@@ -1,5 +1,5 @@
 ﻿/**
- * Client API pour DIDDI S.A-TLR
+ * Client API pour Transport Logistique et Revolution
  * Communique avec le backend NestJS (préfixe global `/api` sur le serveur).
  */
 
